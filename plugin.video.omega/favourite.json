@@ -1,0 +1,27 @@
+{
+  "action": "mainlist",
+  "category": "OMEGA",
+  "channel": "omega",
+  "context": [
+    {
+      "action": "channel_config",
+      "channel": "setting",
+      "config": "omega",
+      "from_action": "mainlist",
+      "from_channel": "omega",
+      "title": "Configurar canal"
+    }
+  ],
+  "fanart": "/resources/media/channels/fanart/omega.gif",
+  "frequency": 2,
+  "infoLabels": {
+    "mediatype": "list"
+  },
+  "language": [
+    "cast"
+  ],
+  "thumbnail": "/resources/media/channels/thumb/omega.gif",
+  "title": "OMEGA",
+  "totalItems": 0,
+  "viewmode": "list"
+}

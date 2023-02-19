@@ -1,0 +1,211 @@
+{
+  "id": "omega",
+  "name": "OMEGA",
+  "active": true,
+  "adult": false,
+  "language": [
+    "cast"
+  ],
+  "thumbnail": "omega.gif",
+  "banner": "omega.gif",
+  "fanart": "omega.gif",
+  "categories": [
+    "movie",
+    "tvshow"
+  ],
+  "settings": [
+    {
+      "id": "omega_user",
+      "type": "text",
+      "label": "Usuario de noestasinvitado.com:",
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "omega_password",
+      "type": "text",
+      "hidden": true,
+      "label": "Password de noestasinvitado.com:",
+      "enabled": "!eq(-1,'')",
+      "visible": true
+    },
+    {
+      "id": "omega_blacklist_uploaders",
+      "type": "text",
+      "label": "UPLOADERS IGNORADOS (separar por comas):",
+      "default": "",
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "omega_blacklist_titles",
+      "type": "text",
+      "label": "IGNORAR TÍTULOS que contengan (separar por comas):",
+      "default": "",
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "omega_realdebrid",
+      "type": "bool",
+      "label": "Usar REALDEBRID",
+      "default": false,
+      "enabled": "eq(1,false)",
+      "visible": "eq(1,false)"
+    },
+    {
+      "id": "omega_alldebrid",
+      "type": "bool",
+      "label": "Usar ALLDEBRID",
+      "default": false,
+      "enabled": "eq(-1,false)",
+      "visible": "eq(-1,false)"
+    },
+    {
+      "id": "omega_debrid_mega_email1",
+      "type": "text",
+      "label": "Email #1 de MEGA (DEBRID):",
+      "enabled": "eq(-2,true)|eq(-1,true)",
+      "visible": "eq(-2,true)|eq(-1,true)"
+    },
+    {
+      "id": "omega_debrid_mega_password1",
+      "type": "text",
+      "hidden": true,
+      "label": "Password #1 de MEGA (DEBRID):",
+      "enabled": "eq(-3,true)|eq(-2,true)",
+      "visible": "eq(-3,true)|eq(-2,true)"
+    },
+    {
+      "id": "omega_debrid_mega_email2",
+      "type": "text",
+      "label": "Email #2 de MEGA (DEBRID):",
+      "enabled": "eq(-4,true)|eq(-3,true)",
+      "visible": "eq(-4,true)|eq(-3,true)"
+    },
+    {
+      "id": "omega_debrid_mega_password2",
+      "type": "text",
+      "hidden": true,
+      "label": "Password #2 de MEGA (DEBRID):",
+      "enabled": "eq(-5,true)|eq(-4,true)",
+      "visible": "eq(-5,true)|eq(-4,true)"
+    },
+    {
+      "id": "omega_debrid_mega_email3",
+      "type": "text",
+      "label": "Email #3 de MEGA (DEBRID):",
+      "enabled": "eq(-6,true)|eq(-5,true)",
+      "visible": "eq(-6,true)|eq(-5,true)"
+    },
+    {
+      "id": "omega_debrid_mega_password3",
+      "type": "text",
+      "hidden": true,
+      "label": "Password #3 de MEGA (DEBRID):",
+      "enabled": "eq(-7,true)|eq(-6,true)",
+      "visible": "eq(-7,true)|eq(-6,true)"
+    },
+    {
+      "id": "omega_debrid_mega_email4",
+      "type": "text",
+      "label": "Email #4 de MEGA (DEBRID):",
+      "enabled": "eq(-8,true)|eq(-7,true)",
+      "visible": "eq(-8,true)|eq(-7,true)"
+    },
+    {
+      "id": "omega_debrid_mega_password4",
+      "type": "text",
+      "hidden": true,
+      "label": "Password #4 de MEGA (DEBRID):",
+      "enabled": "eq(-9,true)|eq(-8,true)",
+      "visible": "eq(-9,true)|eq(-8,true)"
+    },
+    {
+      "id": "omega_debrid_mega_email5",
+      "type": "text",
+      "label": "Email #5 de MEGA (DEBRID):",
+      "enabled": "eq(-10,true)|eq(-9,true)",
+      "visible": "eq(-10,true)|eq(-9,true)"
+    },
+    {
+      "id": "omega_debrid_mega_password5",
+      "type": "text",
+      "hidden": true,
+      "label": "Password #5 de MEGA (DEBRID):",
+      "enabled": "eq(-11,true)|eq(-10,true)",
+      "visible": "eq(-11,true)|eq(-10,true)"
+    },
+    {
+      "id": "omega_debrid_mega_url",
+      "type": "text",
+      "label": "Cuentas MEGA DEBRID (URL):",
+      "default": "",
+      "enabled": "eq(-12,true)|eq(-11,true)",
+      "visible": "eq(-12,true)|eq(-11,true)"
+    },
+    {
+      "id": "omega_debrid_proxy_port",
+      "type": "text",
+      "label": "Puerto para DEBRID proxy:",
+      "default": "21447",
+      "enabled": "eq(-13,true)|eq(-12,true)",
+      "visible": "eq(-13,true)|eq(-12,true)"
+    },
+    {
+      "id": "omega_mega_proxy_list",
+      "type": "text",
+      "label": "Lista de proxys para MEGA (URL):",
+      "default": "",
+      "enabled": "eq(-14,false)+eq(-13,false)",
+      "visible": "eq(-14,false)+eq(-13,false)"
+    },
+    {
+      "id": "omega_mega_premium",
+      "type": "bool",
+      "label": "Usar cuenta PREMIUM de MEGA",
+      "default": false,
+      "enabled": "eq(-15,false)+eq(-14,false)",
+      "visible": "eq(-15,false)+eq(-14,false)"
+    },
+    {
+      "id": "omega_mega_email",
+      "type": "text",
+      "label": "Email de MEGA:",
+      "enabled": "eq(-1,true)",
+      "visible": "eq(-1,true)"
+    },
+    {
+      "id": "omega_mega_password",
+      "type": "text",
+      "hidden": true,
+      "label": "Password de MEGA:",
+      "enabled": "eq(-2,true)",
+      "visible": "eq(-2,true)"
+    },
+    {
+      "id": "omega_use_mc_reverse",
+      "type": "bool",
+      "label": "Usar MEGACRYPTER REVERSE MODE (requiere abrir puerto)",
+      "default": false,
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "omega_mc_reverse_port",
+      "type": "text",
+      "label": "Puerto para MEGACRYPTER REVERSE MODE:",
+      "default": "9998",
+      "enabled": "eq(-1,true)",
+      "visible": "eq(-1,true)"
+    },
+    {
+      "id": "include_in_global_search",
+      "type": "bool",
+      "label": "Incluir OMEGA en la búsqueda global",
+      "default": true,
+      "enabled": true,
+      "visible": true
+    }
+  ]
+}

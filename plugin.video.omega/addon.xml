@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<addon id="plugin.video.omega" name="Omega" version="0.0.1" provider-name="tonikelope">
+    <requires>
+        <import addon="plugin.video.alfa"/>
+    </requires>
+    <extension point="xbmc.python.pluginsource" library="addon.py">
+        <provides>video</provides>
+    </extension>
+    <extension point="xbmc.addon.metadata">
+        <summary lang="es">NOESTASINVITADO.COM</summary>
+        <description lang="es">Navega por NOESTASINVITADO.COM con Kodi</description>
+        <disclaimer lang="es">[COLOR red]Los propietarios y distribuidores de este addon no proveen ni distribuyen ningún contenido mostrado por el addon ni tienen afiliación alguna con los proveedores del contenido.[/COLOR]</disclaimer>
+        <language>es</language> <!-- the language of the videos or other content the plugin provides, may be omitted in case the addon does not provide any content -->
+        <platform>all</platform>
+        <license>GNU GPL v3</license>
+        <forum>https://noestasinvitado.com</forum> <!-- may be omitted  -->
+        <website>https://noestasinvitado.com</website> <!-- the url of the website that contains the videos (or the official website of your plugin). May be omitted.  -->
+        <email>tonikelope@gmail.com</email> <!-- may be left omitted  -->
+        <source>https://github.com/tonikelope/omega/tree/master/plugin.video.omega</source>
+        <news></news>
+        <assets>
+            <icon>resources/icon.gif</icon>
+            <fanart>resources/fanart.png</fanart>
+        </assets>
+    </extension>
+    <extension point="xbmc.service" library="watchdog.py" start="login|startup"></extension>
+</addon>
