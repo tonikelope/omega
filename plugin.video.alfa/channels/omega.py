@@ -27,9 +27,9 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.61"
+OMEGA_VERSION = "3.62"
 
-config.set_setting("unify", "false");
+config.set_setting("unify", "false")
 
 OMEGA_LOGIN = config.get_setting("omega_user", "omega")
 
@@ -75,7 +75,7 @@ ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/master/plugin.vid
 
 ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
-OMEGA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.omega/');
+OMEGA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.omega/')
 
 DEFAULT_HTTP_TIMEOUT = 120 #Para no pillarnos los dedos al generar enlaces Megacrypter
 
@@ -115,7 +115,7 @@ if USE_MC_REVERSE:
 
         MC_REVERSE_PORT = int(config.get_setting("omega_mc_reverse_port", "omega"))
 
-        if MC_REVERSE_PORT >= 1024 and MC_REVERSE_PORT <= 65535:
+        if 1024 <= MC_REVERSE_PORT <= 65535:
             MC_REVERSE_PASS = hashlib.sha1(OMEGA_LOGIN.encode('utf-8')).hexdigest()
 
             MC_REVERSE_DATA = str(MC_REVERSE_PORT) + ":" + base64.b64encode(
@@ -429,7 +429,7 @@ def thumbnail_refresh(item):
     if ret:
 
         try:
-            os.remove(xbmcvfs.translatePath('special://userdata/Database/Textures13.db'));
+            os.remove(xbmcvfs.translatePath('special://userdata/Database/Textures13.db'))
 
             shutil.rmtree(xbmcvfs.translatePath('special://userdata/Thumbnails'))
 
