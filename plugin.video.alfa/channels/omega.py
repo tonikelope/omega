@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.60"
+OMEGA_VERSION = "3.61"
 
 config.set_setting("unify", "false");
 
@@ -604,16 +604,16 @@ def isVideoFilename(filename):
 def bibliotaku_buscar(item, text):
     itemlist = []
 
-    itemlist.extend(bibliotaku_pelis(Item(channel=item.channel, viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (PELÍCULAS)", section="PELÍCULAS", mode="movie", action="bibliotaku_pelis",
+    itemlist.extend(bibliotaku_pelis(Item(channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (PELÍCULAS)", section="PELÍCULAS", mode="movie", action="bibliotaku_pelis",
                                  url='#'.join(BIBLIOTAKU_PELIS_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_peliculas.png")))
 
-    itemlist.extend(bibliotaku_series(Item(channel=item.channel, viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (SERIES)", section="SERIES", mode="tvshow", action="bibliotaku_series",
+    itemlist.extend(bibliotaku_series(Item(channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (SERIES)", section="SERIES", mode="tvshow", action="bibliotaku_series",
                          url='#'.join(BIBLIOTAKU_SERIES_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", tthumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_peliculas.png")))
 
-    itemlist.extend(bibliotaku_series(Item(channel=item.channel, viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (ANIME)", section="ANIME", mode="tvshow", action="bibliotaku_series",
+    itemlist.extend(bibliotaku_series(Item(channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (ANIME)", section="ANIME", mode="tvshow", action="bibliotaku_series",
                          url='#'.join(BIBLIOTAKU_ANIME_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_anime.png")))
 
-    itemlist.extend(bibliotaku_series(Item(channel=item.channel, viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (DONGHUA)", section="DONGHUA", mode="tvshow", action="bibliotaku_series",
+    itemlist.extend(bibliotaku_series(Item(channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (DONGHUA)", section="DONGHUA", mode="tvshow", action="bibliotaku_series",
                          url='#'.join(BIBLIOTAKU_DONGHUA_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_donghua.png")))
 
     search_itemlist = []
