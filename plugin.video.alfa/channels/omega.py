@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.59"
+OMEGA_VERSION = "3.60"
 
 config.set_setting("unify", "false");
 
@@ -1442,14 +1442,19 @@ def find_video_gvideo_links(item, data):
 
     if matches:
 
+        title = '[GVIDEO] ' + item.title
+
+        if hashlib.sha1(title.encode('utf-8')).hexdigest() in HISTORY:
+            title = "[COLOR lightgreen][B](VISTO)[/B][/COLOR] " + title
+
         if len(matches) > 1:
 
             for url in list(OrderedDict.fromkeys(matches)):
                 itemlist.append(
-                    Item(channel=item.channel, action="play", server='gvideo', title='[GVIDEO] ' + item.title, url=url,
+                    Item(channel=item.channel, visto_title=title, context=[{"title":"MARCAR VISTO (OMEGA)", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='gvideo', title=title, url=url,
                          mode=item.mode))
         else:
-            itemlist.append(Item(channel=item.channel, action="play", server='gvideo', title='[GVIDEO] ' + item.title,
+            itemlist.append(Item(channel=item.channel, visto_title=title, context=[{"title":"MARCAR VISTO (OMEGA)", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='gvideo', title=title,
                                  url=matches[0], mode=item.mode))
 
         if item.id_topic:
@@ -1755,7 +1760,7 @@ def get_video_mega_links_group(item):
                                 infoLabels['playcount']=1 if '(VISTO)' in title else 0
 
                             itemlist.append(
-                                Item(channel=item.channel, action="play", server='nei', title=title, url=url + '#' + MC_REVERSE_DATA + '#' + mega_sid, thumbnail=get_omega_resource_path("megacrypter.png"), mode=item.mode, infoLabels=infoLabels))
+                                Item(channel=item.channel, visto_title=title, context=[{"title":"MARCAR VISTO (OMEGA)", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=title, url=url + '#' + MC_REVERSE_DATA + '#' + mega_sid, thumbnail=get_omega_resource_path("megacrypter.png"), mode=item.mode, infoLabels=infoLabels))
 
                     i=i+1
 
@@ -1789,7 +1794,7 @@ def get_video_mega_links_group(item):
 
             infoLabels=item.infoLabels
 
-            itemlist.append(Item(channel=item.channel, action="play", server='nei', title=title, url=murl, thumbnail=get_omega_resource_path("megacrypter.png"), mode=item.mode, infoLabels=infoLabels))
+            itemlist.append(Item(channel=item.channel, visto_title=title, context=[{"title":"MARCAR VISTO (OMEGA)", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=title, url=murl, thumbnail=get_omega_resource_path("megacrypter.png"), mode=item.mode, infoLabels=infoLabels))
         
         elif len(multi_url)>0 and len(multi_url) != tot_multi_url:
             itemlist.append(Item(channel=item.channel,title="[COLOR white][B]ERROR AL GENERAR EL ENLACE MULTI (¿TODAS LAS PARTES DISPONIBLES?)[/B][/COLOR]", action="", url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
@@ -2062,7 +2067,18 @@ def extract_quality(title):
 def play(item):
     itemlist = []
 
-    checksum = hashlib.sha1(item.title.replace("[COLOR lightgreen][B](VISTO)[/B][/COLOR] ", '').encode('utf-8')).hexdigest()
+    marcar_item_visto(item, False)
+
+    itemlist.append(item)
+
+    return itemlist
+
+
+def marcar_item_visto(item, notify=True):
+
+    title = item.visto_title if "visto_title" in item else item.title
+    
+    checksum = hashlib.sha1(title.replace("[COLOR lightgreen][B](VISTO)[/B][/COLOR] ", '').encode('utf-8')).hexdigest()
 
     if checksum not in HISTORY:
         HISTORY.append(checksum)
@@ -2070,9 +2086,8 @@ def play(item):
         with open(KODI_NEI_HISTORY_PATH, "a+") as file:
             file.write((checksum + "\n"))
 
-    itemlist.append(item)
-
-    return itemlist
+        if notify:
+            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "MARCADO COMO VISTO (puede que tengas que refrescar la página)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def customize_title(item):
