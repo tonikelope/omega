@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.omega" name="Omega" version="0.0.1" provider-name="tonikelope">
+<addon id="plugin.video.omega" name="Omega" version="0.0.2" provider-name="tonikelope">
     <requires>
         <import addon="plugin.video.alfa"/>
     </requires>
@@ -16,11 +16,10 @@
         <forum>https://noestasinvitado.com</forum> <!-- may be omitted  -->
         <website>https://noestasinvitado.com</website> <!-- the url of the website that contains the videos (or the official website of your plugin). May be omitted.  -->
         <email>tonikelope@gmail.com</email> <!-- may be left omitted  -->
-        <source>https://github.com/tonikelope/omega/tree/master/plugin.video.omega</source>
+        <source>https://github.com/tonikelope/omega</source>
         <news></news>
         <assets>
             <icon>resources/icon.gif</icon>
-            <fanart>resources/fanart.png</fanart>
         </assets>
     </extension>
     <extension point="xbmc.service" library="watchdog.py" start="login|startup"></extension>
