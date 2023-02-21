@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.62"
+OMEGA_VERSION = "3.63"
 
 config.set_setting("unify", "false")
 
@@ -1009,18 +1009,18 @@ def foro(item):
 
         if len(itemlist) == 0:
 
-            itemlist.append(Item(channel=item.channel,title="[COLOR white][B]NO HAY ENLACES SOPORTADOS DISPONIBLES[/B][/COLOR]", action="sinEnlaces", url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+            itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR white][B]NO HAY ENLACES SOPORTADOS DISPONIBLES[/B][/COLOR]", action="sinEnlaces", url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
-            itemlist.append(Item(channel=item.channel, url_orig=item.url_orig, viewcontent="movies", viewmode="list", url=item.url, id_topic=item.id_topic, title="[B][COLOR lightgrey]MENSAJES DEL FORO[/COLOR][/B]", contentPlot="[I]Mensajes sobre: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leerMensajesHiloForo", thumbnail='https://noestasinvitado.com/logonegro2.png'))
+            itemlist.append(Item(channel=item.channel, fanart=item.fanart, url_orig=item.url_orig, viewcontent="movies", viewmode="list", url=item.url, id_topic=item.id_topic, title="[B][COLOR lightgrey]MENSAJES DEL FORO[/COLOR][/B]", contentPlot="[I]Mensajes sobre: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leerMensajesHiloForo", thumbnail='https://noestasinvitado.com/logonegro2.png'))
 
-            itemlist.append(Item(channel=item.channel, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=False, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+            itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=False, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
             if item.uploader:
-                itemlist.append(Item(channel=item.channel, title="[COLOR yellow][B]IGNORAR TODO EL CONTENIDO DE "+item.uploader+"[/B][/COLOR]", uploader=item.uploader, action="ignore_uploader", url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+                itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR yellow][B]IGNORAR TODO EL CONTENIDO DE "+item.uploader+"[/B][/COLOR]", uploader=item.uploader, action="ignore_uploader", url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
         else:
-            itemlist.append(Item(channel=item.channel, title="PERSONALIZAR TÍTULO", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+            itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="PERSONALIZAR TÍTULO", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
-            itemlist.append(Item(channel=item.channel, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+            itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
     
     if not video_links:
@@ -1110,7 +1110,7 @@ def foro(item):
 
                     logger.info("ID_FORO "+id_foro)
 
-                    itemlist.append(Item(channel=item.channel, parent_title=item.parent_title, viewcontent="movies", viewmode=("poster" if id_foro in FOROS_FINALES_NEI else "list"), mode=item.mode, thumbnail=thumbnail, section=item.section, action=action, title=title, url=url, contentTitle=content_title, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
+                    itemlist.append(Item(channel=item.channel, fanart=item.fanart, parent_title=item.parent_title, viewcontent="movies", viewmode=("poster" if id_foro in FOROS_FINALES_NEI else "list"), mode=item.mode, thumbnail=thumbnail, section=item.section, action=action, title=title, url=url, contentTitle=content_title, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
 
         patron = r'\[<strong>[0-9]+</strong>\][^<>]*<a class="navPages" href="([^"]+)">'
 
@@ -1119,7 +1119,7 @@ def foro(item):
         if matches:
             url = matches.group(1)
             title = "[B]>> PÁGINA SIGUIENTE[/B]"
-            itemlist.append(Item(channel=item.channel, parent_title=item.parent_title, viewcontent="movies", viewmode="poster", mode=item.mode, section=item.section, action="foro", title=title, url=url))
+            itemlist.append(Item(channel=item.channel, fanart=item.fanart, parent_title=item.parent_title, viewcontent="movies", viewmode="poster", mode=item.mode, section=item.section, action="foro", title=title, url=url))
 
         tmdb.set_infoLabels_itemlist(itemlist, True)
 
