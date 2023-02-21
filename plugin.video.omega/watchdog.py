@@ -13,7 +13,7 @@ CHECK_OMEGA_ALFA_STUFF_INTEGRITY = True
 
 MONITOR_TIME = 15
 
-ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/master/plugin.video.alfa/"
+ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
 
 KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
 

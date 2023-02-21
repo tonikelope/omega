@@ -14,7 +14,7 @@ import xbmcvfs
 
 TIMEOUT = 120
 
-ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/master/plugin.video.alfa/"
+ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
 
 ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
