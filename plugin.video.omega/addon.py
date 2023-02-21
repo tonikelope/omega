@@ -18,7 +18,7 @@ ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/master/plugin.vid
 
 ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
-FILES = ['channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json', 'resources/media/channels/banner/omega.png', 'resources/media/channels/thumb/omega.gif', 'resources/media/channels/fanart/omega.png']
+FILES = ['channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json', 'resources/media/channels/banner/omega.png', 'resources/media/channels/thumb/omega.gif', 'resources/media/channels/thumb/omega.png']
 
 def ajustesAvanzados():
     if os.path.exists(xbmcvfs.translatePath('special://userdata/advancedsettings.xml')):
