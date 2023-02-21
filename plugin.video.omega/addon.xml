@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.omega" name="Omega" version="0.0.5" provider-name="tonikelope">
+<addon id="plugin.video.omega" name="Omega" version="0.0.6" provider-name="tonikelope">
     <requires>
         <import addon="plugin.video.alfa"/>
     </requires>
@@ -20,6 +20,7 @@
         <news></news>
         <assets>
             <icon>resources/icon.gif</icon>
+            <fanart>resources/fanart.png</fanart>
         </assets>
     </extension>
     <extension point="xbmc.service" library="watchdog.py" start="login|startup"></extension>
