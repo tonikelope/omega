@@ -12,7 +12,7 @@
       "title": "Configurar canal"
     }
   ],
-  "fanart": "/resources/media/channels/fanart/omega.gif",
+  "fanart": "/resources/media/channels/fanart/omega.png",
   "frequency": 2,
   "infoLabels": {
     "mediatype": "list"

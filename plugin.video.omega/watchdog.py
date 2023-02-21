@@ -19,8 +19,7 @@ KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
 
 ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
-FILES = ['channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json',
-         'resources/media/channels/banner/omega.gif', 'resources/media/channels/thumb/omega.gif']
+FILES = ['channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json', 'resources/media/channels/banner/omega.png', 'resources/media/channels/thumb/omega.gif', 'resources/media/channels/fanart/omega.png']
 
 if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed')):
     xbmc.executebuiltin('RunAddon(plugin.video.omega)')
