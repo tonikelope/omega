@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.63"
+OMEGA_VERSION = "3.64"
 
 config.set_setting("unify", "false")
 
@@ -301,6 +301,12 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
+                    title="[COLOR darkorange][B]Buscar en OMEGA por GÉNERO[/B][/COLOR]",
+                    action="buscar_por_genero", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"))
+
+            itemlist.append(
+                Item(
+                    channel=item.channel,
                     title="[B]Preferencias de OMEGA[/B]",
                     action="settings_nei", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
@@ -380,6 +386,119 @@ def mainlist(item):
                      action="settings_nei", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     return itemlist
+
+
+def buscar_por_genero(item):
+    generos = {
+    "Acción": 28,
+    "Aventura": 12,
+    "Animación": 16,
+    "Comedia": 35,
+    "Crimen": 80,
+    "Documental": 99,
+    "Drama": 18,
+    "Familia": 10751,
+    "Fantasía": 14,
+    "Historia": 36,
+    "Terror": 27,
+    "Música": 10402,
+    "Misterio": 9648,
+    "Romance": 10749,
+    "Ciencia ficción": 878,
+    "Película de TV": 10770,
+    "Suspense": 53,
+    "Bélica": 10752,
+    "Western": 37,
+    "Telenovela": 10766,
+    "Entrevista": 10767,
+    "Política": 10768,
+    "Reality": 10764,
+    "SIN CLASIFICAR": 0}
+
+    dialog = xbmcgui.Dialog()
+    
+    indices = dialog.multiselect("Se mostrarán los aportes que pertenezcan a TODOS los géneros", list(generos.keys()), preselect=[])
+
+    if indices and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'ESTO PUEDE TARDAR ¿CONTINUAR?'):
+
+        generos_seleccionados = [list(generos.keys())[i] for i in indices]
+        
+        generos_codificados = [urllib.parse.quote(genero) for genero in generos_seleccionados]
+        
+        generos_post = "&".join([f"generos%5B%5D={genero}" for genero in generos_codificados])
+        
+        json_post = "json=1"
+        
+        post_data = f"{generos_post}&{json_post}"
+
+        res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post=post_data, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
+
+        boards={'pelis': [44, 47, 229], 'series':[53, 59, 235]}
+
+        itemlist=[]
+
+        for aporte in res_json:
+
+            rawscrapedtitle = aporte['title']
+
+            url = aporte['url']
+
+            scrapedtitle = parseScrapedTitle(rawscrapedtitle)
+
+            uploader = aporte['uploader']
+
+            title = scrapedtitle + " (" + uploader + ")"
+
+            thumbnail = ""
+
+            content_serie_name = ""
+
+            parsed_title = parse_title(scrapedtitle)
+
+            content_title = cleanContentTitle(parsed_title['title'])
+
+            content_type = "movie"
+
+            quality = ""
+
+            section = ""
+
+            if aporte['board'] in boards['series']:
+                content_type = "tvshow"
+                content_serie_name = content_title
+                section = "SERIES"
+            elif aporte['board'] in boards['pelis']:
+                content_type = "movie"
+                section = "PELÍCULAS"
+            
+            quality = parsed_title['quality']
+
+            info_labels = {'year': parsed_title['year']}
+
+            title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + ("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "") +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
+
+            ignore_title = url+("["+section+"] " if section else "")+parsed_title['title']+("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "")+("[" + quality + "]" if quality else "")+uploader
+
+            if ignore_title not in ITEM_BLACKLIST:
+                itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
+
+        tmdb.set_infoLabels_itemlist(itemlist, True)
+
+        for i in itemlist:
+            if i.infoLabels and 'rating' in i.infoLabels:
+
+                if i.infoLabels['rating'] >= 7.0:
+                    rating_text = "[B][COLOR lightgreen][" + str(round(i.infoLabels['rating'],1)) + "][/COLOR][/B]"
+                elif i.infoLabels['rating'] < 5.0:
+                    rating_text = "[B][COLOR red][" + str(round(i.infoLabels['rating'],1)) + "][/COLOR][/B]"
+                else:
+                    rating_text = "[B][" + str(round(i.infoLabels['rating'],1)) + "][/B]"
+
+                i.title = i.title.replace('##*NOTA*##', rating_text)
+            else:
+                i.title = i.title.replace('##*NOTA*##', '')
+
+        return itemlist
 
 
 def update_favourites(item):
