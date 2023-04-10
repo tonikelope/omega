@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.65"
+OMEGA_VERSION = "3.66"
 
 config.set_setting("unify", "false")
 
@@ -427,7 +427,7 @@ def buscar_por_genero(item):
         
         res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post={'generosb64':generos_seleccionados_b64, 'json':1}, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
 
-        boards={'pelis': [44, 47, 229], 'series':[53, 59, 235]}
+        boards={'pelis': ['44', '47', '229'], 'series':['53', '59', '235']}
 
         itemlist=[]
 
@@ -455,7 +455,7 @@ def buscar_por_genero(item):
 
             content_type = "movie"
 
-            quality = ""
+            quality = parsed_title['quality']
 
             section = ""
 
@@ -466,9 +466,7 @@ def buscar_por_genero(item):
             elif aporte['board'] in boards['pelis']:
                 content_type = "movie"
                 section = "PELÍCULAS"
-            
-            quality = parsed_title['quality']
-
+                
             info_labels = {'year': parsed_title['year']}
 
             title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + ("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "") +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
