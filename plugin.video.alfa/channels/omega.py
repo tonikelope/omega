@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.64"
+OMEGA_VERSION = "3.65"
 
 config.set_setting("unify", "false")
 
@@ -302,7 +302,7 @@ def mainlist(item):
                 Item(
                     channel=item.channel,
                     title="[COLOR darkorange][B]Buscar en OMEGA por GÉNERO[/B][/COLOR]",
-                    action="buscar_por_genero", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"))
+                    action="buscar_por_genero", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="list", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"))
 
             itemlist.append(
                 Item(
@@ -422,20 +422,16 @@ def buscar_por_genero(item):
     if indices and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'ESTO PUEDE TARDAR ¿CONTINUAR?'):
 
         generos_seleccionados = [list(generos.keys())[i] for i in indices]
-        
-        generos_codificados = [urllib.parse.quote(genero) for genero in generos_seleccionados]
-        
-        generos_post = "&".join([f"generos%5B%5D={genero}" for genero in generos_codificados])
-        
-        json_post = "json=1"
-        
-        post_data = f"{generos_post}&{json_post}"
 
-        res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post=post_data, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
+        generos_seleccionados_b64=base64.b64encode(",".join(generos_seleccionados).encode('utf-8')).decode('utf-8')
+        
+        res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post={'generosb64':generos_seleccionados_b64, 'json':1}, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
 
         boards={'pelis': [44, 47, 229], 'series':[53, 59, 235]}
 
         itemlist=[]
+
+        itemlist.append(Item(channel=item.channel, action="", title="[B]"+"+".join(generos_seleccionados)+"[/B]"))
 
         for aporte in res_json:
 
