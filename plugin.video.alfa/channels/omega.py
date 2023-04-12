@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.66"
+OMEGA_VERSION = "3.67"
 
 config.set_setting("unify", "false")
 
@@ -1719,7 +1719,7 @@ def find_video_mega_links(item, data):
 
                         content_title=cleanContentTitle(filename)
 
-                        title="[COLOR orange][B]"+content_title+"[/B][/COLOR] ("+item.uploader+")"
+                        title="[COLOR orange][B]"+content_title+"[/B][/COLOR] " + ("[COLOR magenta][B][SAGA][/B][/COLOR] " if saga_pelis else "") + "("+item.uploader+")"
 
                         itemlist.append(Item(channel=item.channel, id_topic=item.id_topic, viewcontent="movies", viewmode="list", action="get_video_mega_links_group",
                                          title=title, url=item.url, mc_url=mc_url,
