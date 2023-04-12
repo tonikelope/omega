@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.68"
+OMEGA_VERSION = "3.69"
 
 config.set_setting("unify", "false")
 
@@ -469,9 +469,17 @@ def buscar_por_genero(item):
                 
             info_labels = {'year': parsed_title['year']}
 
-            title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + ("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "") +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
+            extra=""
 
-            ignore_title = url+("["+section+"] " if section else "")+parsed_title['title']+("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "")+("[" + quality + "]" if quality else "")+uploader
+            if content_type == "tvshow":
+                extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
+            elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+                extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
+                parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
+
+            title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
+
+            ignore_title = url+("["+section+"] " if section else "")+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
             if ignore_title not in ITEM_BLACKLIST:
                 itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
@@ -839,9 +847,17 @@ def bibliotaku_series(item):
 
                 quality = parsed_title['quality']
 
-                title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + ("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "") + (" [" + quality + "]" if quality else "")+" ##*NOTA*## (Akantor)"
+                extra=""
 
-                ignore_title = item.url+parsed_title['title']+("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "")+("[" + quality + "]" if quality else "")+"bibliotaku_series"
+                if content_type == "tvshow":
+                    extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
+                elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+                    extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
+                    parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
+
+                title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra + (" [" + quality + "]" if quality else "")+" ##*NOTA*## (Akantor)"
+
+                ignore_title = item.url+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+"bibliotaku_series"
 
                 if ignore_title not in ITEM_BLACKLIST:
                     itemlist.append(Item(channel=item.channel, parsed_title=parsed_title['title'], scraped_title=rawscrapedtitle, ignore_title=ignore_title, url_orig=item.url_orig, viewcontent="movies", viewmode="list", id_topic=item.id_topic, parent_title=item.parent_title, mode=item.mode, thumbnail=thumbnail, section=item.section, action="bibliotaku_series_temporadas", title=title, url=item.url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader="Akantor"))
@@ -965,9 +981,17 @@ def bibliotaku_pelis(item):
 
             quality = parsed_title['quality']
 
-            title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + ("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "") + (" [" + quality + "]" if quality else "")+" ##*NOTA*## (Akantor)"
+            extra=""
 
-            ignore_title = item.url+parsed_title['title']+("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "")+("[" + quality + "]" if quality else "")+"bibliotak_pelis"
+            if content_type == "tvshow":
+                extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
+            elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+                extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
+                parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
+
+            title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra + (" [" + quality + "]" if quality else "")+" ##*NOTA*## (Akantor)"
+
+            ignore_title = item.url+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+"bibliotak_pelis"
 
             if ignore_title not in ITEM_BLACKLIST:
                 itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, url_orig=item.url_orig, viewcontent="movies", viewmode="list", id_topic=item.id_topic, mc_group_id=mc_id, parent_title=item.parent_title, mode=item.mode, thumbnail=thumbnail, section=item.section, action="bibliotaku_pelis_megacrypter", title=title, url=item.url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader="Akantor"))
@@ -1188,10 +1212,11 @@ def foro(item):
                         extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
                     elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
                         extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
+                        parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
 
                     title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra + ("[" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
                     
-                    ignore_title = url+parsed_title['title']+("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "")+("[" + quality + "]" if quality else "")+uploader
+                    ignore_title = url+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
                     if ignore_title not in ITEM_BLACKLIST:
                         itemlist.append(Item(channel=item.channel, ignore_title=ignore_title, scraped_title=rawscrapedtitle, parent_title=item.parent_title, viewcontent="movies", viewmode="list", mode=item.mode, thumbnail=thumbnail, section=item.section, action=action, title=title, url=url, contentTitle=content_title, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
@@ -1357,9 +1382,17 @@ def search_parse(data, item):
 
         info_labels = {'year': parsed_title['year']}
 
-        title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + ("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "") +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
+        extra=""
 
-        ignore_title = url+("["+section+"] " if section else "")+parsed_title['title']+("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "")+("[" + quality + "]" if quality else "")+uploader
+        if content_type == "tvshow":
+            extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
+        elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+            extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
+            parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
+
+        title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
+
+        ignore_title = url+("["+section+"] " if section else "")+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
         if ignore_title not in ITEM_BLACKLIST:
             itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
@@ -2077,9 +2110,17 @@ def indice_links(item):
         else:
             quality = 'SD'
 
-        title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + ("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "") + " [" + quality + "] ##*NOTA*## (" + uploader + ")"
+        extra=""
 
-        ignore_title = url+parsed_title['title']+("[COLOR magenta][B][SERIE][/B][/COLOR] " if content_type == "tvshow" else "")+("[" + quality + "]" if quality else "")+uploader
+        if content_type == "tvshow":
+            extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
+        elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+            extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
+            parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
+
+        title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra + " [" + quality + "] ##*NOTA*## (" + uploader + ")"
+
+        ignore_title = url+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
         if ignore_title not in ITEM_BLACKLIST:
             itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, mode=item.mode, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
