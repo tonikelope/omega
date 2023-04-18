@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.74"
+OMEGA_VERSION = "3.75"
 
 config.set_setting("unify", "false")
 
@@ -822,7 +822,7 @@ def bibliotaku_series(item):
 
         parsed_title = parse_title(scrapedtitle)
 
-        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or (item.search and item.search.lower() in parsed_title['title'].lower()):
+        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or (item.search and ' '.join(item.search.split()).lower() in ' '.join(parsed_title['title'].split()).lower()):
 
             if parsed_title['title'] in series:
                 series[parsed_title['title']].append(mc_id)
@@ -961,7 +961,7 @@ def bibliotaku_pelis(item):
 
         parsed_title = parse_title(scrapedtitle)
 
-        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or (item.search and item.search.lower() in parsed_title['title'].lower()):
+        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or (item.search and ' '.join(item.search.split()).lower() in ' '.join(parsed_title['title'].split()).lower()):
 
             thumbnail = item.thumbnail
 
