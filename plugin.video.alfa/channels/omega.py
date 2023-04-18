@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.73"
+OMEGA_VERSION = "3.74"
 
 config.set_setting("unify", "false")
 
@@ -737,13 +737,10 @@ def bibliotaku_buscar(item, text):
     itemlist.extend(bibliotaku_series(Item(search=text, channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (DONGHUA)", section="DONGHUA", mode="tvshow", action="bibliotaku_series",
                          url='#'.join(BIBLIOTAKU_DONGHUA_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_donghua.png")))
 
-    search_itemlist = []
-
     for item in itemlist:
         item.title='[Bibliotaku] ' + item.title
-        search_itemlist.append(item)
 
-    return search_itemlist
+    return itemlist
     
 
 def bibliotaku(item):
@@ -1309,7 +1306,9 @@ def search(item, texto):
 
     data = httptools.downloadpage("https://noestasinvitado.com/search2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT).data
 
-    return search_itemlist.extend(search_parse(data, item))
+    search_itemlist.extend(search_parse(data, item))
+
+    return search_itemlist
 
 
 def search_pag(item):
