@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.75"
+OMEGA_VERSION = "3.76"
 
 config.set_setting("unify", "false")
 
@@ -1286,8 +1286,6 @@ def search(item, texto):
     if 'search_section' in item and item.search_section.lower()=='bibliotaku':
         return bibliotaku_buscar(item, texto)
     
-    search_itemlist = bibliotaku_buscar(item, texto)
-
     if texto != "":
         texto = texto.replace(" ", "+")
 
@@ -1306,7 +1304,9 @@ def search(item, texto):
 
     data = httptools.downloadpage("https://noestasinvitado.com/search2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT).data
 
-    search_itemlist.extend(search_parse(data, item))
+    search_itemlist = search_parse(data, item)
+
+    search_itemlist.extend(bibliotaku_buscar(item, texto))
 
     return search_itemlist
 
