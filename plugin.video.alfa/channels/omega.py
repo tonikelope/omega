@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.79"
+OMEGA_VERSION = "3.80"
 
 config.set_setting("unify", "false")
 
@@ -1286,6 +1286,8 @@ def search(item, texto):
     if 'search_section' in item and item.search_section.lower()=='bibliotaku':
         return bibliotaku_buscar(item, texto)
     
+    texto_orig = texto
+
     if texto != "":
         texto = texto.replace(" ", "+")
 
@@ -1306,7 +1308,7 @@ def search(item, texto):
 
     search_itemlist = search_parse(data, item)
 
-    search_itemlist.extend(bibliotaku_buscar(item, texto))
+    search_itemlist.extend(bibliotaku_buscar(item, texto_orig))
 
     return search_itemlist
 
