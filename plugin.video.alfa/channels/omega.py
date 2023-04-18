@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.69"
+OMEGA_VERSION = "3.70"
 
 config.set_setting("unify", "false")
 
@@ -725,24 +725,23 @@ def isVideoFilename(filename):
 def bibliotaku_buscar(item, text):
     itemlist = []
 
-    itemlist.extend(bibliotaku_pelis(Item(channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (PELÍCULAS)", section="PELÍCULAS", mode="movie", action="bibliotaku_pelis",
+    itemlist.extend(bibliotaku_pelis(Item(search=text, channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (PELÍCULAS)", section="PELÍCULAS", mode="movie", action="bibliotaku_pelis",
                                  url='#'.join(BIBLIOTAKU_PELIS_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_peliculas.png")))
 
-    itemlist.extend(bibliotaku_series(Item(channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (SERIES)", section="SERIES", mode="tvshow", action="bibliotaku_series",
+    itemlist.extend(bibliotaku_series(Item(search=text, channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (SERIES)", section="SERIES", mode="tvshow", action="bibliotaku_series",
                          url='#'.join(BIBLIOTAKU_SERIES_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", tthumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_peliculas.png")))
 
-    itemlist.extend(bibliotaku_series(Item(channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (ANIME)", section="ANIME", mode="tvshow", action="bibliotaku_series",
+    itemlist.extend(bibliotaku_series(Item(search=text, channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (ANIME)", section="ANIME", mode="tvshow", action="bibliotaku_series",
                          url='#'.join(BIBLIOTAKU_ANIME_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_anime.png")))
 
-    itemlist.extend(bibliotaku_series(Item(channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (DONGHUA)", section="DONGHUA", mode="tvshow", action="bibliotaku_series",
+    itemlist.extend(bibliotaku_series(Item(search=text, channel=item.channel, letter="TODO", viewcontent="movies", viewmode="poster", url_orig=BIBLIOTAKU_URL, id_topic=BIBLIOTAKU_TOPIC_ID, title="Bibliotaku (DONGHUA)", section="DONGHUA", mode="tvshow", action="bibliotaku_series",
                          url='#'.join(BIBLIOTAKU_DONGHUA_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_donghua.png")))
 
     search_itemlist = []
 
     for item in itemlist:
-        if text.lower() in item.contentTitle.lower():
-            item.title='[Bibliotaku] '+item.title
-            search_itemlist.append(item)
+        item.title='[Bibliotaku] ' + item.title
+        search_itemlist.append(item)
 
     return search_itemlist
     
@@ -826,7 +825,7 @@ def bibliotaku_series(item):
 
         parsed_title = parse_title(scrapedtitle)
 
-        if not letter_pattern or re.search(letter_pattern, parsed_title['title']):
+        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or (item.search and item.search.lower() in parsed_title['title'].lower()):
 
             if parsed_title['title'] in series:
                 series[parsed_title['title']].append(mc_id)
@@ -965,7 +964,7 @@ def bibliotaku_pelis(item):
 
         parsed_title = parse_title(scrapedtitle)
 
-        if not letter_pattern or re.search(letter_pattern, parsed_title['title']):
+        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or (item.search and item.search.lower() in parsed_title['title'].lower()):
 
             thumbnail = item.thumbnail
 
