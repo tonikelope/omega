@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.80"
+OMEGA_VERSION = "3.81"
 
 config.set_setting("unify", "false")
 
@@ -769,6 +769,38 @@ def bibliotaku(item):
     return itemlist
 
 
+def title_contains_words(title, search, all_words=True):
+
+    if not title or not search:
+        return False
+
+    title = ' '.join(title.split()).lower()
+    
+    search = ' '.join(search.split()).lower()
+
+    replacements = (
+        ("á", "a"),
+        ("é", "e"),
+        ("í", "i"),
+        ("ó", "o"),
+        ("ú", "u"),
+    )
+
+    for a, b in replacements:
+        title = title.replace(a, b)
+        search = search.replace(a, b)
+
+    contains = False
+
+    for word in search.split():
+        if word in title:
+            contains = True
+        elif all_words:
+            return False
+
+    return contains
+
+
 def bibliotaku_index(item):
     
     letters = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T',
@@ -822,7 +854,7 @@ def bibliotaku_series(item):
 
         parsed_title = parse_title(scrapedtitle)
 
-        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or (item.search and ' '.join(item.search.split()).lower() in ' '.join(parsed_title['title'].split()).lower()):
+        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or title_contains_words(parsed_title['title'], item.search):
 
             if parsed_title['title'] in series:
                 series[parsed_title['title']].append(mc_id)
@@ -961,7 +993,7 @@ def bibliotaku_pelis(item):
 
         parsed_title = parse_title(scrapedtitle)
 
-        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or (item.search and ' '.join(item.search.split()).lower() in ' '.join(parsed_title['title'].split()).lower()):
+        if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or title_contains_words(parsed_title['title'], item.search):
 
             thumbnail = item.thumbnail
 
