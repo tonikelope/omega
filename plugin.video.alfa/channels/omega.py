@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.81"
+OMEGA_VERSION = "3.82"
 
 config.set_setting("unify", "false")
 
@@ -792,8 +792,10 @@ def title_contains_words(title, search, all_words=True):
 
     contains = False
 
+    title_words = title.split()
+
     for word in search.split():
-        if word in title:
+        if word in title_words:
             contains = True
         elif all_words:
             return False
