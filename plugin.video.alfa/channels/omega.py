@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.82"
+OMEGA_VERSION = "3.83"
 
 config.set_setting("unify", "false")
 
@@ -280,7 +280,7 @@ def mainlist(item):
                                  url="https://noestasinvitado.com/peliculas/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_movie.png"))
             itemlist.append(Item(channel=item.channel, title="[B]SERIES[/B]", viewcontent="movies", viewmode="list",section="SERIES", mode="tvshow", action="foro",
                                  url="https://noestasinvitado.com/series/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_tvshow.png"))
-            itemlist.append(Item(channel=item.channel, title="Documetales", viewcontent="movies", viewmode="list", section="Documentales", mode="movie", action="foro",
+            itemlist.append(Item(channel=item.channel, title="Documentales", viewcontent="movies", viewmode="list", section="Documentales", mode="movie", action="foro",
                                  url="https://noestasinvitado.com/documentales/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_documentary.png"))
             itemlist.append(Item(channel=item.channel, title="Vídeos deportivos", viewcontent="movies", viewmode="list", section="Vídeos deportivos", mode="movie", action="foro",
                                  url="https://noestasinvitado.com/deportes/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_sport.png"))
