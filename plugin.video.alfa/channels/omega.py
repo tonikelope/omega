@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.83"
+OMEGA_VERSION = "3.84"
 
 config.set_setting("unify", "false")
 
@@ -52,6 +52,10 @@ KODI_NEI_HISTORY_PATH = KODI_USERDATA_PATH + 'kodi_nei_history'
 KODI_NEI_BLACKLIST_ITEM_PATH = KODI_USERDATA_PATH + 'kodi_nei_item_blacklist'
 
 KODI_NEI_CUSTOM_TITLES_PATH = KODI_USERDATA_PATH + 'kodi_nei_custom_titles'
+
+KODI_NEI_MC_CACHE_PATH = KODI_USERDATA_PATH + 'kodi_nei_mc_cache'
+
+KODI_NEI_MC_CACHE = {}
 
 BIBLIOTAKU_TOPIC_ID='35243'
 
@@ -142,6 +146,33 @@ TITLES_BLACKLIST = [
         "omega").split(',')] if config.get_setting(
     "omega_blacklist_titles",
     "omega") else []
+
+
+if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
+
+    try:
+        with open(KODI_NEI_MC_CACHE_PATH, "rb") as file:
+            KODI_NEI_MC_CACHE = pickle.load(file)
+
+    except Exception as ex:
+        logger.info("OMEGA KODI MC CACHE EXCEPTION")
+        logger.info(ex)
+        
+        if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
+            os.remove(KODI_NEI_MC_CACHE_PATH)
+
+
+def save_mc_cache():
+    try:
+        with open(KODI_NEI_MC_CACHE_PATH, "wb") as file:
+            pickle.dump(KODI_NEI_MC_CACHE, file)
+
+    except Exception as ex:
+        logger.info("OMEGA KODI MC CACHE EXCEPTION")
+        logger.info(ex)
+        
+        if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
+            os.remove(KODI_NEI_MC_CACHE_PATH)
 
 
 def forceView(mode):
@@ -1761,15 +1792,30 @@ def find_video_mega_links(item, data):
                         saga_pelis = True
 
                         if id[0]:
-                            d = httptools.downloadpage("https://noestasinvitado.com/gen_mc.php?id=" + id[0] + "&raw=1", timeout=DEFAULT_HTTP_TIMEOUT).data
+
+                            if id[0] in KODI_NEI_MC_CACHE:
+                                filename = KODI_NEI_MC_CACHE[id[0]]
+                            else:
+                                d = httptools.downloadpage("https://noestasinvitado.com/gen_mc.php?id=" + id[0] + "&raw=1", timeout=DEFAULT_HTTP_TIMEOUT).data
                             
-                            m = re.search(r'(.*?) *?\[[0-9.]+ *?.*?\] *?(https://megacrypter\.noestasinvitado\.com/.+)', d)
+                                m = re.search(r'(.*?) *?\[[0-9.]+ *?.*?\] *?(https://megacrypter\.noestasinvitado\.com/.+)', d)
                             
-                            filename = m[1] if m else "LINK ERROR"
+                                filename = m[1] if m else "LINK ERROR"
+
+                                if m:
+                                    KODI_NEI_MC_CACHE[id[0]] = filename
                         elif id[1]:
-                            filename = getMegacrypterFilename(id[1])
+                            if id[1] in KODI_NEI_MC_CACHE:
+                                filename = KODI_NEI_MC_CACHE[id[1]]
+                            else:
+                                filename = getMegacrypterFilename(id[1])
+                                KODI_NEI_MC_CACHE[id[1]] = filename
                         elif id[2]:
-                            filename = getMegaFilename(id[2])
+                            if id[2] in KODI_NEI_MC_CACHE:
+                                filename = KODI_NEI_MC_CACHE[id[2]]
+                            else:
+                                filename = getMegaFilename(id[2])
+                                KODI_NEI_MC_CACHE[id[2]] = filename
 
                         if len(matches)==len(matches_years):
                             year = matches_years[i-1]
@@ -1802,6 +1848,8 @@ def find_video_mega_links(item, data):
                                          mc_group_id=mc_group_id, infoLabels=infoLabels, contentTitle=content_title, mode=item.mode))
 
                     i = i + 1
+
+                save_mc_cache()
 
                 if len(itemlist)>0:
                     if not saga_pelis:
