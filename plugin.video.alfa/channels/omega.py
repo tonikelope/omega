@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.84"
+OMEGA_VERSION = "3.85"
 
 config.set_setting("unify", "false")
 
@@ -700,6 +700,10 @@ def clean_cache(item):
         if file.startswith("kodi_nei_"):
             os.remove(KODI_TEMP_PATH + file)
             conta_files = conta_files + 1
+
+    if os.path.exists(KODI_NEI_MC_CACHE_PATH):        
+        os.remove(KODI_NEI_MC_CACHE_PATH)
+        KODI_NEI_MC_CACHE = {}
 
     xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')',
                                   "¡Caché borrada! (" + str(conta_files) + " archivos eliminados)",
