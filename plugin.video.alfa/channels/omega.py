@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.86"
+OMEGA_VERSION = "3.87"
 
 config.set_setting("unify", "false")
 
@@ -484,6 +484,10 @@ def buscar_por_genero(item):
 
             parsed_title = parse_title(scrapedtitle)
 
+            if custom_title:
+                parsed_custom_title = parse_title(custom_title)
+                parsed_title['year'] = parsed_custom_title['year']
+
             content_title = cleanContentTitle(parsed_title['title'] if not custom_title else custom_title)
 
             content_type = "movie"
@@ -895,6 +899,10 @@ def bibliotaku_series(item):
 
         parsed_title = parse_title(scrapedtitle)
 
+        if custom_title:
+            parsed_custom_title = parse_title(custom_title)
+            parsed_title['year'] = parsed_custom_title['year']
+
         if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or title_contains_words(parsed_title['title'], item.search):
 
             if parsed_title['title'] in series:
@@ -1035,6 +1043,10 @@ def bibliotaku_pelis(item):
         scrapedtitle = parseScrapedTitle(rawscrapedtitle)
 
         parsed_title = parse_title(scrapedtitle)
+
+        if custom_title:
+            parsed_custom_title = parse_title(custom_title)
+            parsed_title['year'] = parsed_custom_title['year']
 
         if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or title_contains_words(parsed_title['title'], item.search):
 
@@ -1263,6 +1275,10 @@ def foro(item):
 
                     parsed_title = parse_title(scrapedtitle)
 
+                    if custom_title:
+                        parsed_custom_title = parse_title(custom_title)
+                        parsed_title['year'] = parsed_custom_title['year']
+
                     content_title = cleanContentTitle(parsed_title['title'] if not custom_title else custom_title)
 
                     if item.mode == "tvshow":
@@ -1425,6 +1441,10 @@ def search_parse(data, item):
         content_serie_name = ""
 
         parsed_title = parse_title(scrapedtitle)
+
+        if custom_title:
+            parsed_custom_title = parse_title(custom_title)
+            parsed_title['year'] = parsed_custom_title['year']
 
         content_title = cleanContentTitle(parsed_title['title'] if not custom_title else custom_title)
 
@@ -2196,6 +2216,10 @@ def indice_links(item):
         content_serie_name = ""
 
         parsed_title = parse_title(scrapedtitle)
+
+        if custom_title:
+            parsed_custom_title = parse_title(custom_title)
+            parsed_title['year'] = parsed_custom_title['year']
 
         content_title = re.sub('^(Saga|Trilog.a|Duolog*a) ' , '', parsed_title['title'] if not custom_title else custom_title)
 
