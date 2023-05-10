@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.85"
+OMEGA_VERSION = "3.86"
 
 config.set_setting("unify", "false")
 
@@ -470,6 +470,8 @@ def buscar_por_genero(item):
 
             url = aporte['url']
 
+            custom_title = findCustomTitle(rawscrapedtitle)
+
             scrapedtitle = parseScrapedTitle(rawscrapedtitle)
 
             uploader = aporte['uploader']
@@ -482,7 +484,7 @@ def buscar_por_genero(item):
 
             parsed_title = parse_title(scrapedtitle)
 
-            content_title = cleanContentTitle(parsed_title['title'])
+            content_title = cleanContentTitle(parsed_title['title'] if not custom_title else custom_title)
 
             content_type = "movie"
 
@@ -887,6 +889,8 @@ def bibliotaku_series(item):
 
     for rawscrapedtitle, mc_id in matches:
 
+        custom_title = findCustomTitle(rawscrapedtitle)
+
         scrapedtitle = parseScrapedTitle(rawscrapedtitle)
 
         parsed_title = parse_title(scrapedtitle)
@@ -902,7 +906,7 @@ def bibliotaku_series(item):
 
                 content_serie_name = ""
 
-                content_title = cleanContentTitle(parsed_title['title'])
+                content_title = cleanContentTitle(parsed_title['title'] if not custom_title else custom_title)
 
                 content_type = "movie" if scrapedtitle.endswith("*") else "tvshow"
 
@@ -960,7 +964,7 @@ def bibliotaku_series_temporadas(item):
 
         itemlist = bibliotaku_series_megacrypter(item)
 
-        itemlist.append(Item(channel=item.channel, title="PERSONALIZAR TÍTULO", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+        itemlist.append(Item(channel=item.channel, title="PERSONALIZAR TÍTULO PARA CARÁTULA", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
         itemlist.append(Item(channel=item.channel, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
@@ -985,7 +989,7 @@ def bibliotaku_series_temporadas(item):
             if item.id_topic:
                 itemlist.append(Item(channel=item.channel, scraped_title=item.scraped_title, ignore_title=item.ignore_title, url_orig=item.url_orig, id_topic=item.id_topic, url=item.url, viewcontent="movies", viewmode="list", title="[B][COLOR lightgrey]MENSAJES DEL FORO[/COLOR][/B]", contentPlot="[I]Mensajes sobre: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leerMensajesHiloForo", thumbnail='https://noestasinvitado.com/logonegro2.png'))   
 
-            itemlist.append(Item(channel=item.channel, title="PERSONALIZAR TÍTULO", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+            itemlist.append(Item(channel=item.channel, title="PERSONALIZAR TÍTULO PARA CARÁTULA", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(Item(channel=item.channel, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
@@ -1026,6 +1030,8 @@ def bibliotaku_pelis(item):
 
     for rawscrapedtitle, mc_id in matches:
 
+        custom_title = findCustomTitle(rawscrapedtitle)
+
         scrapedtitle = parseScrapedTitle(rawscrapedtitle)
 
         parsed_title = parse_title(scrapedtitle)
@@ -1036,7 +1042,7 @@ def bibliotaku_pelis(item):
 
             content_serie_name = ""
 
-            content_title = cleanContentTitle(parsed_title['title'])
+            content_title = cleanContentTitle(parsed_title['title'] if not custom_title else custom_title)
 
             content_type = "tvshow" if scrapedtitle.endswith("#") else "movie"
 
@@ -1085,7 +1091,7 @@ def bibliotaku_pelis_megacrypter(item):
             
     itemlist = get_video_mega_links_group(Item(channel=item.channel, scraped_title=item.scraped_title, ignore_title=item.ignore_title, url_orig=item.url_orig, viewcontent="movies", viewmode="list", id_topic=item.id_topic, mode=item.mode, action='', title='', url=item.url, mc_group_id=item.mc_group_id, infoLabels=infoLabels))
 
-    itemlist.append(Item(channel=item.channel, title="PERSONALIZAR TÍTULO", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+    itemlist.append(Item(channel=item.channel, title="PERSONALIZAR TÍTULO PARA CARÁTULA", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     itemlist.append(Item(channel=item.channel, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
@@ -1161,13 +1167,17 @@ def sinEnlaces(item):
 
 def parseScrapedTitle(scrapedtitle):
 
+    return scrapertools.htmlclean(scrapedtitle)
+
+
+def findCustomTitle(scrapedtitle):
     sha1 = hashlib.sha1(scrapedtitle.encode('utf-8')).hexdigest()
 
     if sha1 in CUSTOM_TITLES.keys():
         logger.info("CUSTOM TITLE -> "+ CUSTOM_TITLES[sha1])
         return CUSTOM_TITLES[sha1]
 
-    return scrapertools.htmlclean(scrapedtitle)
+    return None
 
 
 def foro(item):
@@ -1220,7 +1230,7 @@ def foro(item):
             if item.uploader:
                 itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR yellow][B]IGNORAR TODO EL CONTENIDO DE "+item.uploader+"[/B][/COLOR]", uploader=item.uploader, action="ignore_uploader", url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
         else:
-            itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="PERSONALIZAR TÍTULO", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+            itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="PERSONALIZAR TÍTULO PARA CARÁTULA", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
@@ -1232,6 +1242,8 @@ def foro(item):
         for scrapedmsg, scrapedurl, rawscrapedtitle, uploader in matches:
 
             url = urllib.parse.urljoin(item.url, scrapedurl)
+
+            custom_title = findCustomTitle(rawscrapedtitle)
 
             scrapedtitle = parseScrapedTitle(rawscrapedtitle)
 
@@ -1251,7 +1263,7 @@ def foro(item):
 
                     parsed_title = parse_title(scrapedtitle)
 
-                    content_title = cleanContentTitle(parsed_title['title'])
+                    content_title = cleanContentTitle(parsed_title['title'] if not custom_title else custom_title)
 
                     if item.mode == "tvshow":
                         content_type = "movie" if scrapedtitle.endswith("*") else "tvshow"
@@ -1399,6 +1411,8 @@ def search_parse(data, item):
     for scrapedurl, rawscrapedtitle, uploader in matches:
         url = urllib.parse.urljoin(item.url, scrapedurl)
 
+        custom_title = findCustomTitle(rawscrapedtitle)
+
         scrapedtitle = parseScrapedTitle(rawscrapedtitle)
 
         if uploader != '>':
@@ -1412,7 +1426,7 @@ def search_parse(data, item):
 
         parsed_title = parse_title(scrapedtitle)
 
-        content_title = cleanContentTitle(parsed_title['title'])
+        content_title = cleanContentTitle(parsed_title['title'] if not custom_title else custom_title)
 
         quality = ""
 
@@ -2168,6 +2182,8 @@ def indice_links(item):
 
         url = urllib.parse.urljoin(item.url, scrapedurl)
 
+        custom_title = findCustomTitle(rawscrapedtitle)
+
         scrapedtitle = parseScrapedTitle(rawscrapedtitle)
 
         if uploader != '>':
@@ -2181,7 +2197,7 @@ def indice_links(item):
 
         parsed_title = parse_title(scrapedtitle)
 
-        content_title = re.sub('^(Saga|Trilog.a|Duolog*a) ' , '', parsed_title['title'])
+        content_title = re.sub('^(Saga|Trilog.a|Duolog*a) ' , '', parsed_title['title'] if not custom_title else custom_title)
 
         if item.mode == "tvshow":
             content_type = "tvshow"
