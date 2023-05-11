@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.87"
+OMEGA_VERSION = "3.88"
 
 config.set_setting("unify", "false")
 
@@ -2161,7 +2161,7 @@ def leer_criticas_fa(item):
                 rating_text = "[B][" + str(critica['nota']) + "][/B]"
                 thumbnail = get_omega_resource_path("neutral.png")
 
-            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", url=critica['url']))
+            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":"LEER CRÍTICA CON SPOILERS", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
 
         return itemlist
 
@@ -2187,6 +2187,32 @@ def cargar_critica(item):
 
     if res:
         xbmcgui.Dialog().textviewer(item.title, html.unescape(clean_html_tags(res.group(1).replace('<br>', "\n"))))
+
+
+def cargar_critica_con_spoiler(item):
+    
+    headers = DEFAULT_HEADERS
+
+    headers["Referer"] = item.url
+
+    data = httptools.downloadpage(item.url, ignore_response_code=True, headers=headers, timeout=DEFAULT_HTTP_TIMEOUT).data
+
+    critica_pattern = r"\"review-text1\" *?>(.*?)< *?/ *?div"
+
+    res = re.compile(critica_pattern, re.DOTALL).search(data)
+
+    if res:
+        respuesta = res.group(1)
+
+        critica_pattern_spoiler = r"\"review-text2\" *?>(.*?)< *?/ *?div"
+
+        res_spoiler = re.compile(critica_pattern_spoiler, re.DOTALL).search(data)
+
+        if res_spoiler:
+            respuesta = respuesta + "\n\n*********************************\nCUIDADO: SPOILER A PARTIR DE AQUÍ\n*********************************\n\n" + res_spoiler.group(1)
+
+        xbmcgui.Dialog().textviewer(item.title, html.unescape(clean_html_tags(respuesta.replace('<br>', "\n"))))
+
 
 def indice_links(item):
     itemlist = []
