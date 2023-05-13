@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.88"
+OMEGA_VERSION = "3.89"
 
 config.set_setting("unify", "false")
 
@@ -779,7 +779,7 @@ def bibliotaku_buscar(item, text):
                          url='#'.join(BIBLIOTAKU_DONGHUA_URL), fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="https://noestasinvitado.com/bibliotaku/bibliotaku_donghua.png")))
 
     for i in itemlist:
-        i.title='[Bibliotaku] ' + i.title
+        i.title='[COLOR gray][Bibliotaku][/COLOR] ' + i.title
 
     return itemlist
     
@@ -1405,7 +1405,12 @@ def search(item, texto):
 
     search_itemlist = search_parse(data, item)
 
-    search_itemlist.extend(bibliotaku_buscar(item, texto_orig))
+    if search_itemlist and search_itemlist[-1].action=="search_pag":
+        next_page = search_itemlist.pop()
+        search_itemlist.extend(bibliotaku_buscar(item, texto_orig))
+        search_itemlist.append(next_page)
+    else:
+        search_itemlist.extend(bibliotaku_buscar(item, texto_orig))
 
     return search_itemlist
 
@@ -2382,14 +2387,14 @@ def extract_quality(title):
 def play(item):
     itemlist = []
 
-    marcar_item_visto(item, False)
+    marcar_item_visto(item, False, False)
 
     itemlist.append(item)
 
     return itemlist
 
 
-def marcar_item_visto(item, notify=True):
+def marcar_item_visto(item, notify=True, novisto=True):
 
     title = item.visto_title if "visto_title" in item else item.title
     
@@ -2403,6 +2408,16 @@ def marcar_item_visto(item, notify=True):
 
         if notify:
             xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "MARCADO COMO VISTO (puede que tengas que refrescar la página)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+    
+    elif novisto:
+        HISTORY.remove(checksum)
+
+        with open(KODI_NEI_HISTORY_PATH, "w+") as file:
+            for visto in HISTORY:
+                file.write((visto + "\n"))
+
+        if notify:
+            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "MARCADO COMO NO VISTO (puede que tengas que refrescar la página)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def customize_title(item):
