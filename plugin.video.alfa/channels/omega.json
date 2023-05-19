@@ -153,20 +153,29 @@
       "visible": "eq(-13,true)|eq(-12,true)"
     },
     {
+      "id": "omega_debrid_proxy_chunks",
+      "type": "list",
+      "label": "Número de CHUNKS para DEBRID proxy:",
+      "default": 2,
+      "enabled": "eq(-14,true)|eq(-13,true)",
+      "visible": "eq(-14,true)|eq(-13,true)",
+      "lvalues": [ "10", "20", "30", "40", "50", "60" ]
+    },
+    {
       "id": "omega_mega_proxy_list",
       "type": "text",
       "label": "Lista de proxys para MEGA (URL):",
       "default": "",
-      "enabled": "eq(-14,false)+eq(-13,false)",
-      "visible": "eq(-14,false)+eq(-13,false)"
+      "enabled": "eq(-15,false)+eq(-14,false)",
+      "visible": "eq(-15,false)+eq(-14,false)"
     },
     {
       "id": "omega_mega_premium",
       "type": "bool",
       "label": "Usar cuenta PREMIUM de MEGA",
       "default": false,
-      "enabled": "eq(-15,false)+eq(-14,false)",
-      "visible": "eq(-15,false)+eq(-14,false)"
+      "enabled": "eq(-16,false)+eq(-15,false)",
+      "visible": "eq(-16,false)+eq(-15,false)"
     },
     {
       "id": "omega_mega_email",
