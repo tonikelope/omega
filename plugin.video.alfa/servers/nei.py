@@ -46,7 +46,7 @@ DEBRID_PROXY_URL_LOCK = threading.Lock()
 
 CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 WORKERS = 8 #Lo mismo, no subir mucho porque PETA
-MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_port", "omega"))+1)*10) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
+MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "omega"))+1)*10) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
 CHUNK_ERROR_SLEEP = 2 #segundos
 
 DEBRID_ACCOUNT_FREE_SPACE = None
