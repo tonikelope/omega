@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.92"
+OMEGA_VERSION = "3.93"
 
 config.set_setting("unify", "false")
 

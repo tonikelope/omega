@@ -155,11 +155,11 @@
     {
       "id": "omega_debrid_proxy_chunks",
       "type": "list",
-      "label": "Tamaño del búffer (chunks) del proxy DEBRID:",
+      "label": "Tamaño del búffer (RAM) del proxy DEBRID:",
       "default": 2,
       "enabled": "eq(-14,true)|eq(-13,true)",
       "visible": "eq(-14,true)|eq(-13,true)",
-      "lvalues": [ "10", "20", "30", "40", "50", "60" ]
+      "lvalues": [ "50 MB", "100 MB", "150 MB", "200 MB", "250 MB", "300 MB" ]
     },
     {
       "id": "omega_mega_proxy_list",
