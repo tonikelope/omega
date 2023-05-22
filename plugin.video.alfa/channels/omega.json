@@ -147,7 +147,7 @@
     {
       "id": "omega_debrid_proxy_port",
       "type": "text",
-      "label": "Puerto para DEBRID proxy:",
+      "label": "Puerto para el proxy DEBRID:",
       "default": "21447",
       "enabled": "eq(-13,true)|eq(-12,true)",
       "visible": "eq(-13,true)|eq(-12,true)"
@@ -155,7 +155,7 @@
     {
       "id": "omega_debrid_proxy_chunks",
       "type": "list",
-      "label": "Número de CHUNKS para DEBRID proxy:",
+      "label": "Tamaño del búffer (chunks) del proxy DEBRID:",
       "default": 2,
       "enabled": "eq(-14,true)|eq(-13,true)",
       "visible": "eq(-14,true)|eq(-13,true)",
