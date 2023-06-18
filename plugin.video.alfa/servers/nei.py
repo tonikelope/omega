@@ -45,7 +45,7 @@ DEBRID_PROXY_FILE_URL=None
 DEBRID_PROXY_URL_LOCK = threading.Lock()
 
 CHUNK_SIZE = 5*1024*1024 #COMPROMISO
-WORKERS = 8 #Lo mismo, no subir mucho porque PETA
+WORKERS = int(config.get_setting("omega_debrid_proxy_workers", "omega"))+1
 MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "omega"))+1)*10) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
 CHUNK_ERROR_SLEEP = 2 #segundos
 
@@ -168,11 +168,9 @@ class DebridProxyChunkWriter():
 
                 while not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
 
-                    self.chunk_queue_lock.acquire()
+                    with self.chunk_queue_lock:
 
-                    current_chunk = self.queue.pop(self.bytes_written)
-
-                    self.chunk_queue_lock.release()
+                        current_chunk = self.queue.pop(self.bytes_written)
 
                     self.output.write(current_chunk)
 
@@ -191,24 +189,20 @@ class DebridProxyChunkWriter():
 
         self.exit = True
 
-        self.chunk_queue_lock.acquire()
+        with self.chunk_queue_lock:
 
-        self.queue.clear()
-
-        self.chunk_queue_lock.release()
+            self.queue.clear()
 
         logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] BYE')
 
 
     def nextOffset(self):
         
-        self.chunk_offset_lock.acquire()
+        with self.chunk_offset_lock:
 
-        next_offset = self.next_offset_required
+            next_offset = self.next_offset_required
 
-        self.next_offset_required = self.next_offset_required + CHUNK_SIZE if self.next_offset_required + CHUNK_SIZE < self.end_offset else -1;
-
-        self.chunk_offset_lock.release()
+            self.next_offset_required = self.next_offset_required + CHUNK_SIZE if self.next_offset_required + CHUNK_SIZE < self.end_offset else -1;
 
         return next_offset
 
@@ -288,12 +282,10 @@ class DebridProxyChunkDownloader():
 
                             if len(full_chunk) == required_full_chunk_size:
 
-                                self.chunk_writer.chunk_queue_lock.acquire()
+                                with self.chunk_writer.chunk_queue_lock:
                                 
-                                if not self.exit and not self.chunk_writer.exit:
-                                    self.chunk_writer.queue[inicio]=full_chunk
-
-                                self.chunk_writer.chunk_queue_lock.release()
+                                    if not self.exit and not self.chunk_writer.exit:
+                                        self.chunk_writer.queue[inicio]=full_chunk
 
                                 with self.chunk_writer.cv_new_element:
                                     self.chunk_writer.cv_new_element.notify_all()
@@ -393,13 +385,11 @@ class DebridProxy(BaseHTTPRequestHandler):
 
         logger.debug(url)
 
-        DEBRID_PROXY_URL_LOCK.acquire()
+        with DEBRID_PROXY_URL_LOCK:
         
-        if not DEBRID_PROXY_FILE_URL or DEBRID_PROXY_FILE_URL.url != url:
+            if not DEBRID_PROXY_FILE_URL or DEBRID_PROXY_FILE_URL.url != url:
             
-            DEBRID_PROXY_FILE_URL = multiPartVideoURL(url)
-        
-        DEBRID_PROXY_URL_LOCK.release()
+                DEBRID_PROXY_FILE_URL = multiPartVideoURL(url)
 
 
     def sendResponseHeaders(self):

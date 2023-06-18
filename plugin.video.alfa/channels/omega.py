@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.96"
+OMEGA_VERSION = "3.97"
 
 config.set_setting("unify", "false")
 
@@ -380,7 +380,7 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="Regenerar fichero de ajustes avanzados",
+                    title="Regenerar AJUSTES DE BUFFER DE VIDEO (todo KODI)",
                     action="improve_streaming", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
             itemlist.append(
@@ -603,7 +603,10 @@ def thumbnail_refresh(item):
 
 def improve_streaming(item):
 
-    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), '¿SEGURO?')
+    new_memorysize = str((int(config.get_setting("omega_kodi_buffer", "omega"))+1)*52428800)
+    new_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
+
+    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'Nuevo tamaño de búffer de video de KODI: '+new_memorysize+' bytes\nNueva velocidad de llenado del búffer: '+new_readfactor+'x\n\n¿APLICAR NUEVOS VALORES?')
 
     if ret:
     
@@ -615,9 +618,9 @@ def improve_streaming(item):
         cache = settings_xml.findall("cache")
         cache = ET.Element('cache')
         memorysize = ET.Element('memorysize')
-        memorysize.text = '52428800'
+        memorysize.text = new_memorysize
         readfactor = ET.Element('readfactor')
-        readfactor.text = '8'
+        readfactor.text = new_readfactor
         cache.append(memorysize)
         cache.append(readfactor)
         settings_xml.getroot().append(cache)
