@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.97"
+OMEGA_VERSION = "3.98"
 
 config.set_setting("unify", "false")
 
@@ -604,9 +604,10 @@ def thumbnail_refresh(item):
 def improve_streaming(item):
 
     new_memorysize = str((int(config.get_setting("omega_kodi_buffer", "omega"))+1)*52428800)
+    new_readfactor_mul = str(int(config.get_setting("omega_kodi_readfactor", "omega"))+1)
     new_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
 
-    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'Nuevo tamaño de búffer de video de KODI: '+new_memorysize+' bytes\nNueva velocidad de llenado del búffer: '+new_readfactor+'x\n\n¿APLICAR NUEVOS VALORES?')
+    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'Nuevo tamaño de búffer de video de KODI: '+new_memorysize+' bytes\nNueva velocidad de llenado del búffer: '+new_readfactor_mul+'x\n\n¿APLICAR NUEVOS VALORES?')
 
     if ret:
     
