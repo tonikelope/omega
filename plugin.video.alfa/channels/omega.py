@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.98"
+OMEGA_VERSION = "3.99"
 
 config.set_setting("unify", "false")
 
@@ -652,8 +652,20 @@ def improve_streaming(item):
 
 
 def settings_nei(item):
+    old_kodi_memorysize = str((int(config.get_setting("omega_kodi_buffer", "omega"))+1)*52428800)
+
+    old_kodi_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
+    
     platformtools.show_channel_settings()
+    
     xbmc.executebuiltin('Container.Refresh')
+
+    new_kodi_memorysize = str((int(config.get_setting("omega_kodi_buffer", "omega"))+1)*52428800)
+
+    new_kodi_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
+
+    if old_kodi_memorysize!=new_kodi_memorysize or old_kodi_readfactor!=new_kodi_readfactor:
+        improve_streaming(item)
 
 
 def settings_alfa(item):

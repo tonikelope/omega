@@ -228,7 +228,7 @@
     {
       "id": "omega_kodi_buffer",
       "type": "list",
-      "label": "Tamaño del búffer de KODI (requiere regenerar ajustes):",
+      "label": "Tamaño del búffer de KODI (requiere reiniciar):",
       "default": 0,
       "enabled": true,
       "visible": true,
@@ -237,7 +237,7 @@
     {
       "id": "omega_kodi_readfactor",
       "type": "list",
-      "label": "Velocidad de llenado del búffer de KODI (requiere regenerar ajustes):",
+      "label": "Velocidad de llenado del búffer de KODI (requiere reiniciar):",
       "default": 1,
       "enabled": true,
       "visible": true,
