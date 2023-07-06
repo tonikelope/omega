@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "3.99"
+OMEGA_VERSION = "4.0"
 
 config.set_setting("unify", "false")
 
@@ -926,7 +926,7 @@ def bibliotaku_series(item):
             else:
                 series[parsed_title['title']]=[mc_id]
 
-                thumbnail = item.thumbnail
+                thumbnail="special://home/addons/plugin.video.omega/resources/fanart.png"
 
                 content_serie_name = ""
 
@@ -1066,7 +1066,7 @@ def bibliotaku_pelis(item):
 
         if (not letter_pattern and not item.search) or (letter_pattern and re.search(letter_pattern, parsed_title['title'])) or title_contains_words(parsed_title['title'], item.search):
 
-            thumbnail = item.thumbnail
+            thumbnail="special://home/addons/plugin.video.omega/resources/fanart.png"
 
             content_serie_name = ""
 
@@ -1283,7 +1283,7 @@ def foro(item):
                     title = scrapedtitle
                     uploader=""
 
-                thumbnail = item.thumbnail
+                thumbnail="special://home/addons/plugin.video.omega/resources/fanart.png"
 
                 content_serie_name = ""
 
@@ -1372,8 +1372,8 @@ def foro(item):
 
         if matches:
             url = matches.group(1)
-            title = "[B]>> PÁGINA SIGUIENTE[/B]"
-            itemlist.append(Item(channel=item.channel, fanart=item.fanart, parent_title=item.parent_title, viewcontent="movies", viewmode="poster", mode=item.mode, section=item.section, action="foro", title=title, url=url))
+            title = ""
+            itemlist.append(Item(channel=item.channel, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, parent_title=item.parent_title, viewcontent="movies", viewmode="poster", mode=item.mode, section=item.section, action="foro", title=title, url=url))
 
         tmdb.set_infoLabels_itemlist(itemlist, True)
 
@@ -1529,10 +1529,10 @@ def search_parse(data, item):
 
     if matches:
         url = matches.group(1)
-        title = "[B]>> PÁGINA SIGUIENTE[/B]"
+        title = ""
         thumbnail = ""
         plot = ""
-        itemlist.append(Item(channel=item.channel, action="search_pag", viewcontent="movies", viewmode="poster", title=title, url=url, thumbnail=item.thumbnail))
+        itemlist.append(Item(channel=item.channel, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", action="search_pag", viewcontent="movies", viewmode="poster", title=title, url=url))
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
