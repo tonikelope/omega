@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.1"
+OMEGA_VERSION = "4.2"
 
 config.set_setting("unify", "false")
 
@@ -2191,7 +2191,7 @@ def leer_criticas_fa(item):
                 rating_text = "[B][" + str(critica['nota']) + "][/B]"
                 thumbnail = get_omega_resource_path("neutral.png")
 
-            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":"LEER CRÍTICA CON SPOILERS", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
+            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":rating_text+" "+critica['title']+" ("+critica['nick']+") (SPOILERS ACTIVADOS)", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
 
         return itemlist
 
@@ -2216,7 +2216,16 @@ def cargar_critica(item):
     res = re.compile(critica_pattern, re.DOTALL).search(data)
 
     if res:
-        xbmcgui.Dialog().textviewer(item.title, html.unescape(clean_html_tags(res.group(1).replace('<br>', "\n"))))
+        respuesta = res.group(1)
+
+        critica_pattern_spoiler = r"\"review-text2\" *?>(.*?)< *?/ *?div"
+
+        res_spoiler = re.compile(critica_pattern_spoiler, re.DOTALL).search(data)
+
+        if res_spoiler:
+            respuesta = respuesta + "\n\n**********************************************************\n(CLICK DERECHO PARA ACTIVAR LOS SPOILERS A PARTIR DE AQUÍ)\n**********************************************************\n\n"
+
+        xbmcgui.Dialog().textviewer(item.title, html.unescape(clean_html_tags(respuesta.replace('<br>', "\n"))))
 
 
 def cargar_critica_con_spoiler(item):
