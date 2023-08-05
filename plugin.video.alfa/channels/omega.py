@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.2"
+OMEGA_VERSION = "4.3"
 
 config.set_setting("unify", "false")
 
@@ -2191,7 +2191,7 @@ def leer_criticas_fa(item):
                 rating_text = "[B][" + str(critica['nota']) + "][/B]"
                 thumbnail = get_omega_resource_path("neutral.png")
 
-            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":rating_text+" "+critica['title']+" ("+critica['nick']+") (SPOILERS ACTIVADOS)", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
+            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":"LEER CRÍTICA CON SPOILERS", "title2":rating_text+" "+critica['title']+" ("+critica['nick']+") (SPOILERS ACTIVADOS)", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
 
         return itemlist
 
@@ -2225,7 +2225,7 @@ def cargar_critica(item):
         if res_spoiler:
             respuesta = respuesta + "\n\n**********************************************************\n(CLICK DERECHO PARA ACTIVAR LOS SPOILERS A PARTIR DE AQUÍ)\n**********************************************************\n\n"
 
-        xbmcgui.Dialog().textviewer(item.title, html.unescape(clean_html_tags(respuesta.replace('<br>', "\n"))))
+        xbmcgui.Dialog().textviewer(item.title2 if 'title2' in item else item.title, html.unescape(clean_html_tags(respuesta.replace('<br>', "\n"))))
 
 
 def cargar_critica_con_spoiler(item):
@@ -2250,7 +2250,7 @@ def cargar_critica_con_spoiler(item):
         if res_spoiler:
             respuesta = respuesta + "\n\n*********************************\nCUIDADO: SPOILER A PARTIR DE AQUÍ\n*********************************\n\n" + res_spoiler.group(1)
 
-        xbmcgui.Dialog().textviewer(item.title, html.unescape(clean_html_tags(respuesta.replace('<br>', "\n"))))
+        xbmcgui.Dialog().textviewer(item.title2 if 'title2' in item else item.title, html.unescape(clean_html_tags(respuesta.replace('<br>', "\n"))))
 
 
 def indice_links(item):
