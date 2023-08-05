@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.0"
+OMEGA_VERSION = "4.1"
 
 config.set_setting("unify", "false")
 
@@ -333,7 +333,7 @@ def mainlist(item):
                 Item(
                     channel=item.channel,
                     title="[COLOR darkorange][B]Buscar en OMEGA por GÉNERO[/B][/COLOR]",
-                    action="buscar_por_genero", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="list", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"))
+                    action="buscar_por_genero", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png", page=1))
 
             itemlist.append(
                 Item(
@@ -420,51 +420,58 @@ def mainlist(item):
 
 
 def buscar_por_genero(item):
-    generos = {
-    "Acción": 28,
-    "Aventura": 12,
-    "Animación": 16,
-    "Comedia": 35,
-    "Crimen": 80,
-    "Documental": 99,
-    "Drama": 18,
-    "Familia": 10751,
-    "Fantasía": 14,
-    "Historia": 36,
-    "Terror": 27,
-    "Música": 10402,
-    "Misterio": 9648,
-    "Romance": 10749,
-    "Ciencia ficción": 878,
-    "Película de TV": 10770,
-    "Suspense": 53,
-    "Bélica": 10752,
-    "Western": 37,
-    "Telenovela": 10766,
-    "Entrevista": 10767,
-    "Política": 10768,
-    "Reality": 10764,
-    "SIN CLASIFICAR": 0}
-
-    dialog = xbmcgui.Dialog()
     
-    indices = dialog.multiselect("Se mostrarán los aportes que pertenezcan a TODOS los géneros", list(generos.keys()), preselect=[])
+    if item.page == 1:
+        generos = {
+        "Acción": 28,
+        "Aventura": 12,
+        "Animación": 16,
+        "Comedia": 35,
+        "Crimen": 80,
+        "Documental": 99,
+        "Drama": 18,
+        "Familia": 10751,
+        "Fantasía": 14,
+        "Historia": 36,
+        "Terror": 27,
+        "Música": 10402,
+        "Misterio": 9648,
+        "Romance": 10749,
+        "Ciencia ficción": 878,
+        "Película de TV": 10770,
+        "Suspense": 53,
+        "Bélica": 10752,
+        "Western": 37,
+        "Telenovela": 10766,
+        "Entrevista": 10767,
+        "Política": 10768,
+        "Reality": 10764,
+        "SIN CLASIFICAR": 0}
 
-    if indices and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'ESTO PUEDE TARDAR ¿CONTINUAR?'):
-
-        generos_seleccionados = [list(generos.keys())[i] for i in indices]
-
-        generos_seleccionados_b64=base64.b64encode(",".join(generos_seleccionados).encode('utf-8')).decode('utf-8')
+        dialog = xbmcgui.Dialog()
         
-        res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post={'generosb64':generos_seleccionados_b64, 'json':1}, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
+        indices = dialog.multiselect("Se mostrarán los aportes que pertenezcan a TODOS los géneros", list(generos.keys()), preselect=[])
+
+        if indices:
+            generos_seleccionados = [list(generos.keys())[i] for i in indices]
+
+            generos_seleccionados_b64=base64.b64encode(",".join(generos_seleccionados).encode('utf-8')).decode('utf-8')
+
+            item.generosb64=generos_seleccionados_b64
+
+            item.generos=generos_seleccionados
+
+    if item.page>1 or indices:
+
+        res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post={'generosb64':item.generosb64, 'json':1, 'page':item.page}, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
 
         boards={'pelis': ['44', '47', '229'], 'series':['53', '59', '235']}
 
         itemlist=[]
 
-        itemlist.append(Item(channel=item.channel, action="", title="[B]"+"+".join(generos_seleccionados)+"[/B]"))
+        itemlist.append(Item(channel=item.channel, action="", title="[B]"+"+".join(item.generos)+" (Pag: "+str(item.page)+")[/B]"))
 
-        for aporte in res_json:
+        for aporte in res_json['data']:
 
             rawscrapedtitle = aporte['title']
 
@@ -520,6 +527,8 @@ def buscar_por_genero(item):
 
             if ignore_title not in ITEM_BLACKLIST:
                 itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
+
+        itemlist.append(Item(channel=item.channel, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
 
         tmdb.set_infoLabels_itemlist(itemlist, True)
 
