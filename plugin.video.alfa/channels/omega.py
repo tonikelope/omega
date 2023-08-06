@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.3"
+OMEGA_VERSION = "4.4"
 
 config.set_setting("unify", "false")
 
@@ -1271,6 +1271,17 @@ def foro(item):
 
             itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
+        search_item = item.clone()
+
+        search_item.title = "[COLOR orange][B]BUSCAR APORTES SIMILARES DE OTROS UPLOADERS[/B][/COLOR]"
+
+        search_item.action = "search_similares"
+
+        search_item. url=""
+
+        search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"
+
+        itemlist.append(search_item)
     
     if not video_links:
 
@@ -1402,6 +1413,41 @@ def foro(item):
 
     return itemlist
 
+
+def search_similares(item):
+
+    texto = item.contentTitle
+
+    texto_orig = texto
+
+    if texto != "":
+        texto = texto.replace(" ", "+")
+
+    post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&" \
+                                          "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D" \
+                                          "=229&brd%5B230%5D=230&brd%5B41%5D=41&brd%5B47%5D=47&brd%5B48%5D" \
+                                          "=48&brd%5B42%5D=42&brd%5B44%5D=44&brd%5B46%5D=46&brd%5B218%5D=2" \
+                                          "18&brd%5B225%5D=225&brd%5B7%5D=7&brd%5B52%5D=52&brd%5B59%5D=59&b" \
+                                          "rd%5B61%5D=61&brd%5B62%5D=62&brd%5B51%5D=51&brd%5B53%5D=53&brd%5" \
+                                          "B54%5D=54&brd%5B55%5D=55&brd%5B63%5D=63&brd%5B64%5D=64&brd%5B66%" \
+                                          "5D=66&brd%5B67%5D=67&brd%5B65%5D=65&brd%5B68%5D=68&brd%5B69%5D=69" \
+                                          "&brd%5B14%5D=14&brd%5B87%5D=87&brd%5B86%5D=86&brd%5B93%5D=93&brd" \
+                                          "%5B83%5D=83&brd%5B89%5D=89&brd%5B85%5D=85&brd%5B82%5D=82&brd%5B9" \
+                                          "1%5D=91&brd%5B90%5D=90&brd%5B92%5D=92&brd%5B88%5D=88&brd%5B84%5D" \
+                                          "=84&brd%5B212%5D=212&brd%5B94%5D=94&brd%5B23%5D=23&submit=Buscar"
+
+    data = httptools.downloadpage("https://noestasinvitado.com/search2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT).data
+
+    search_itemlist = search_parse(data, item)
+
+    if search_itemlist and search_itemlist[-1].action=="search_pag":
+        next_page = search_itemlist.pop()
+        search_itemlist.extend(bibliotaku_buscar(item, texto_orig))
+        search_itemlist.append(next_page)
+    else:
+        search_itemlist.extend(bibliotaku_buscar(item, texto_orig))
+
+    return search_itemlist
 
 def search(item, texto):
 
