@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.4"
+OMEGA_VERSION = "4.5"
 
 config.set_setting("unify", "false")
 
@@ -1553,7 +1553,7 @@ def search_parse(data, item):
             quality = "HD"
             section = "PELÍCULAS"
         elif "/sd-espanol/" in url or "/sd-v-o-v-o-s/" in url or "/sd-animacion/" in url or "/3d-/" in url or "/cine-clasico-/" in url :
-            content_type = "tvshow"
+            content_type = "movie"
             content_serie_name = content_title
             quality = "SD"
             section = "PELÍCULAS"
