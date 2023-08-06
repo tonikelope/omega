@@ -1,4 +1,4 @@
-﻿# -*- coding: utf-8 -*-
+# -*- coding: utf-8 -*-
 # https://github.com/tonikelope/omega
 
 import base64
@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.6"
+OMEGA_VERSION = "4.7"
 
 config.set_setting("unify", "false")
 
@@ -1421,6 +1421,7 @@ def search_similares(item):
     texto_orig = texto
 
     if texto != "":
+        texto = re.sub(r'(?:(?<=^)|(?<=[^\w]))\w{1}(?=[^\w]|$)', '', texto)
         texto = texto.replace(" ", "+")
 
     post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&" \
@@ -1457,6 +1458,7 @@ def search(item, texto):
     texto_orig = texto
 
     if texto != "":
+        texto = re.sub(r'(?:(?<=^)|(?<=[^\w]))\w{1}(?=[^\w]|$)', '', texto)
         texto = texto.replace(" ", "+")
 
     post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&" \
@@ -1817,6 +1819,10 @@ def ignore_uploader(item):
                                       os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
                                                    'thumb', 'omega.gif'), 5000)
         xbmc.executebuiltin('Container.Refresh')
+
+
+def debugNotification(msg):
+    xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels','thumb', 'omega.gif'), 5000)
 
 
 def getMegacrypterFilename(url):
