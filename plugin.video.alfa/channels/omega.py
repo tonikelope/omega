@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.8"
+OMEGA_VERSION = "4.9"
 
 config.set_setting("unify", "false")
 
@@ -1184,7 +1184,7 @@ def leerMensajesHiloForo(item):
     
     for msg in json_response:
         if i>0:
-            itemlist.append(Item(channel=item.channel, url=item.url, context=[{"title":"AGRADECER MENSAJE", "action": "darGraciasMensajeForo", "channel":"omega"}] if (OMEGA_LOGIN != msg['nick'] and not msg['thanks']) else None, contentPlot=item.contentPlot, fanart='https://noestasinvitado.com/logonegro2.png', thumbnail='https://noestasinvitado.com/logonegro2.png', action='cargarMensajeForo', msg=msg, title='[B][COLOR '+('lightgreen' if OMEGA_LOGIN == msg['nick'] else 'darkorange')+'][I]'+msg['nick']+':[/I][/COLOR][/B] '+html.unescape(clean_html_tags(msg['body'].replace('\n', ' ')))))
+            itemlist.append(Item(channel=item.channel, url=item.url, context=[{"title":"[B]AGRADECER MENSAJE[/B]", "action": "darGraciasMensajeForo", "channel":"omega"}] if (OMEGA_LOGIN != msg['nick'] and not msg['thanks']) else None, contentPlot=item.contentPlot, fanart='https://noestasinvitado.com/logonegro2.png', thumbnail='https://noestasinvitado.com/logonegro2.png', action='cargarMensajeForo', msg=msg, title='[B][COLOR '+('lightgreen' if OMEGA_LOGIN == msg['nick'] else 'darkorange')+'][I]'+msg['nick']+':[/I][/COLOR][/B] '+html.unescape(clean_html_tags(msg['body'].replace('\n', ' ')))))
 
         i+=1
 
@@ -1421,8 +1421,7 @@ def search_similares(item):
     texto_orig = texto
 
     if texto != "":
-        texto = re.sub(r'(?:(?<=^)|(?<=[^\w]))\w{1}(?=[^\w]|$)', '', texto)
-        texto = texto.replace(" ", "+")
+        texto = '"'+texto.replace(" ", "+")+'"'
 
     post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&" \
                                           "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D" \
@@ -1458,8 +1457,7 @@ def search(item, texto):
     texto_orig = texto
 
     if texto != "":
-        texto = re.sub(r'(?:(?<=^)|(?<=[^\w]))\w{1}(?=[^\w]|$)', '', texto)
-        texto = texto.replace(" ", "+")
+        texto = '"'+texto.replace(" ", "+")+'"'
 
     post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&" \
                                           "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D" \
@@ -1592,7 +1590,7 @@ def search_parse(data, item):
         title = ""
         thumbnail = ""
         plot = ""
-        itemlist.append(Item(channel=item.channel, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", action="search_pag", viewcontent="movies", viewmode="poster", title=title, url=url))
+        itemlist.append(Item(channel=item.channel, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", action="search_pag", viewcontent=item.viewcontent, viewmode=item.viewmode, title=title, url=url))
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
@@ -1790,10 +1788,10 @@ def find_video_gvideo_links(item, data):
 
             for url in list(OrderedDict.fromkeys(matches)):
                 itemlist.append(
-                    Item(channel=item.channel, visto_title=title, context=[{"title":"MARCAR VISTO (OMEGA)", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='gvideo', title=title, url=url,
+                    Item(channel=item.channel, visto_title=title, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='gvideo', title=title, url=url,
                          mode=item.mode))
         else:
-            itemlist.append(Item(channel=item.channel, visto_title=title, context=[{"title":"MARCAR VISTO (OMEGA)", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='gvideo', title=title,
+            itemlist.append(Item(channel=item.channel, visto_title=title, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='gvideo', title=title,
                                  url=matches[0], mode=item.mode))
 
         if item.id_topic:
@@ -2120,7 +2118,7 @@ def get_video_mega_links_group(item):
                                 infoLabels['playcount']=1 if '(VISTO)' in title else 0
 
                             itemlist.append(
-                                Item(channel=item.channel, visto_title=title, context=[{"title":"MARCAR VISTO (OMEGA)", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=title, url=url + '#' + MC_REVERSE_DATA + '#' + mega_sid, thumbnail=get_omega_resource_path("megacrypter.png"), mode=item.mode, infoLabels=infoLabels))
+                                Item(channel=item.channel, visto_title=title, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=title, url=url + '#' + MC_REVERSE_DATA + '#' + mega_sid, thumbnail=get_omega_resource_path("megacrypter.png"), mode=item.mode, infoLabels=infoLabels))
 
                     i=i+1
 
@@ -2154,7 +2152,7 @@ def get_video_mega_links_group(item):
 
             infoLabels=item.infoLabels
 
-            itemlist.append(Item(channel=item.channel, visto_title=title, context=[{"title":"MARCAR VISTO (OMEGA)", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=title, url=murl, thumbnail=get_omega_resource_path("megacrypter.png"), mode=item.mode, infoLabels=infoLabels))
+            itemlist.append(Item(channel=item.channel, visto_title=title, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=title, url=murl, thumbnail=get_omega_resource_path("megacrypter.png"), mode=item.mode, infoLabels=infoLabels))
         
         elif len(multi_url)>0 and len(multi_url) != tot_multi_url:
             itemlist.append(Item(channel=item.channel,title="[COLOR white][B]ERROR AL GENERAR EL ENLACE MULTI (¿TODAS LAS PARTES DISPONIBLES?)[/B][/COLOR]", action="", url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
@@ -2246,7 +2244,7 @@ def leer_criticas_fa(item):
                 rating_text = "[B][" + str(critica['nota']) + "][/B]"
                 thumbnail = get_omega_resource_path("neutral.png")
 
-            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":"LEER CRÍTICA CON SPOILERS", "title2":rating_text+" "+critica['title']+" ("+critica['nick']+") (SPOILERS ACTIVADOS)", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
+            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":"[COLOR yellow][B]LEER CRÍTICA CON SPOILERS[/B][/COLOR]", "title2":rating_text+" "+critica['title']+" ("+critica['nick']+") (SPOILERS ACTIVADOS)", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
 
         return itemlist
 
