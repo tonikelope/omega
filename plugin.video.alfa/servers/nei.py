@@ -48,6 +48,7 @@ CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 WORKERS = int(config.get_setting("omega_debrid_proxy_workers", "omega"))+1
 MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "omega"))+1)*10) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
 CHUNK_ERROR_SLEEP = 2 #segundos
+CHUNKWRITER_SLOW_WAIT = 10 #segundos
 
 DEBRID_ACCOUNT_FREE_SPACE = None
 
@@ -164,8 +165,10 @@ class DebridProxyChunkWriter():
 
         try:
 
+            conta_wait = -1
+            
             while not self.exit and self.bytes_written < self.end_offset:
-
+                
                 while not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
 
                     with self.chunk_queue_lock:
@@ -176,10 +179,19 @@ class DebridProxyChunkWriter():
 
                     self.bytes_written+=len(current_chunk)
 
+                    conta_wait = 0
+
                     with self.cv_queue_full:
                         self.cv_queue_full.notify_all()
 
                 if not self.exit and self.bytes_written < self.end_offset:
+                    
+                    if conta_wait >= 0:
+                        
+                        conta_wait+=1
+
+                        if conta_wait == CHUNKWRITER_SLOW_WAIT:
+                            xbmcgui.Dialog().notification('OMEGA STREAM PROXY', 'AVISO: FUENTE DE DATOS LENTA', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 2000, False)
 
                     with self.cv_new_element:
                         self.cv_new_element.wait(1)
