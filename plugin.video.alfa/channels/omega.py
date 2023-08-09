@@ -25,9 +25,9 @@ from platformcode import config, logger, platformtools, updater
 from collections import OrderedDict
 from datetime import datetime
 
-CHECK_STUFF_INTEGRITY = True
+CHECK_STUFF_INTEGRITY = False
 
-OMEGA_VERSION = "4.9"
+OMEGA_VERSION = "4.10"
 
 config.set_setting("unify", "false")
 
@@ -450,7 +450,7 @@ def buscar_por_genero(item):
 
         dialog = xbmcgui.Dialog()
         
-        indices = dialog.multiselect("Se mostrarán los aportes que pertenezcan a TODOS los géneros", list(generos.keys()), preselect=[])
+        indices = dialog.multiselect("Se mostrará lo que pertenezca a TODOS los géneros seleccionados", list(generos.keys()), preselect=[])
 
         if indices:
             generos_seleccionados = [list(generos.keys())[i] for i in indices]
@@ -1421,7 +1421,7 @@ def search_similares(item):
     texto_orig = texto
 
     if texto != "":
-        texto = '"'+texto.replace(" ", "+")+'"'
+        texto = '"'+texto.replace("&"," ").replace(" ", "+")+'"'
 
     post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&" \
                                           "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D" \
@@ -1457,7 +1457,7 @@ def search(item, texto):
     texto_orig = texto
 
     if texto != "":
-        texto = '"'+texto.replace(" ", "+")+'"'
+        texto = '"'+texto.replace("&"," ").replace(" ", "+")+'"'
 
     post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&" \
                                           "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D" \
