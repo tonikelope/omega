@@ -25,9 +25,9 @@ from platformcode import config, logger, platformtools, updater
 from collections import OrderedDict
 from datetime import datetime
 
-CHECK_STUFF_INTEGRITY = False
+CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.10"
+OMEGA_VERSION = "4.11"
 
 config.set_setting("unify", "false")
 
@@ -1841,19 +1841,21 @@ def getMegacrypterFilename(url):
 
 
 def getMegaFilename(url):
-    url = re.sub(r"(\.nz/file/)([^#]+)#", r".nz/#!\2!", url)
+    try:
+        url = re.sub(r"(\.nz/file/)([^#]+)#", r".nz/#!\2!", url)
 
-    if len(url.split("!")) == 3:
-        file_id = url.split("!")[1]
-        file_key = url.split("!")[2]
-        file = mega_api_req({'a': 'g', 'g': 1, 'p': file_id})
-        
-        key = crypto.base64_to_a32(file_key)
-        k = (key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7])
-        attributes = crypto.base64_url_decode(file['at'])
-        attributes = crypto.decrypt_attr(attributes, k)
-
-        return attributes['n']
+        if len(url.split("!")) == 3:
+            file_id = url.split("!")[1]
+            file_key = url.split("!")[2]
+            file = mega_api_req({'a': 'g', 'g': 1, 'p': file_id})
+            
+            key = crypto.base64_to_a32(file_key)
+            k = (key[0] ^ key[4], key[1] ^ key[5], key[2] ^ key[6], key[3] ^ key[7])
+            attributes = crypto.base64_url_decode(file['at'])
+            attributes = crypto.decrypt_attr(attributes, k)
+            return attributes['n']
+    except:
+        return 'MEGA BAD FILENAME'
 
 
 def find_video_mega_links(item, data):
