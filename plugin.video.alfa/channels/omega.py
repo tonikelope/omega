@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.12"
+OMEGA_VERSION = "4.14"
 
 config.set_setting("unify", "false")
 
@@ -364,8 +364,14 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]Crear BACKUP de los ajustes de OMEGA[/B]", viewcontent="movies", viewmode="list",
+                    title="[B]EXPORTAR AJUSTES de OMEGA[/B]", viewcontent="movies", viewmode="list",
                     action="backup_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[B]RESTAURAR AJUSTES de OMEGA[/B]", viewcontent="movies", viewmode="list",
+                    action="restore_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
                 Item(
@@ -732,37 +738,85 @@ def xxx_on(item):
         xbmc.executebuiltin('Container.Refresh')
 
 
-def backup_omega_userdata(item):
+def backup_omega_userdata(item, save_dir=None):
     try:
-        omega_data_tmp_dir=KODI_TEMP_PATH+"omega_backup_"+str(int(time.time()))+"/"
+        if not save_dir:
+            save_path=xbmcgui.Dialog().browseSingle(0, 'Selecciona la carpeta para guardar el backup con tus ajustes', 'local', '', False, False, None)
+        else:
+            save_path=save_dir
 
-        os.makedirs(omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/", exist_ok=True)
-        
-        try:
-            shutil.copy(KODI_USERDATA_PATH+"kodi_nei_history", omega_data_tmp_dir+"userdata/kodi_nei_history")
-        except:
-            pass
+        if save_path:
+            omega_data_tmp_dir=KODI_TEMP_PATH+"omega_backup_"+str(int(time.time()))+"/"
+
+            os.makedirs(omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/", exist_ok=True)
             
-        try:
-            shutil.copy(KODI_USERDATA_PATH+"kodi_nei_custom_titles", omega_data_tmp_dir+"userdata/kodi_nei_custom_titles")
-        except:
-            pass
+            try:
+                shutil.copy(KODI_USERDATA_PATH+"kodi_nei_history", omega_data_tmp_dir+"userdata/kodi_nei_history")
+            except:
+                pass
+                
+            try:
+                shutil.copy(KODI_USERDATA_PATH+"kodi_nei_custom_titles", omega_data_tmp_dir+"userdata/kodi_nei_custom_titles")
+            except:
+                pass
 
-        try:
-            shutil.copy(KODI_USERDATA_PATH+"kodi_nei_item_blacklist", omega_data_tmp_dir+"userdata/kodi_nei_item_blacklist")
-        except:
-            pass
+            try:
+                shutil.copy(KODI_USERDATA_PATH+"kodi_nei_item_blacklist", omega_data_tmp_dir+"userdata/kodi_nei_item_blacklist")
+            except:
+                pass
 
-        try:
-            shutil.copy(KODI_USERDATA_PATH+"addon_data/plugin.video.alfa/settings_channels/omega_data.json", omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/omega_data.json")
-        except:
-            pass
+            try:
+                shutil.copy(KODI_USERDATA_PATH+"addon_data/plugin.video.alfa/settings_channels/omega_data.json", omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/omega_data.json")
+            except:
+                pass
 
-        shutil.make_archive(KODI_HOME_PATH+'omega_backup_data_'+str(int(time.time())), 'zip', omega_data_tmp_dir)
+            shutil.make_archive(save_path+'/omega_backup_data_'+str(int(time.time())), 'zip', omega_data_tmp_dir)
 
-        xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "BACKUP CREADO (ver carpeta de KODI)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            if not save_dir:
+                xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "BACKUP CREADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
     except:
         xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "ERROR AL CREAR EL BACKUP", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+
+
+def restore_omega_userdata(item):
+    try:
+        backup_file=xbmcgui.Dialog().browseSingle(1, 'Selecciona el fichero de backup con tus ajustes', 'local', '', False, False, None)
+        
+        if backup_file:
+            omega_data_tmp_dir=KODI_TEMP_PATH+"omega_backup_restore_"+str(int(time.time()))+"/"
+            
+            shutil.unpack_archive(backup_file, omega_data_tmp_dir, 'zip')
+            
+            backup_omega_userdata(item, KODI_USERDATA_PATH)
+
+            try:
+                shutil.copy(omega_data_tmp_dir+"userdata/kodi_nei_history", KODI_USERDATA_PATH+"kodi_nei_history" )
+            except:
+                pass
+                
+            try:
+                shutil.copy(omega_data_tmp_dir+"userdata/kodi_nei_custom_titles", KODI_USERDATA_PATH+"kodi_nei_custom_titles")
+            except:
+                pass
+
+            try:
+                shutil.copy(omega_data_tmp_dir+"userdata/kodi_nei_item_blacklist", KODI_USERDATA_PATH+"kodi_nei_item_blacklist")
+            except:
+                pass
+
+            try:
+                shutil.copy(omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/omega_data.json", KODI_USERDATA_PATH+"addon_data/plugin.video.alfa/settings_channels/omega_data.json")
+            except:
+                pass
+
+            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "BACKUP RESTAURADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            
+            ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
+
+            if ret:
+                xbmc.executebuiltin('RestartApp')
+    except:
+        xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "ERROR AL RESTAURAR EL BACKUP", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def clean_cache(item):
