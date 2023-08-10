@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.11"
+OMEGA_VERSION = "4.12"
 
 config.set_setting("unify", "false")
 
@@ -46,6 +46,8 @@ USE_MC_REVERSE = config.get_setting("omega_use_mc_reverse", "omega")
 KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
 
 KODI_USERDATA_PATH = xbmcvfs.translatePath('special://userdata/')
+
+KODI_HOME_PATH = xbmcvfs.translatePath('special://home/')
 
 KODI_NEI_HISTORY_PATH = KODI_USERDATA_PATH + 'kodi_nei_history'
 
@@ -358,6 +360,12 @@ def mainlist(item):
                     channel=item.channel,
                     title="[COLOR red][B]Gestionar aportes ignorados[/B][/COLOR]", viewcontent="movies", viewmode="list",
                     action="clean_ignored_items", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[B]Crear BACKUP de los ajustes de OMEGA[/B]", viewcontent="movies", viewmode="list",
+                    action="backup_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
                 Item(
@@ -722,6 +730,39 @@ def xxx_on(item):
                 xbmcgui.Dialog().ok('OMEGA: reactivar contenido adulto', 'Contraseña incorrecta')
     else:
         xbmc.executebuiltin('Container.Refresh')
+
+
+def backup_omega_userdata(item):
+    try:
+        omega_data_tmp_dir=KODI_TEMP_PATH+"omega_backup_"+str(int(time.time()))+"/"
+
+        os.makedirs(omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/", exist_ok=True)
+        
+        try:
+            shutil.copy(KODI_USERDATA_PATH+"kodi_nei_history", omega_data_tmp_dir+"userdata/kodi_nei_history")
+        except:
+            pass
+            
+        try:
+            shutil.copy(KODI_USERDATA_PATH+"kodi_nei_custom_titles", omega_data_tmp_dir+"userdata/kodi_nei_custom_titles")
+        except:
+            pass
+
+        try:
+            shutil.copy(KODI_USERDATA_PATH+"kodi_nei_item_blacklist", omega_data_tmp_dir+"userdata/kodi_nei_item_blacklist")
+        except:
+            pass
+
+        try:
+            shutil.copy(KODI_USERDATA_PATH+"addon_data/plugin.video.alfa/settings_channels/omega_data.json", omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/omega_data.json")
+        except:
+            pass
+
+        shutil.make_archive(KODI_HOME_PATH+'omega_backup_data_'+str(int(time.time())), 'zip', omega_data_tmp_dir)
+
+        xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "BACKUP CREADO (ver carpeta de KODI)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+    except:
+        xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "ERROR AL CREAR EL BACKUP", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def clean_cache(item):
