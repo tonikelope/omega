@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.14"
+OMEGA_VERSION = "4.15"
 
 config.set_setting("unify", "false")
 
@@ -1470,8 +1470,10 @@ def foro(item):
                     
                     matches = re.compile(r"([^/]+)/$", re.DOTALL).search(url)
 
-                    if matches.group(1) not in ('hd-espanol-59', 'hd-v-o-v-o-s-61', 'hd-animacion-62', 'sd-espanol-53', 'sd-v-o-v-o-s-54', 'sd-animacion', 'seriesovas-anime-espanol', 'seriesovas-anime-v-o-v-o-s'):
+                    if matches.group(1) not in ('hd-espanol-59', 'hd-v-o-v-o-s-61', 'hd-animacion-62', 'sd-espanol-53', 'sd-v-o-v-o-s-54', 'sd-animacion', 'seriesovas-anime-espanol', 'seriesovas-anime-v-o-v-o-s', 'seriesovas-anime-espanol-4k', 'seriesovas-anime-v-o-v-o-s-4k'):
                         url = url + "?sort=first_post;desc"
+                    else:
+                        item.mode="tvshow"
 
                     logger.info("URL_FORO "+item.url)
 
