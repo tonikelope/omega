@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.15"
+OMEGA_VERSION = "4.16"
 
 config.set_setting("unify", "false")
 
@@ -301,6 +301,12 @@ def mainlist(item):
             Item(channel=item.channel,
                  title="[COLOR darkorange][B]Habilita tu cuenta de NEI en preferencias.[/B][/COLOR]",
                  action="settings_nei"))
+
+        itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[B]RESTAURAR AJUSTES de OMEGA[/B]",
+                    action="restore_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
     else:
         if login():
             xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Bienvenido " + OMEGA_LOGIN + "!",
@@ -364,13 +370,12 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]EXPORTAR AJUSTES de OMEGA[/B]", viewcontent="movies", viewmode="list",
-                    action="backup_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+                    title="[B]EXPORTAR AJUSTES de OMEGA[/B]", action="backup_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]RESTAURAR AJUSTES de OMEGA[/B]", viewcontent="movies", viewmode="list",
+                    title="[B]RESTAURAR AJUSTES de OMEGA[/B]",
                     action="restore_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
