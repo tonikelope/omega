@@ -171,13 +171,14 @@ class DebridProxyChunkWriter():
 
                         current_chunk = self.queue.pop(self.bytes_written)
 
+                    with self.cv_queue_full:
+
+                        self.cv_queue_full.notify_all()
+
                     self.output.write(current_chunk)
 
                     self.bytes_written+=len(current_chunk)
-
-                    with self.cv_queue_full:
-                        self.cv_queue_full.notify_all()
-
+                    
                 if not self.exit and self.bytes_written < self.end_offset:
                     
                     with self.cv_new_element:
