@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.16"
+OMEGA_VERSION = "4.17"
 
 config.set_setting("unify", "false")
 
@@ -399,12 +399,6 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="Regenerar AJUSTES DE BUFFER DE VIDEO (todo KODI)",
-                    action="improve_streaming", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
                     title="Regenerar miniaturas (todo KODI)",
                     action="thumbnail_refresh", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
@@ -628,55 +622,6 @@ def thumbnail_refresh(item):
 
         except Exception as e:
             xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', 'ERROR al intentar regenerar miniaturas', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
-
-def improve_streaming(item):
-
-    new_memorysize = str((int(config.get_setting("omega_kodi_buffer", "omega"))+1)*52428800)
-    new_readfactor_mul = str(int(config.get_setting("omega_kodi_readfactor", "omega"))+1)
-    new_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
-
-    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'Nuevo tamaño de búffer de video de KODI: '+new_memorysize+' bytes\nNueva velocidad de llenado del búffer: '+new_readfactor_mul+'x\n\n¿APLICAR NUEVOS VALORES?')
-
-    if ret:
-    
-        if os.path.exists(xbmcvfs.translatePath('special://userdata/advancedsettings.xml')):
-            os.rename(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'), xbmcvfs.translatePath('special://userdata/advancedsettings.xml')+"."+str(int(time.time()))+".bak")
-        
-        settings_xml = ET.ElementTree(ET.Element('advancedsettings'))
-
-        cache = settings_xml.findall("cache")
-        cache = ET.Element('cache')
-        memorysize = ET.Element('memorysize')
-        memorysize.text = new_memorysize
-        readfactor = ET.Element('readfactor')
-        readfactor.text = new_readfactor
-        cache.append(memorysize)
-        cache.append(readfactor)
-        settings_xml.getroot().append(cache)
-
-        network = settings_xml.findall("network")
-        network = ET.Element('network')
-        curlclienttimeout = ET.Element('curlclienttimeout')
-        curlclienttimeout.text = str(ADVANCED_SETTINGS_TIMEOUT)
-        network.append(curlclienttimeout)
-        curllowspeedtime = ET.Element('curllowspeedtime')
-        curllowspeedtime.text = str(ADVANCED_SETTINGS_TIMEOUT)
-        network.append(curllowspeedtime)
-        settings_xml.getroot().append(network)
-
-        playlisttimeout = settings_xml.findall('playlisttimeout')
-        playlisttimeout = ET.Element('playlisttimeout')
-        playlisttimeout.text = str(ADVANCED_SETTINGS_TIMEOUT)
-        settings_xml.getroot().append(playlisttimeout)
-
-        settings_xml.write(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'))
-
-        xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "Ajustes avanzados regenerados", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
-
-        ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
-
-        if ret:
-            xbmc.executebuiltin('RestartApp')
 
 
 def settings_nei(item):
