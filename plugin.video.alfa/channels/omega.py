@@ -27,9 +27,13 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.17"
+OMEGA_VERSION = "4.18"
 
 config.set_setting("unify", "false")
+
+config.set_setting("premium", bool(config.get_setting("omega_realdebrid", "omega")), server="realdebrid")
+
+config.set_setting("premium", bool(config.get_setting("omega_alldebrid", "omega")), server="alldebrid")
 
 OMEGA_LOGIN = config.get_setting("omega_user", "omega")
 
@@ -630,6 +634,10 @@ def settings_nei(item):
     old_kodi_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
     
     platformtools.show_channel_settings()
+
+    config.set_setting("premium", bool(config.get_setting("omega_realdebrid", "omega")), server="realdebrid")
+
+    config.set_setting("premium", bool(config.get_setting("omega_alldebrid", "omega")), server="alldebrid")
     
     xbmc.executebuiltin('Container.Refresh')
 
