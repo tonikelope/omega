@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.21"
+OMEGA_VERSION = "4.22"
 
 config.set_setting("unify", "false")
 
@@ -2094,16 +2094,16 @@ def find_video_mega_links(item, data):
 
                 mc_url=None
                 mc_group_id=None
+                filename=None
 
                 if id[0]:
                     mc_group_id=id[0]
                 elif id[1]:
                     mc_url=id[1]
+                    filename = getMegacrypterFilename(id[1])
                 elif id[2]:
                     mc_url=id[2]
-
-                logger.info("mc_group_id: "+str(mc_group_id))
-                logger.info("mc_url: "+str(mc_url))
+                    filename = getMegaFilename(id[2])
            
                 infoLabels=item.infoLabels
             
@@ -2113,7 +2113,7 @@ def find_video_mega_links(item, data):
                 if mc_group_id:
                     itemlist = get_video_mega_links_group(Item(channel=item.channel, mode=item.mode, id_topic=item.id_topic, viewcontent="movies", viewmode="list", action='', title='', url=item.url, mc_group_id=mc_group_id, mc_url=mc_url, infoLabels=infoLabels))
                 else:
-                    itemlist.append(Item(channel=item.channel, visto_title=item.contentTitle, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=item.contentTitle, url=mc_url, mode=item.mode, infoLabels=infoLabels))
+                    itemlist.append(Item(channel=item.channel, visto_title=filename, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=filename, url=mc_url, mode=item.mode, infoLabels=infoLabels))
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
