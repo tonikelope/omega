@@ -717,13 +717,14 @@ def pageURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=
                 elif OMEGA_ALLDEBRID:
                     urls = alldebrid.get_video_url(page_url)
                 else:
-                    return None
+                    urls = None
 
-                for u in urls:
-                    u[0]='VIDEO NEIDEBRID'
-                    u[1]=debrid2proxyURL(u[1])
-                
-                pickle.dump(urls, file)
+                if urls:
+                    for u in urls:
+                        u[0]='VIDEO NEIDEBRID'
+                        u[1]=debrid2proxyURL(u[1])
+                    
+                    pickle.dump(urls, file)
 
     if progress_bar:
         pbar.update(100)

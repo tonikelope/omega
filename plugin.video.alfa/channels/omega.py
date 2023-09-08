@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.20"
+OMEGA_VERSION = "4.21"
 
 config.set_setting("unify", "false")
 
@@ -2102,13 +2102,19 @@ def find_video_mega_links(item, data):
                 elif id[2]:
                     mc_url=id[2]
 
+                logger.info("mc_group_id: "+str(mc_group_id))
+                logger.info("mc_url: "+str(mc_url))
+           
                 infoLabels=item.infoLabels
             
                 if item.mode == "tvshow":
                     infoLabels['season'] = 1
-                
-                itemlist = get_video_mega_links_group(Item(channel=item.channel, mode=item.mode, id_topic=item.id_topic, viewcontent="movies", viewmode="list", action='', title='', url=item.url, mc_group_id=mc_group_id, mc_url=mc_url, infoLabels=infoLabels))
-                
+
+                if mc_group_id:
+                    itemlist = get_video_mega_links_group(Item(channel=item.channel, mode=item.mode, id_topic=item.id_topic, viewcontent="movies", viewmode="list", action='', title='', url=item.url, mc_group_id=mc_group_id, mc_url=mc_url, infoLabels=infoLabels))
+                else:
+                    itemlist.append(Item(channel=item.channel, visto_title=item.contentTitle, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=item.contentTitle, url=mc_url, mode=item.mode, infoLabels=infoLabels))
+
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
     return itemlist
