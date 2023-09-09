@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.22"
+OMEGA_VERSION = "4.23"
 
 config.set_setting("unify", "false")
 
@@ -1967,6 +1967,37 @@ def getMegaFilename(url):
         return 'MEGA BAD FILENAME'
 
 
+def getMegacrypterFilesize(url):
+    url_split = url.split('/!')
+
+    mc_api_url = url_split[0] + '/api'
+
+    mc_api_r = {'m': 'info', 'link': url}
+
+    if USE_MC_REVERSE:
+        mc_api_r['reverse'] = MC_REVERSE_DATA
+
+    mc_info_res = mc_api_req(mc_api_url, mc_api_r)
+
+    size = mc_info_res['size'].replace('#', '')
+
+    return size
+
+
+def getMegaFilesize(url):
+    try:
+        url = re.sub(r"(\.nz/file/)([^#]+)#", r".nz/#!\2!", url)
+
+        if len(url.split("!")) == 3:
+            file_id = url.split("!")[1]
+            file_key = url.split("!")[2]
+            file = mega_api_req({'a': 'g', 'g': 1, 'p': file_id})
+            
+            return file['s']
+    except:
+        return 0
+
+
 def find_video_mega_links(item, data):
     
     msg_id = re.compile(r'subject_([0-9]+)', re.IGNORECASE).search(data)
@@ -2101,9 +2132,11 @@ def find_video_mega_links(item, data):
                 elif id[1]:
                     mc_url=id[1]
                     filename = getMegacrypterFilename(id[1])
+                    size = getMegacrypterFilesize(id[1])
                 elif id[2]:
                     mc_url=id[2]
                     filename = getMegaFilename(id[2])
+                    size = getMegaFilesize(id[2])
            
                 infoLabels=item.infoLabels
             
@@ -2113,7 +2146,8 @@ def find_video_mega_links(item, data):
                 if mc_group_id:
                     itemlist = get_video_mega_links_group(Item(channel=item.channel, mode=item.mode, id_topic=item.id_topic, viewcontent="movies", viewmode="list", action='', title='', url=item.url, mc_group_id=mc_group_id, mc_url=mc_url, infoLabels=infoLabels))
                 else:
-                    itemlist.append(Item(channel=item.channel, visto_title=filename, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=filename, url=mc_url, mode=item.mode, infoLabels=infoLabels))
+                    title = "[B]" + filename + " [COLOR cyan]["+ str(format_bytes(size))+ "][/COLOR][/B]"
+                    itemlist.append(Item(channel=item.channel, visto_title=filename, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=title, url=mc_url, mode=item.mode, infoLabels=infoLabels))
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
