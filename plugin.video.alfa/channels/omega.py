@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.23"
+OMEGA_VERSION = "4.24"
 
 config.set_setting("unify", "false")
 
@@ -1523,14 +1523,19 @@ def foro(item):
     return itemlist
 
 
-def search_similares(item):
+def search_similares(item, comillas=True):
 
     texto = item.contentTitle
 
     texto_orig = texto
 
     if texto != "":
-        texto = '"'+texto.replace("&"," ").replace(" ", "+")+'"'
+        if comillas:
+            texto = '"'+texto.replace("&"," ").replace(" ", "+")+'"'
+        else:
+            texto = texto.replace("&"," ").replace(" ", "+")
+    else:
+        return []
 
     post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&" \
                                           "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D" \
@@ -1556,7 +1561,7 @@ def search_similares(item):
     else:
         search_itemlist.extend(bibliotaku_buscar(item, texto_orig))
 
-    return search_itemlist
+    return search_itemlist if (len(search_itemlist) > 0 or not comillas) else search_similares(item, False)
 
 def search(item, texto):
 
@@ -1979,7 +1984,7 @@ def getMegacrypterFilesize(url):
 
     mc_info_res = mc_api_req(mc_api_url, mc_api_r)
 
-    size = mc_info_res['size'].replace('#', '')
+    size = mc_info_res['size']
 
     return size
 
@@ -2148,6 +2153,15 @@ def find_video_mega_links(item, data):
                 else:
                     title = "[B]" + filename + " [COLOR cyan]["+ str(format_bytes(size))+ "][/COLOR][/B]"
                     itemlist.append(Item(channel=item.channel, visto_title=filename, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='nei', title=title, url=mc_url, mode=item.mode, infoLabels=infoLabels))
+
+                    if len(itemlist)>0:
+                    
+                        if not saga_pelis:
+                            itemlist.append(Item(channel=item.channel, title="[COLOR orange][B]CRÍTICAS DE FILMAFFINITY[/B][/COLOR]", viewcontent="movies", viewmode="list", contentPlot="[I]Críticas de: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leer_criticas_fa", year=item.infoLabels['year'], mode=item.mode, contentTitle=(item.contentSerieName if item.mode == "tvshow" else item.contentTitle), thumbnail="https://www.filmaffinity.com/images/logo4.png"))
+                    
+                        if item.id_topic:
+                            itemlist.append(Item(channel=item.channel, url_orig=item.url_orig, url=item.url, id_topic=item.id_topic, viewcontent="movies", viewmode="list", title="[B][COLOR lightgrey]MENSAJES DEL FORO[/COLOR][/B]", contentPlot="[I]Mensajes sobre: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leerMensajesHiloForo", thumbnail='https://noestasinvitado.com/logonegro2.png'))
+
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
