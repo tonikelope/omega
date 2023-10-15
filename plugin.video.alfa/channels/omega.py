@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.24"
+OMEGA_VERSION = "4.25"
 
 config.set_setting("unify", "false")
 
@@ -2131,13 +2131,13 @@ def find_video_mega_links(item, data):
                 mc_url=None
                 mc_group_id=None
                 filename=None
+                mc_legacy=False
 
                 if id[0]:
                     mc_group_id=id[0]
                 elif id[1]:
+                    mc_legacy=True
                     mc_url=id[1]
-                    filename = getMegacrypterFilename(id[1])
-                    size = getMegacrypterFilesize(id[1])
                 elif id[2]:
                     mc_url=id[2]
                     filename = getMegaFilename(id[2])
@@ -2148,7 +2148,7 @@ def find_video_mega_links(item, data):
                 if item.mode == "tvshow":
                     infoLabels['season'] = 1
 
-                if mc_group_id:
+                if mc_group_id or mc_legacy:
                     itemlist = get_video_mega_links_group(Item(channel=item.channel, mode=item.mode, id_topic=item.id_topic, viewcontent="movies", viewmode="list", action='', title='', url=item.url, mc_group_id=mc_group_id, mc_url=mc_url, infoLabels=infoLabels))
                 else:
                     title = "[B]" + filename + " [COLOR cyan]["+ str(format_bytes(size))+ "][/COLOR][/B]"
