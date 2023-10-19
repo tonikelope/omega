@@ -17,7 +17,7 @@
     {
       "id": "omega_user",
       "type": "text",
-      "label": "Usuario de noestasinvitado.com:",
+      "label": "Usuario de NEI (exacto):",
       "enabled": true,
       "visible": true
     },
