@@ -25,7 +25,7 @@
       "id": "omega_password",
       "type": "text",
       "hidden": true,
-      "label": "Password de noestasinvitado.com:",
+      "label": "Password de NEI:",
       "enabled": "!eq(-1,'')",
       "visible": true
     },
