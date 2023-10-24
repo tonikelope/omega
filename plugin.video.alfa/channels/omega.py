@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.27"
+OMEGA_VERSION = "4.28"
 
 config.set_setting("unify", "false")
 
@@ -54,6 +54,8 @@ KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
 KODI_USERDATA_PATH = xbmcvfs.translatePath('special://userdata/')
 
 KODI_HOME_PATH = xbmcvfs.translatePath('special://home/')
+
+KODI_NEI_LAST_ITEMS_PATH = KODI_USERDATA_PATH + 'kodi_nei_last'
 
 KODI_NEI_HISTORY_PATH = KODI_USERDATA_PATH + 'kodi_nei_history'
 
@@ -98,6 +100,11 @@ FORO_ITEMS_RETRY = 3
 DEFAULT_HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"}
 
 FOROS_FINALES_NEI = ["ultrahd", "alta-definicion-(hd)", "definicion-estandar-(sd)", "ultra-definicion-(ultra-hd)", "alta-definicion-(hd)-52", "definicion-estandar-(sd)-51"]
+
+try:
+    LAST_ITEMS = [line.rstrip('\n') for line in open(KODI_NEI_LAST_ITEMS_PATH)]
+except:
+    LAST_ITEMS = []
 
 try:
     HISTORY = [line.rstrip('\n') for line in open(KODI_NEI_HISTORY_PATH)]
@@ -204,21 +211,25 @@ def get_omega_resource_path(resource):
 def login():
     logger.info("channels.omega login")
 
+    data = httptools.downloadpage("https://noestasinvitado.com/profile", timeout=DEFAULT_HTTP_TIMEOUT).data
+
+    if data.find(OMEGA_LOGIN) != -1:
+        return True
+
     httptools.downloadpage("https://noestasinvitado.com/login/", timeout=DEFAULT_HTTP_TIMEOUT)
 
     if OMEGA_LOGIN and OMEGA_PASSWORD:
 
-        post = "user=" + OMEGA_LOGIN + "&passwrd=" + \
-               OMEGA_PASSWORD + "&cookielength=-1"
+        post = "user=" + OMEGA_LOGIN + "&passwrd=" + OMEGA_PASSWORD + "&cookielength=-1"
 
-        data = httptools.downloadpage(
-            "https://noestasinvitado.com/login2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT).data
+        data = httptools.downloadpage("https://noestasinvitado.com/login2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT).data
 
-        return data.find(OMEGA_LOGIN) != -1
+        if data.find(OMEGA_LOGIN) != -1:
+            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Bienvenido " + OMEGA_LOGIN + "!",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
-    else:
+            return True
 
-        return false
+    return False
 
 def improve_streaming(item):
 
@@ -365,12 +376,17 @@ def mainlist(item):
                     action="restore_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
     else:
         if login():
-            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Bienvenido " + OMEGA_LOGIN + "!",
-                                          os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
-                                                       'channels', 'thumb', 'omega.gif'), 5000)
             
             mega_login(True)
+            
             load_mega_proxy('', MC_REVERSE_PORT, MC_REVERSE_PASS)
+            
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[B]RECIENTES[/B]",
+                    action="getLastItemList", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_all.png"))
+
             itemlist.append(Item(channel=item.channel, title="[B]PELÍCULAS[/B]", viewcontent="movies", viewmode="list", section="PELÍCULAS", mode="movie", action="foro",
                                  url="https://noestasinvitado.com/peliculas/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_movie.png"))
             itemlist.append(Item(channel=item.channel, title="[B]SERIES[/B]", viewcontent="movies", viewmode="list",section="SERIES", mode="tvshow", action="foro",
@@ -387,6 +403,7 @@ def mainlist(item):
                                      url="https://noestasinvitado.com/18-15/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_adult.png", xxx=True))
             itemlist.append(Item(channel=item.channel, title="Listados alfabéticos", viewcontent="movies", viewmode="list", mode="movie", section="Listados", action="indices",
                                  url="https://noestasinvitado.com/indices/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_movie_az.png"))
+            
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -408,13 +425,19 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]Borrar caché[/B]",
+                    title="[B]Purgar caché[/B]",
                     action="clean_cache", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[COLOR red][B]Borrar historial[/B][/COLOR]",
+                    title="[COLOR red][B]Borrar recientes[/B][/COLOR]",
+                    action="clean_last", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[COLOR red][B]Borrar marcas vídeos vistos[/B][/COLOR]",
                     action="clean_history", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
@@ -763,6 +786,11 @@ def backup_omega_userdata(item, save_dir=None):
             os.makedirs(omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/", exist_ok=True)
             
             try:
+                shutil.copy(KODI_USERDATA_PATH+"kodi_nei_last", omega_data_tmp_dir+"userdata/kodi_nei_last")
+            except:
+                pass
+
+            try:
                 shutil.copy(KODI_USERDATA_PATH+"kodi_nei_history", omega_data_tmp_dir+"userdata/kodi_nei_history")
             except:
                 pass
@@ -800,6 +828,11 @@ def restore_omega_userdata(item):
             shutil.unpack_archive(backup_file, omega_data_tmp_dir, 'zip')
             
             backup_omega_userdata(item, KODI_USERDATA_PATH)
+
+            try:
+                shutil.copy(omega_data_tmp_dir+"userdata/kodi_nei_last", KODI_USERDATA_PATH+"kodi_nei_last" )
+            except:
+                pass
 
             try:
                 shutil.copy(omega_data_tmp_dir+"userdata/kodi_nei_history", KODI_USERDATA_PATH+"kodi_nei_history" )
@@ -850,12 +883,27 @@ def clean_cache(item):
     platformtools.itemlist_refresh()
 
 
+def clean_last(item):
+    if xbmcgui.Dialog().yesno('OMEGA (' + OMEGA_VERSION + ')',
+                              '¿Estás seguro de que quieres borrar el listado de aportes recientes?'):
+
+        try:
+            os.remove(KODI_NEI_LAST_ITEMS_PATH)
+            LAST_ITEMS.clear()
+            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Aportes recientes borrados!",
+                                          os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
+                                                       'channels', 'thumb', 'omega.gif'), 5000)
+        except:
+            pass
+
+
 def clean_history(item):
     if xbmcgui.Dialog().yesno('OMEGA (' + OMEGA_VERSION + ')',
                               '¿Estás seguro de que quieres borrar tu historial de vídeos visionados?'):
 
         try:
             os.remove(KODI_NEI_HISTORY_PATH)
+            HISTORY.clear()
             xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Historial borrado!",
                                           os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                        'channels', 'thumb', 'omega.gif'), 5000)
@@ -1095,6 +1143,8 @@ def bibliotaku_series(item):
 
 def bibliotaku_series_temporadas(item):
 
+    updateLastItems(item)
+
     itemlist = []
 
     if len(item.mc_group_id) == 1:
@@ -1231,6 +1281,8 @@ def bibliotaku_pelis(item):
 
 
 def bibliotaku_pelis_megacrypter(item):
+    updateLastItems(item)
+    
     infoLabels=item.infoLabels
             
     itemlist = get_video_mega_links_group(Item(channel=item.channel, scraped_title=item.scraped_title, ignore_title=item.ignore_title, url_orig=item.url_orig, viewcontent="movies", viewmode="list", id_topic=item.id_topic, mode=item.mode, action='', title='', url=item.url, mc_group_id=item.mc_group_id, infoLabels=infoLabels))
@@ -1324,6 +1376,38 @@ def findCustomTitle(scrapedtitle):
     return None
 
 
+
+def updateLastItems(item):
+
+    if item.tourl() not in LAST_ITEMS: 
+        LAST_ITEMS.append(item.tourl())
+
+        with open(KODI_NEI_LAST_ITEMS_PATH, "a+") as file:
+            file.write((item.tourl() + "\n"))
+    else:
+        LAST_ITEMS.remove(item.tourl())
+        LAST_ITEMS.append(item.tourl())
+
+        with open(KODI_NEI_LAST_ITEMS_PATH, "w+") as file:
+            for last_item in LAST_ITEMS:
+                file.write((last_item + "\n"))
+
+
+
+def getLastItemList(item):
+    itemlist = []
+
+    lista = LAST_ITEMS.copy()
+
+    lista.reverse()
+
+    for item_url in lista:
+        itemlist.append(Item().fromurl(item_url))
+
+    return itemlist
+
+
+
 def foro(item):
     logger.info("channels.omega foro")
 
@@ -1349,6 +1433,9 @@ def foro(item):
         final_item = True
         action = "foro"
     else:
+
+        updateLastItems(item)
+
         video_links = True
 
         m = re.compile(r'action="http[^"]+action=post2".*?input.*?"topic".*?"(.*?)"', re.DOTALL).search(data)
