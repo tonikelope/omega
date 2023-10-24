@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.30"
+OMEGA_VERSION = "4.31"
 
 config.set_setting("unify", "false")
 
@@ -384,7 +384,7 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]RECIENTES[/B]",
+                    title="[B]VISTOS recientemente[/B]",
                     action="getLastItemList", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_all.png"))
 
             itemlist.append(Item(channel=item.channel, title="[B]PELÍCULAS[/B]", viewcontent="movies", viewmode="list", section="PELÍCULAS", mode="movie", action="foro",
@@ -885,7 +885,7 @@ def clean_cache(item):
 
 def clean_last(item):
     if xbmcgui.Dialog().yesno('OMEGA (' + OMEGA_VERSION + ')',
-                              '¿Estás seguro de que quieres borrar el listado de aportes recientes?'):
+                              '¿Estás seguro de que quieres borrar tus aportes vistos recientemente?'):
 
         try:
             os.remove(KODI_NEI_LAST_ITEMS_PATH)
