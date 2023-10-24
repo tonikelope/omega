@@ -27,7 +27,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.28"
+OMEGA_VERSION = "4.29"
 
 config.set_setting("unify", "false")
 
@@ -93,7 +93,7 @@ OMEGA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.omega/')
 
 DEFAULT_HTTP_TIMEOUT = 120 #Para no pillarnos los dedos al generar enlaces Megacrypter
 
-ADVANCED_SETTINGS_TIMEOUT = 120
+ADVANCED_SETTINGS_TIMEOUT = 300
 
 FORO_ITEMS_RETRY = 3
 
