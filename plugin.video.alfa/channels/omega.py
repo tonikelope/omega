@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.32"
+OMEGA_VERSION = "4.33"
 
 config.set_setting("unify", "false")
 
@@ -96,6 +96,8 @@ DEFAULT_HTTP_TIMEOUT = 180 #Para no pillarnos los dedos al generar enlaces Megac
 
 ADVANCED_SETTINGS_TIMEOUT = 300
 
+LAST_ITEMS_MAX = 100
+
 FORO_ITEMS_RETRY = 3
 
 DEFAULT_HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"}
@@ -103,9 +105,9 @@ DEFAULT_HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5)
 FOROS_FINALES_NEI = ["ultrahd", "alta-definicion-(hd)", "definicion-estandar-(sd)", "ultra-definicion-(ultra-hd)", "alta-definicion-(hd)-52", "definicion-estandar-(sd)-51"]
 
 try:
-    LAST_ITEMS = deque([line.rstrip('\n') for line in open(KODI_NEI_LAST_ITEMS_PATH)], maxlen=100)
+    LAST_ITEMS = deque([line.rstrip('\n') for line in open(KODI_NEI_LAST_ITEMS_PATH)], maxlen=LAST_ITEMS_MAX)
 except:
-    LAST_ITEMS = deque(maxlen=100)
+    LAST_ITEMS = deque(maxlen=LAST_ITEMS_MAX)
 
 try:
     HISTORY = [line.rstrip('\n') for line in open(KODI_NEI_HISTORY_PATH)]
