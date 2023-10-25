@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.33"
+OMEGA_VERSION = "4.35"
 
 config.set_setting("unify", "false")
 
@@ -522,7 +522,7 @@ def mainlist(item):
 
 
 def about_omega(item):
-    xbmcgui.Dialog().ok('OMEGA (' + OMEGA_VERSION + ')', 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\nCARPE DIEM')
+    xbmcgui.Dialog().ok('OMEGA (' + OMEGA_VERSION + ')', 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA por su cojonudo trabajo y a MEGA, por supuesto).\n\nCARPE DIEM')
 
 
 def buscar_por_genero(item):
