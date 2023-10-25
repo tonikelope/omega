@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.38"
+OMEGA_VERSION = "4.39"
 
 config.set_setting("unify", "false")
 
@@ -1392,10 +1392,6 @@ def findCustomTitle(scrapedtitle):
 
 
 def updateLastItems(item):
-
-    if hasattr(item, "orig_item_url"):
-        del item.orig_item_url
-
     if item.tourl() not in LAST_ITEMS: 
         LAST_ITEMS.appendleft(item.tourl())
     else:
@@ -1412,27 +1408,9 @@ def getLastItemList(item):
     itemlist = []
 
     for item_url in LAST_ITEMS:
-        item = Item().fromurl(item_url)
-        item.context=[{"title":"[B]QUITAR DE RECIENTES (OMEGA)[/B]", "action": "eliminar_item_recientes", "channel":"omega"}]
-        item.orig_item_url=item_url
-        itemlist.append(item)
+        itemlist.append(Item().fromurl(item_url))
 
     return itemlist
-
-
-
-def eliminar_item_recientes(item):
-    LAST_ITEMS.remove(item.orig_item_url)
-
-    with open(KODI_NEI_LAST_ITEMS_PATH, "w+") as file:
-        for last_item in LAST_ITEMS:
-            file.write((last_item + "\n"))
-
-    xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')',
-                                  "Aporte reciente eliminado (puede que tengas que refrescar)",
-                                  os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
-                                               'thumb', 'omega.gif'), 5000)
-    platformtools.itemlist_refresh()
 
 
 
