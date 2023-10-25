@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.37"
+OMEGA_VERSION = "4.38"
 
 config.set_setting("unify", "false")
 
@@ -1393,7 +1393,7 @@ def findCustomTitle(scrapedtitle):
 
 def updateLastItems(item):
 
-    if orig_item_url in item:
+    if hasattr(item, "orig_item_url"):
         del item.orig_item_url
 
     if item.tourl() not in LAST_ITEMS: 
