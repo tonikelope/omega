@@ -22,12 +22,13 @@ import shutil
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 from platformcode import config, logger, platformtools, updater
-from collections import OrderedDict
+from collections import OrderedDict, deque
 from datetime import datetime
+
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.31"
+OMEGA_VERSION = "4.32"
 
 config.set_setting("unify", "false")
 
@@ -91,7 +92,7 @@ ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
 OMEGA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.omega/')
 
-DEFAULT_HTTP_TIMEOUT = 120 #Para no pillarnos los dedos al generar enlaces Megacrypter
+DEFAULT_HTTP_TIMEOUT = 180 #Para no pillarnos los dedos al generar enlaces Megacrypter
 
 ADVANCED_SETTINGS_TIMEOUT = 300
 
@@ -102,9 +103,9 @@ DEFAULT_HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5)
 FOROS_FINALES_NEI = ["ultrahd", "alta-definicion-(hd)", "definicion-estandar-(sd)", "ultra-definicion-(ultra-hd)", "alta-definicion-(hd)-52", "definicion-estandar-(sd)-51"]
 
 try:
-    LAST_ITEMS = [line.rstrip('\n') for line in open(KODI_NEI_LAST_ITEMS_PATH)]
+    LAST_ITEMS = deque([line.rstrip('\n') for line in open(KODI_NEI_LAST_ITEMS_PATH)], maxlen=100)
 except:
-    LAST_ITEMS = []
+    LAST_ITEMS = deque(maxlen=100)
 
 try:
     HISTORY = [line.rstrip('\n') for line in open(KODI_NEI_HISTORY_PATH)]
@@ -228,6 +229,8 @@ def login():
             xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Bienvenido " + OMEGA_LOGIN + "!",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
             return True
+
+    xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "ERROR AL HACER LOGIN EN NEI",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     return False
 
@@ -384,7 +387,7 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]VISTOS recientemente[/B]",
+                    title="[COLOR yellow][B]VISTOS recientemente[/B][/COLOR]",
                     action="getLastItemList", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_all.png"))
 
             itemlist.append(Item(channel=item.channel, title="[B]PELÍCULAS[/B]", viewcontent="movies", viewmode="list", section="PELÍCULAS", mode="movie", action="foro",
@@ -425,25 +428,25 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]Purgar caché[/B]",
+                    title="[B]PURGAR CACHÉ[/B]",
                     action="clean_cache", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[COLOR red][B]Borrar recientes[/B][/COLOR]",
+                    title="[COLOR red][B]BORRAR VISTOS RECIENTEMENTE[/B][/COLOR]",
                     action="clean_last", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[COLOR red][B]Borrar marcas vídeos vistos[/B][/COLOR]",
+                    title="[COLOR red][B]BORRAR MARCAS DE VÍDEOS VISTOS[/B][/COLOR]",
                     action="clean_history", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[COLOR red][B]Gestionar aportes ignorados[/B][/COLOR]", viewcontent="movies", viewmode="list",
+                    title="[B]GESTIONAR APORTES IGNORADOS[/B]", viewcontent="movies", viewmode="list",
                     action="clean_ignored_items", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(
@@ -494,10 +497,14 @@ def mainlist(item):
                         channel=item.channel,
                         title="Reactivar contenido adulto",
                         action="xxx_on", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+        
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="tonikelope",
+                    action="about_omega", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/icon.gif"))
+
         else:
-            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "ERROR AL HACER LOGIN EN NEI",
-                                          os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
-                                                       'channels', 'thumb', 'omega.gif'), 5000)
             itemlist.append(
                 Item(channel=item.channel,
                      title="[COLOR red][B]ERROR: Usuario y/o password de NEI incorrectos (revisa las preferencias)[/B][/COLOR]",
@@ -509,6 +516,11 @@ def mainlist(item):
                      action="settings_nei", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     return itemlist
+
+
+
+def about_omega(item):
+    xbmcgui.Dialog().ok('OMEGA (' + OMEGA_VERSION + ')', 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\nCARPE DIEM')
 
 
 def buscar_por_genero(item):
@@ -643,7 +655,7 @@ def buscar_por_genero(item):
 
 def update_favourites(item):
 
-    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), '¿SEGURO?')
+    ret = xbmcgui.Dialog().yesno('OMEGA (' + OMEGA_VERSION + ')', '¿Seguro que quieres regenerar el icono de favoritos?')
 
     if ret:
 
@@ -890,7 +902,7 @@ def clean_last(item):
         try:
             os.remove(KODI_NEI_LAST_ITEMS_PATH)
             LAST_ITEMS.clear()
-            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Aportes recientes borrados!",
+            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Aportes vistos recientemente borrados!",
                                           os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                        'channels', 'thumb', 'omega.gif'), 5000)
         except:
@@ -1343,7 +1355,7 @@ def leerMensajesHiloForo(item):
     
     for msg in json_response:
         if i>0:
-            itemlist.append(Item(channel=item.channel, url=item.url, context=[{"title":"[B]AGRADECER MENSAJE[/B]", "action": "darGraciasMensajeForo", "channel":"omega"}] if (OMEGA_LOGIN != msg['nick'] and not msg['thanks']) else None, contentPlot=item.contentPlot, fanart='https://noestasinvitado.com/logonegro2.png', thumbnail='https://noestasinvitado.com/logonegro2.png', action='cargarMensajeForo', msg=msg, title='[B][COLOR '+('lightgreen' if OMEGA_LOGIN == msg['nick'] else 'darkorange')+'][I]'+msg['nick']+':[/I][/COLOR][/B] '+html.unescape(clean_html_tags(msg['body'].replace('\n', ' ')))))
+            itemlist.append(Item(channel=item.channel, url=item.url, context=[{"title":"[B]AGRADECER MENSAJE (OMEGA)[/B]", "action": "darGraciasMensajeForo", "channel":"omega"}] if (OMEGA_LOGIN != msg['nick'] and not msg['thanks']) else None, contentPlot=item.contentPlot, fanart='https://noestasinvitado.com/logonegro2.png', thumbnail='https://noestasinvitado.com/logonegro2.png', action='cargarMensajeForo', msg=msg, title='[B][COLOR '+('lightgreen' if OMEGA_LOGIN == msg['nick'] else 'darkorange')+'][I]'+msg['nick']+':[/I][/COLOR][/B] '+html.unescape(clean_html_tags(msg['body'].replace('\n', ' ')))))
 
         i+=1
 
@@ -1380,31 +1392,42 @@ def findCustomTitle(scrapedtitle):
 def updateLastItems(item):
 
     if item.tourl() not in LAST_ITEMS: 
-        LAST_ITEMS.append(item.tourl())
-
-        with open(KODI_NEI_LAST_ITEMS_PATH, "a+") as file:
-            file.write((item.tourl() + "\n"))
+        LAST_ITEMS.appendleft(item.tourl())
     else:
         LAST_ITEMS.remove(item.tourl())
-        LAST_ITEMS.append(item.tourl())
+        LAST_ITEMS.appendleft(item.tourl())
 
-        with open(KODI_NEI_LAST_ITEMS_PATH, "w+") as file:
-            for last_item in LAST_ITEMS:
-                file.write((last_item + "\n"))
+    with open(KODI_NEI_LAST_ITEMS_PATH, "w+") as file:
+        for last_item in LAST_ITEMS:
+            file.write((last_item + "\n"))
 
 
 
 def getLastItemList(item):
     itemlist = []
 
-    lista = LAST_ITEMS.copy()
-
-    lista.reverse()
-
-    for item_url in lista:
-        itemlist.append(Item().fromurl(item_url))
+    for item_url in LAST_ITEMS:
+        item = Item().fromurl(item_url)
+        item.context=[{"title":"[B]QUITAR DE RECIENTES (OMEGA)[/B]", "action": "eliminar_item_recientes", "channel":"omega"}]
+        item.orig_item_url=item_url
+        itemlist.append(item)
 
     return itemlist
+
+
+
+def eliminar_item_recientes(item):
+    LAST_ITEMS.remove(item.orig_item_url)
+
+    with open(KODI_NEI_LAST_ITEMS_PATH, "w+") as file:
+        for last_item in LAST_ITEMS:
+            file.write((last_item + "\n"))
+
+    xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')',
+                                  "Aporte reciente eliminado (puede que tengas que refrescar)",
+                                  os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
+                                               'thumb', 'omega.gif'), 5000)
+    platformtools.itemlist_refresh()
 
 
 
@@ -2496,7 +2519,7 @@ def leer_criticas_fa(item):
                 rating_text = "[B][" + str(critica['nota']) + "][/B]"
                 thumbnail = get_omega_resource_path("neutral.png")
 
-            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":"[COLOR yellow][B]LEER CRÍTICA CON SPOILERS[/B][/COLOR]", "title2":rating_text+" "+critica['title']+" ("+critica['nick']+") (SPOILERS ACTIVADOS)", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
+            itemlist.append(Item(channel=item.channel, nota_fa=fa_data['rate'], contentPlot="[I]Crítica de: "+item.contentTitle+"[/I]", thumbnail=thumbnail, title=rating_text+" "+critica['title']+" ("+critica['nick']+")", action="cargar_critica", context=[{"title":"[COLOR yellow][B]LEER CRÍTICA CON SPOILERS (OMEGA)[/B][/COLOR]", "title2":rating_text+" "+critica['title']+" ("+critica['nick']+") (SPOILERS ACTIVADOS)", "action": "cargar_critica_con_spoiler", "channel":"omega"}], url=critica['url']))
 
         return itemlist
 
