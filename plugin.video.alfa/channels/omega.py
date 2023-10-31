@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.41"
+OMEGA_VERSION = "4.42"
 
 config.set_setting("unify", "false")
 
@@ -904,7 +904,7 @@ def clean_cache(item):
         KODI_NEI_MC_CACHE = {}
 
     xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')',
-                                  "¡Caché borrada! (" + str(conta_files) + " archivos eliminados)",
+                                  "CACHÉ PURGADA (" + str(conta_files) + " archivos eliminados)",
                                   os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
                                                'thumb', 'omega.gif'), 5000)
     platformtools.itemlist_refresh()
@@ -912,12 +912,12 @@ def clean_cache(item):
 
 def clean_last(item):
     if xbmcgui.Dialog().yesno('OMEGA (' + OMEGA_VERSION + ')',
-                              '¿Estás seguro de que quieres borrar tus aportes vistos recientemente?'):
+                              '¿Estás seguro de que quieres borrar tu historial?'):
 
         try:
             os.remove(KODI_NEI_LAST_ITEMS_PATH)
             LAST_ITEMS.clear()
-            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Aportes vistos recientemente borrados!",
+            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "HISTORIAL ELIMINADO",
                                           os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                        'channels', 'thumb', 'omega.gif'), 5000)
         except:
@@ -926,12 +926,12 @@ def clean_last(item):
 
 def clean_history(item):
     if xbmcgui.Dialog().yesno('OMEGA (' + OMEGA_VERSION + ')',
-                              '¿Estás seguro de que quieres borrar tu historial de vídeos visionados?'):
+                              '¿Estás seguro de que quieres borrar las marcas de las películas y capítulos de series que has visto?'):
 
         try:
             os.remove(KODI_NEI_HISTORY_PATH)
             HISTORY.clear()
-            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "¡Historial borrado!",
+            xbmcgui.Dialog().notification('OMEGA (' + OMEGA_VERSION + ')', "MARCAS DE VISTO ELIMINADAS",
                                           os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                        'channels', 'thumb', 'omega.gif'), 5000)
         except:
