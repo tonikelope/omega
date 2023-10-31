@@ -31,7 +31,7 @@ import json
 KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
 MEGA_FILES = None
 
-DEFAULT_HTTP_TIMEOUT = 120
+DEFAULT_HTTP_TIMEOUT = 300
 
 DEBRID_PROXY_HOST = 'localhost'
 DEBRID_PROXY_PORT = int(config.get_setting("omega_debrid_proxy_port", "omega").strip())
@@ -39,8 +39,8 @@ OMEGA_REALDEBRID = config.get_setting("omega_realdebrid", "omega")
 OMEGA_ALLDEBRID = config.get_setting("omega_alldebrid", "omega")
 
 MEGACRYPTER2DEBRID_ENDPOINT='https://noestasinvitado.com/megacrypter2debrid.php'
-MEGACRYPTER2DEBRID_TIMEOUT=120 #Cuando aumente la demanda habrá que implementar en el server de NEI un sistema de polling asíncrono
-MEGACRYPTER2DEBRID_MULTI_RETRY=3
+MEGACRYPTER2DEBRID_TIMEOUT=300 #Cuando aumente la demanda habrá que implementar en el server de NEI un sistema de polling asíncrono
+MEGACRYPTER2DEBRID_MULTI_RETRY=5
 DEBRID_PROXY_FILE_URL=None
 DEBRID_PROXY_URL_LOCK = threading.Lock()
 
