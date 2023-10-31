@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.40"
+OMEGA_VERSION = "4.41"
 
 config.set_setting("unify", "false")
 
@@ -389,7 +389,7 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[COLOR yellow][B]VISTOS recientemente[/B][/COLOR]",
+                    title="[COLOR yellow][B]HISTORIAL[/B][/COLOR]",
                     action="getLastItemList", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_all.png"))
 
             itemlist.append(Item(channel=item.channel, title="[B]PELÍCULAS[/B]", viewcontent="movies", viewmode="list", section="PELÍCULAS", mode="movie", action="foro",
@@ -402,7 +402,8 @@ def mainlist(item):
                                  url="https://noestasinvitado.com/deportes/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_sport.png"))
             itemlist.append(Item(channel=item.channel, title="Anime", viewcontent="movies", viewmode="list", action="foro", section="Anime",
                                  url="https://noestasinvitado.com/anime/", mode="movie", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_anime.png"))
-            itemlist.append(Item(channel=item.channel, title="Bibliotaku (Akantor)", viewcontent="movies", viewmode="list", action="bibliotaku", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/akantor.gif"))
+            itemlist.append(Item(channel=item.channel, title="Bibliotaku", viewcontent="movies", viewmode="list", action="bibliotaku", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/akantor.gif"))
+            
             if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
                 itemlist.append(Item(channel=item.channel, title="\"Guarreridas\"", viewcontent="movies", viewmode="list", mode="movie", section="Guarreridas", action="foro",
                                      url="https://noestasinvitado.com/18-15/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_adult.png", xxx=True))
@@ -412,98 +413,26 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[COLOR darkorange][B]Buscar en OMEGA[/B][/COLOR]",
+                    title="[COLOR darkorange][B]BUSCAR (por título)[/B][/COLOR]",
                     action="search", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"))
 
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[COLOR darkorange][B]Buscar en OMEGA por GÉNERO[/B][/COLOR]",
+                    title="[COLOR darkorange][B]BUSCAR (por género)[/B][/COLOR]",
                     action="buscar_por_genero", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png", page=1))
 
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]Preferencias de OMEGA[/B]",
-                    action="settings_nei", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+                    title="[B]AJUSTES[/B]",
+                    action="ajustes", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
 
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]PURGAR CACHÉ[/B]",
-                    action="clean_cache", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="[COLOR red][B]BORRAR VISTOS RECIENTEMENTE[/B][/COLOR]",
-                    action="clean_last", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="[COLOR red][B]BORRAR MARCAS DE VÍDEOS VISTOS[/B][/COLOR]",
-                    action="clean_history", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="[B]GESTIONAR APORTES IGNORADOS[/B]", viewcontent="movies", viewmode="list",
-                    action="clean_ignored_items", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="[B]EXPORTAR AJUSTES de OMEGA[/B]", action="backup_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="[B]RESTAURAR AJUSTES de OMEGA[/B]",
-                    action="restore_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="Preferencias de ALFA",
-                    action="settings_alfa", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="Comprobar actualización de ALFA",
-                    action="check_alfa_update", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="Regenerar icono de FAVORITOS",
-                    action="update_favourites", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="Regenerar miniaturas (todo KODI)",
-                    action="thumbnail_refresh", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
-
-
-            if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
-                itemlist.append(
-                    Item(
-                        channel=item.channel,
-                        title="Desactivar contenido adulto",
-                        action="xxx_off", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-            else:
-                itemlist.append(
-                    Item(
-                        channel=item.channel,
-                        title="Reactivar contenido adulto",
-                        action="xxx_on", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-        
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="tonikelope",
+                    title="OMEGA "+OMEGA_VERSION,
                     action="about_omega", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/icon.gif"))
 
         else:
@@ -520,9 +449,93 @@ def mainlist(item):
     return itemlist
 
 
+def ajustes(item):
+    itemlist = []
+
+    itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[B]Preferencias de OMEGA[/B]",
+                    action="settings_nei", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[B]PURGAR CACHÉ[/B]",
+            action="clean_cache", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[COLOR red][B]BORRAR HISTORIAL DE APORTES VISITADOS[/B][/COLOR]",
+            action="clean_last", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[COLOR red][B]BORRAR MARCAS DE VÍDEOS VISTOS[/B][/COLOR]",
+            action="clean_history", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[B]GESTIONAR APORTES IGNORADOS[/B]", viewcontent="movies", viewmode="list",
+            action="clean_ignored_items", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[B]EXPORTAR AJUSTES de OMEGA[/B]", action="backup_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[B]RESTAURAR AJUSTES de OMEGA[/B]",
+            action="restore_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="Preferencias de ALFA",
+            action="settings_alfa", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="Comprobar actualización de ALFA",
+            action="check_alfa_update", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="Regenerar icono de FAVORITOS",
+            action="update_favourites", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="Regenerar miniaturas (todo KODI)",
+            action="thumbnail_refresh", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
+
+
+    if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
+        itemlist.append(
+            Item(
+                channel=item.channel,
+                title="Desactivar contenido adulto",
+                action="xxx_off", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+    else:
+        itemlist.append(
+            Item(
+                channel=item.channel,
+                title="Reactivar contenido adulto",
+                action="xxx_on", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    return itemlist
+
 
 def about_omega(item):
-    xbmcgui.Dialog().ok('OMEGA (' + OMEGA_VERSION + ')', 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su cojonudo trabajo y por supuesto, a MEGA).\n\nCARPE DIEM')
+    xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su cojonudo trabajo y por supuesto, a MEGA).\n\nCARPE DIEM')
 
 
 def buscar_por_genero(item):
