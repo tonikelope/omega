@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.45"
+OMEGA_VERSION = "4.46"
 
 config.set_setting("unify", "false")
 
@@ -225,13 +225,15 @@ def get_omega_resource_path(resource):
     else:
         return OMEGA_RESOURCES_URL+resource
 
-def login():
+
+def login(force=False):
     logger.info("channels.omega login")
 
-    data = httptools.downloadpage("https://noestasinvitado.com/profile", timeout=DEFAULT_HTTP_TIMEOUT).data
+    if not force:
+        data = httptools.downloadpage("https://noestasinvitado.com/profile", timeout=DEFAULT_HTTP_TIMEOUT).data
 
-    if data.find(OMEGA_LOGIN) != -1:
-        return True
+        if data.find(OMEGA_LOGIN) != -1:
+            return True
 
     httptools.downloadpage("https://noestasinvitado.com/login/", timeout=DEFAULT_HTTP_TIMEOUT)
 
@@ -533,6 +535,11 @@ def ajustes(item):
             title="Regenerar miniaturas (todo KODI)",
             action="thumbnail_refresh", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="FORZAR RE-LOGIN",
+            action="force_login", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
     if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
         itemlist.append(
@@ -548,6 +555,10 @@ def ajustes(item):
                 action="xxx_on", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     return itemlist
+
+
+def force_login(item):
+    login(force=True)
 
 
 def about_omega(item):
