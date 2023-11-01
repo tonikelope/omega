@@ -30,6 +30,15 @@
       "visible": true
     },
     {
+      "id": "omega_items_per_page",
+      "type": "list",
+      "label": "Aportes por página:",
+      "default": 0,
+      "enabled": true,
+      "visible": true,
+      "lvalues": ["50", "100", "150", "200"]
+    },
+    {
       "id": "omega_blacklist_uploaders",
       "type": "text",
       "label": "UPLOADERS IGNORADOS (separar por comas):",

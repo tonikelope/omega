@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.44"
+OMEGA_VERSION = "4.45"
 
 config.set_setting("unify", "false")
 
@@ -49,6 +49,8 @@ MEGA_EMAIL = config.get_setting("omega_mega_email", "omega")
 MEGA_PASSWORD = config.get_setting("omega_mega_password", "omega")
 
 USE_MC_REVERSE = config.get_setting("omega_use_mc_reverse", "omega")
+
+ITEMS_PER_PAGE = (int(config.get_setting("omega_items_per_page", "omega"))+1)*50
 
 KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
 
@@ -193,6 +195,18 @@ def save_mc_cache():
             os.remove(KODI_NEI_MC_CACHE_PATH)
 
 
+def setNEITopicsPerPage(value):
+    httptools.downloadpage("https://noestasinvitado.com/omega_user_profile.php?topics_per_page="+str(value), timeout=DEFAULT_HTTP_TIMEOUT)
+
+
+def getNEITopicsPerPage():
+    httptools.downloadpage("https://noestasinvitado.com/omega_user_profile.php", timeout=DEFAULT_HTTP_TIMEOUT)
+    res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/omega_user_profile.php", timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
+
+    if 'topics_per_page' in res_json:
+        return int(res_json['topics_per_page'])
+
+
 def forceView(mode):
     skin = xbmc.getSkinDir()
 
@@ -228,6 +242,8 @@ def login():
         data = httptools.downloadpage("https://noestasinvitado.com/login2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT).data
 
         if data.find(OMEGA_LOGIN) != -1:
+            setNEITopicsPerPage(ITEMS_PER_PAGE)
+
             xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "¡Bienvenido " + OMEGA_LOGIN + "!",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
             return True
@@ -750,6 +766,8 @@ def settings_nei(item):
 
     if old_kodi_memorysize!=new_kodi_memorysize or old_kodi_readfactor!=new_kodi_readfactor:
         improve_streaming(item)
+
+    setNEITopicsPerPage((int(config.get_setting("omega_items_per_page", "omega"))+1)*50)
 
 
 def settings_alfa(item):
