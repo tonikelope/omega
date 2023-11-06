@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.46"
+OMEGA_VERSION = "4.47"
 
 config.set_setting("unify", "false")
 
@@ -609,7 +609,7 @@ def buscar_por_genero(item):
 
     if item.page>1 or indices:
 
-        res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post={'generosb64':item.generosb64, 'json':1, 'page':item.page}, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
+        res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post={'generosb64':item.generosb64, 'json':1, 'page':item.page, 'items_per_page':ITEMS_PER_PAGE}, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
 
         boards={'pelis': ['44', '47', '229'], 'series':['53', '59', '235']}
 
