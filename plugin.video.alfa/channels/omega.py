@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.48"
+OMEGA_VERSION = "4.49"
 
 config.set_setting("unify", "false")
 
@@ -423,7 +423,7 @@ def mainlist(item):
             itemlist.append(Item(channel=item.channel, title="Bibliotaku", viewcontent="movies", viewmode="list", action="bibliotaku", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/akantor.gif"))
             
             if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
-                itemlist.append(Item(channel=item.channel, title="\"Adultos +18\"", viewcontent="movies", viewmode="list", mode="movie", section="Adultos", action="foro",
+                itemlist.append(Item(channel=item.channel, title="Adultos +18", viewcontent="movies", viewmode="list", mode="movie", section="Adultos", action="foro",
                                      url="https://noestasinvitado.com/18-15/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_adult.png", xxx=True))
             itemlist.append(Item(channel=item.channel, title="Listados alfabéticos", viewcontent="movies", viewmode="list", mode="movie", section="Listados", action="indices",
                                  url="https://noestasinvitado.com/indices/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_movie_az.png"))
