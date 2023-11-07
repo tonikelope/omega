@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.47"
+OMEGA_VERSION = "4.48"
 
 config.set_setting("unify", "false")
 
@@ -416,14 +416,14 @@ def mainlist(item):
                                  url="https://noestasinvitado.com/series/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_tvshow.png"))
             itemlist.append(Item(channel=item.channel, title="Documentales", viewcontent="movies", viewmode="list", section="Documentales", mode="movie", action="foro",
                                  url="https://noestasinvitado.com/documentales/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_documentary.png"))
-            itemlist.append(Item(channel=item.channel, title="Vídeos deportivos", viewcontent="movies", viewmode="list", section="Vídeos deportivos", mode="movie", action="foro",
+            itemlist.append(Item(channel=item.channel, title="Deportes", viewcontent="movies", viewmode="list", section="Vídeos deportivos", mode="movie", action="foro",
                                  url="https://noestasinvitado.com/deportes/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_sport.png"))
             itemlist.append(Item(channel=item.channel, title="Anime", viewcontent="movies", viewmode="list", action="foro", section="Anime",
                                  url="https://noestasinvitado.com/anime/", mode="movie", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_anime.png"))
             itemlist.append(Item(channel=item.channel, title="Bibliotaku", viewcontent="movies", viewmode="list", action="bibliotaku", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/akantor.gif"))
             
             if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
-                itemlist.append(Item(channel=item.channel, title="\"Guarreridas\"", viewcontent="movies", viewmode="list", mode="movie", section="Guarreridas", action="foro",
+                itemlist.append(Item(channel=item.channel, title="\"Adultos +18\"", viewcontent="movies", viewmode="list", mode="movie", section="Adultos", action="foro",
                                      url="https://noestasinvitado.com/18-15/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_adult.png", xxx=True))
             itemlist.append(Item(channel=item.channel, title="Listados alfabéticos", viewcontent="movies", viewmode="list", mode="movie", section="Listados", action="indices",
                                  url="https://noestasinvitado.com/indices/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_movie_az.png"))
@@ -473,7 +473,7 @@ def ajustes(item):
     itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]Preferencias de OMEGA[/B]",
+                    title="[B]PREFERENCIAS DE OMEGA[/B]",
                     action="settings_nei", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     itemlist.append(
@@ -503,7 +503,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]EXPORTAR AJUSTES de OMEGA[/B]", action="backup_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+            title="[B]GUARDAR AJUSTES DE OMEGA[/B]", action="backup_omega_userdata", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     itemlist.append(
         Item(
@@ -538,20 +538,20 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="FORZAR RE-LOGIN",
+            title="[B]FORZAR RE-LOGIN EN NEI[/B]",
             action="force_login", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
     if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
         itemlist.append(
             Item(
                 channel=item.channel,
-                title="Desactivar contenido adulto",
+                title="DESACTIVAR CONTENIDO XXX +18",
                 action="xxx_off", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
     else:
         itemlist.append(
             Item(
                 channel=item.channel,
-                title="Reactivar contenido adulto",
+                title="REACTIVAR CONTENIDO XXX +18",
                 action="xxx_on", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     return itemlist
