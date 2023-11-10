@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.51"
+OMEGA_VERSION = "4.52"
 
 config.set_setting("unify", "false")
 
@@ -686,7 +686,9 @@ def buscar_por_genero(item):
             if ignore_title not in ITEM_BLACKLIST:
                 itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
 
-        itemlist.append(Item(channel=item.channel, title="[COLOR yellow][B]PASAR DE PÁGINA[/B][/COLOR]", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="saltar_pagina", action_salto="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
+        itemlist.append(Item(channel=item.channel, title="[COLOR yellow][B]IR A PÁGINA X[/B][/COLOR]", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="saltar_pagina", action_salto="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
+
+        itemlist.append(Item(channel=item.channel, title="SIGUIENTE PÁGINA", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
 
         tmdb.set_infoLabels_itemlist(itemlist, True)
 
