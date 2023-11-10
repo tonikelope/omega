@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.50"
+OMEGA_VERSION = "4.51"
 
 config.set_setting("unify", "false")
 
@@ -565,6 +565,18 @@ def about_omega(item):
     xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su cojonudo trabajo y por supuesto, a MEGA).\n\nCARPE DIEM')
 
 
+def saltar_pagina(item):
+    dialog = xbmcgui.Dialog()
+    
+    d = dialog.numeric(0, '¿A QUÉ PÁGINA QUIERES SALTAR?', str(item.page))
+
+    try:
+        item.page = int(d)
+    except:
+        item.page = int(item.page)
+
+    return globals()[item.action_salto](item)
+
 def buscar_por_genero(item):
     
     if item.page == 1:
@@ -674,7 +686,7 @@ def buscar_por_genero(item):
             if ignore_title not in ITEM_BLACKLIST:
                 itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
 
-        itemlist.append(Item(channel=item.channel, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
+        itemlist.append(Item(channel=item.channel, title="[COLOR yellow][B]PASAR DE PÁGINA[/B][/COLOR]", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="saltar_pagina", action_salto="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
 
         tmdb.set_infoLabels_itemlist(itemlist, True)
 
