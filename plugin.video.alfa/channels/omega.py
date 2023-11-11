@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.52"
+OMEGA_VERSION = "4.53"
 
 config.set_setting("unify", "false")
 
@@ -254,15 +254,16 @@ def login(force=False):
 
     return False
 
-def improve_streaming(item):
+def kodi_advancedsettings(verbose=True):
 
     new_memorysize = str((int(config.get_setting("omega_kodi_buffer", "omega"))+1)*52428800)
     new_readfactor_mul = str(int(config.get_setting("omega_kodi_readfactor", "omega"))+1)
     new_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
 
-    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Nuevo tamaño de búffer de video de KODI: '+new_memorysize+' bytes\nNueva velocidad de llenado del búffer: '+new_readfactor_mul+'x\n\n¿APLICAR NUEVOS VALORES?')
+    if verbose:
+        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Nuevo tamaño de búffer de video de KODI: '+new_memorysize+' bytes\nNueva velocidad de llenado del búffer: '+new_readfactor_mul+'x\n\n¿APLICAR NUEVOS VALORES?')
 
-    if ret:
+    if not verbose or ret:
     
         if os.path.exists(xbmcvfs.translatePath('special://userdata/advancedsettings.xml')):
             os.rename(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'), xbmcvfs.translatePath('special://userdata/advancedsettings.xml')+"."+str(int(time.time()))+".bak")
@@ -296,12 +297,13 @@ def improve_streaming(item):
 
         settings_xml.write(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'))
 
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "Ajustes avanzados regenerados", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        if verbose:
+            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "Ajustes avanzados regenerados", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
-        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
+            ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
 
-        if ret:
-            xbmc.executebuiltin('RestartApp')
+            if ret:
+                xbmc.executebuiltin('RestartApp')
             
 
 def mega_login(verbose):
@@ -783,16 +785,15 @@ def settings_nei(item):
     if bool(config.get_setting("omega_alldebrid", "omega")):
         config.set_setting("premium", bool(config.get_setting("omega_alldebrid", "omega")), server="alldebrid")
     
-    xbmc.executebuiltin('Container.Refresh')
-
     new_kodi_memorysize = str((int(config.get_setting("omega_kodi_buffer", "omega"))+1)*52428800)
 
     new_kodi_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
 
-    if old_kodi_memorysize!=new_kodi_memorysize or old_kodi_readfactor!=new_kodi_readfactor:
-        improve_streaming(item)
+    kodi_advancedsettings((old_kodi_memorysize!=new_kodi_memorysize or old_kodi_readfactor!=new_kodi_readfactor))
 
     setNEITopicsPerPage((int(config.get_setting("omega_items_per_page", "omega"))+1)*50)
+
+    xbmc.executebuiltin('Container.Refresh')
 
 
 def settings_alfa(item):
