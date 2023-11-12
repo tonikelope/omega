@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.54"
+OMEGA_VERSION = "4.55"
 
 config.set_setting("unify", "false")
 
@@ -1238,7 +1238,7 @@ def bibliotaku_series_temporadas(item):
             infoLabels['season']=i
             
             itemlist.append(Item(channel=item.channel, url_orig=item.url_orig, viewcontent="movies", viewmode="list", id_topic=item.id_topic, action="bibliotaku_series_megacrypter",
-                                 title='[COLOR cyan][B][' + str(i) + '/' + str(len(item.mc_group_id)) + '[/B][/COLOR] ' + item.title, url=item.url,
+                                 title='[COLOR yellow][B][' + str(i) + '/' + str(len(item.mc_group_id)) + '][/B][/COLOR] ' + item.title, url=item.url,
                                  mc_group_id=mc_id, infoLabels=infoLabels, mode=item.mode))
 
             i = i + 1
@@ -2196,7 +2196,7 @@ def find_video_mega_links(item, data):
 
                     infoLabels=item.infoLabels
 
-                    title = '[COLOR cyan][B][' + str(i) + '/' + str(len(matches)) + '][/COLOR][/B] ' + item.title
+                    title = '[COLOR yellow][B][' + str(i) + '/' + str(len(matches)) + '][/B][/COLOR] ' + item.title
 
                     content_title=item.contentTitle
 
