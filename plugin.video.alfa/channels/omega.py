@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.55"
+OMEGA_VERSION = "4.56"
 
 config.set_setting("unify", "false")
 
@@ -686,7 +686,7 @@ def buscar_por_genero(item):
             ignore_title = url+("["+section+"] " if section else "")+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
             if ignore_title not in ITEM_BLACKLIST:
-                itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
+                itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, generos=item.generos, generosb64=item.generosb64, page=item.page, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
 
         itemlist.append(Item(channel=item.channel, title="[COLOR yellow][B]IR A PÁGINA X[/B][/COLOR]", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="saltar_pagina", action_salto="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
 
@@ -1533,11 +1533,24 @@ def foro(item):
 
         search_item.action = "search_similares"
 
-        search_item. url=""
+        search_item.url=""
 
         search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"
 
         itemlist.append(search_item)
+
+        if 'generos' in item:
+            generos_item = item.clone()
+
+            generos_item.title = "[B]"+"+".join(item.generos)+" (página "+str(item.page)+")[/B]"
+
+            generos_item.action = "buscar_por_genero"
+
+            generos_item.url=""
+
+            generos_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"
+
+            itemlist.append(generos_item)
     
     if not video_links:
 
