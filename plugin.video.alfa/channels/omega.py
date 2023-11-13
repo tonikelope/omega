@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.56"
+OMEGA_VERSION = "4.57"
 
 config.set_setting("unify", "false")
 
@@ -452,7 +452,7 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="OMEGA "+OMEGA_VERSION,
+                    title="[B]OMEGA "+OMEGA_VERSION+"[/B]",
                     action="about_omega", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/icon.gif"))
 
         else:
@@ -629,7 +629,9 @@ def buscar_por_genero(item):
 
         itemlist=[]
 
-        itemlist.append(Item(channel=item.channel, action="", title="[B]"+"+".join(item.generos)+" (Pag: "+str(item.page)+")[/B]"))
+        itemlist.append(Item(channel=item.channel, title="[COLOR yellow][B]"+"+".join(item.generos)+" (pag: "+str(item.page)+")[/B][/COLOR]", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png", fanart=item.fanart, action="saltar_pagina", action_salto="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
+
+        itemlist.append(Item(channel=item.channel, title="PÁGINA ANTERIOR", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_back.png", fanart=item.fanart, action="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=max(1, item.page-1)))
 
         for aporte in res_json['data']:
 
@@ -687,8 +689,6 @@ def buscar_por_genero(item):
 
             if ignore_title not in ITEM_BLACKLIST:
                 itemlist.append(Item(channel=item.channel, scraped_title=rawscrapedtitle, generos=item.generos, generosb64=item.generosb64, page=item.page, ignore_title=ignore_title, mode=content_type, viewcontent="movies", viewmode="list", thumbnail=thumbnail, section=item.section, action="foro", title=title, url=url, contentTitle=content_title, contentType=content_type, contentSerieName=content_serie_name, infoLabels=info_labels, uploader=uploader))
-
-        itemlist.append(Item(channel=item.channel, title="[COLOR yellow][B]IR A PÁGINA X[/B][/COLOR]", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="saltar_pagina", action_salto="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
 
         itemlist.append(Item(channel=item.channel, title="SIGUIENTE PÁGINA", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, action="buscar_por_genero", viewcontent="movies", viewmode="poster", generos=item.generos, generosb64=item.generosb64, page=(item.page+1)))
 
@@ -1531,6 +1531,10 @@ def foro(item):
 
         search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
 
+        search_item.contentTitle= ""
+
+        search_item.contentPlot= "Busca en NEI otros aportes con el mismo título"
+
         search_item.action = "search_similares"
 
         search_item.url=""
@@ -1542,7 +1546,11 @@ def foro(item):
         if 'generos' in item:
             generos_item = item.clone()
 
-            generos_item.title = "[B]"+"+".join(item.generos)+" (página "+str(item.page)+")[/B]"
+            generos_item.title = "[COLOR blue][B]"+"+".join(item.generos)+" (página "+str(item.page)+")[/B][/COLOR]"
+
+            generos_item.contentTitle= ""
+
+            generos_item.contentPlot = "Vuelve al buscador por géneros desde este género y página"
 
             generos_item.action = "buscar_por_genero"
 
