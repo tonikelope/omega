@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.57"
+OMEGA_VERSION = "4.58"
 
 config.set_setting("unify", "false")
 
@@ -440,7 +440,7 @@ def mainlist(item):
                 Item(
                     channel=item.channel,
                     title="[COLOR darkorange][B]BUSCAR (por género)[/B][/COLOR]",
-                    action="buscar_por_genero", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png", page=1))
+                    action="buscar_por_genero", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png", page=0))
 
             itemlist.append(
                 Item(
@@ -581,7 +581,7 @@ def saltar_pagina(item):
 
 def buscar_por_genero(item):
     
-    if item.page == 1:
+    if item.page == 0:
         generos = {
         "Acción": 28,
         "Aventura": 12,
@@ -621,7 +621,7 @@ def buscar_por_genero(item):
 
             item.generos=generos_seleccionados
 
-    if item.page>1 or indices:
+    if item.page>0 or indices:
 
         res_json = json.loads(httptools.downloadpage("https://noestasinvitado.com/generos.php", post={'generosb64':item.generosb64, 'json':1, 'page':item.page, 'items_per_page':ITEMS_PER_PAGE}, timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
 
