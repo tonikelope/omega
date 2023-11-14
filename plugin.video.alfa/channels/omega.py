@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.58"
+OMEGA_VERSION = "4.59"
 
 config.set_setting("unify", "false")
 
@@ -1530,8 +1530,6 @@ def foro(item):
         search_item = item.clone()
 
         search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
-
-        search_item.contentTitle= ""
 
         search_item.contentPlot= "Busca en NEI otros aportes con el mismo título"
 
