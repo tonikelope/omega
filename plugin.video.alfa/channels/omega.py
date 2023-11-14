@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.59"
+OMEGA_VERSION = "4.60"
 
 config.set_setting("unify", "false")
 
@@ -620,6 +620,8 @@ def buscar_por_genero(item):
             item.generosb64=generos_seleccionados_b64
 
             item.generos=generos_seleccionados
+
+            item.page = 1
 
     if item.page>0 or indices:
 
