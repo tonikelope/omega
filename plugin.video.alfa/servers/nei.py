@@ -739,8 +739,14 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     logger.info(page_url)
 
+    pbar = xbmcgui.DialogProgressBG()
+
+    pbar.create('OMEGA', 'Cargando conector NEI...')
+
     if proxy_server:
         start_proxy()
+
+    pbar.close()
 
     if page_url[0]=='*':
         #ENLACE MULTI-BASTERD (vídeo troceado con MegaBasterd) 
@@ -754,8 +760,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             video_sizes=[]
 
             page_urls = page_url.split('#')
-
-            pbar = xbmcgui.DialogProgressBG()
 
             pbar.create('OMEGA', 'Preparando enlace MULTI('+str(len(page_urls)-1)+') (paciencia)...')
 
