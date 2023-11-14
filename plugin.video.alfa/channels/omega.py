@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.60"
+OMEGA_VERSION = "4.61"
 
 config.set_setting("unify", "false")
 
@@ -1528,6 +1528,18 @@ def foro(item):
             itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(Item(channel=item.channel, fanart=item.fanart, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+
+        trailer_item = item.clone()
+        
+        trailer_item.title="[B]BUSCAR TRAILER[/B]"
+        
+        trailer_item.action="buscartrailer"
+        
+        trailer_item.channel="trailertools"
+
+        trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+        
+        itemlist.append(trailer_item)
 
         search_item = item.clone()
 
