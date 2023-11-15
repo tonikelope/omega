@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.63"
+OMEGA_VERSION = "4.64"
 
 config.set_setting("unify", "false")
 
@@ -1230,9 +1230,9 @@ def bibliotaku_series_temporadas(item):
 
         itemlist = bibliotaku_series_megacrypter(item)
 
-        itemlist.append(Item(channel=item.channel, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+        itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
-        itemlist.append(Item(channel=item.channel, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+        itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
     else:
         
@@ -1255,9 +1255,37 @@ def bibliotaku_series_temporadas(item):
             if item.id_topic:
                 itemlist.append(Item(channel=item.channel, scraped_title=item.scraped_title, ignore_title=item.ignore_title, url_orig=item.url_orig, id_topic=item.id_topic, url=item.url, viewcontent="movies", viewmode="list", title="[B][COLOR lightgrey]MENSAJES DEL FORO[/COLOR][/B]", contentPlot="[I]Mensajes sobre: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leerMensajesHiloForo", thumbnail='https://noestasinvitado.com/logonegro2.png'))   
 
-            itemlist.append(Item(channel=item.channel, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+            itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
-            itemlist.append(Item(channel=item.channel, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+            itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+
+    trailer_item = item.clone()
+        
+    trailer_item.title="[B]BUSCAR TRAILER[/B]"
+
+    trailer_item.contentPlot= ""
+    
+    trailer_item.action="buscartrailer"
+    
+    trailer_item.channel="trailertools"
+
+    trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_nofolder.png"
+    
+    itemlist.append(trailer_item)
+
+    search_item = item.clone()
+
+    search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+
+    search_item.contentPlot= "Busca en NEI otros aportes con el mismo título"
+
+    search_item.action = "search_similares"
+
+    search_item.url=""
+
+    search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+
+    itemlist.append(search_item)
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
@@ -1363,9 +1391,9 @@ def bibliotaku_pelis_megacrypter(item):
             
     itemlist = get_video_mega_links_group(Item(channel=item.channel, scraped_title=item.scraped_title, ignore_title=item.ignore_title, url_orig=item.url_orig, viewcontent="movies", viewmode="list", id_topic=item.id_topic, mode=item.mode, action='', title='', url=item.url, mc_group_id=item.mc_group_id, infoLabels=infoLabels))
 
-    itemlist.append(Item(channel=item.channel, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+    itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
-    itemlist.append(Item(channel=item.channel, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+    itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
