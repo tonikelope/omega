@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.61"
+OMEGA_VERSION = "4.62"
 
 config.set_setting("unify", "false")
 
@@ -180,6 +180,10 @@ if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
         
         if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
             os.remove(KODI_NEI_MC_CACHE_PATH)
+
+
+def color_uploader(uploader):
+    return uploader if uploader!=OMEGA_LOGIN else "[COLOR yellow]"+uploader+"[/COLOR]"
 
 
 def save_mc_cache():
@@ -434,7 +438,7 @@ def mainlist(item):
                 Item(
                     channel=item.channel,
                     title="[COLOR darkorange][B]BUSCAR (por título)[/B][/COLOR]",
-                    action="search", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"))
+                    action="search", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_generic.png"))
 
             itemlist.append(
                 Item(
@@ -647,7 +651,7 @@ def buscar_por_genero(item):
 
             uploader = aporte['uploader']
 
-            title = scrapedtitle + " (" + uploader + ")"
+            title = scrapedtitle + " (" + color_uploader(uploader) + ")"
 
             thumbnail = ""
 
@@ -685,7 +689,7 @@ def buscar_por_genero(item):
                 extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
                 parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
 
-            title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
+            title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + color_uploader(uploader) + ")"
 
             ignore_title = url+("["+section+"] " if section else "")+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
@@ -1532,12 +1536,14 @@ def foro(item):
         trailer_item = item.clone()
         
         trailer_item.title="[B]BUSCAR TRAILER[/B]"
+
+        trailer_item.contentPlot= ""
         
         trailer_item.action="buscartrailer"
         
         trailer_item.channel="trailertools"
 
-        trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+        trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_nofolder.png"
         
         itemlist.append(trailer_item)
 
@@ -1551,7 +1557,7 @@ def foro(item):
 
         search_item.url=""
 
-        search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"
+        search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
         itemlist.append(search_item)
 
@@ -1587,7 +1593,7 @@ def foro(item):
             if uploader not in UPLOADERS_BLACKLIST and not any(word in scrapedtitle for word in TITLES_BLACKLIST) and not ("Filmografías" in scrapedtitle and action == "foro"):
 
                 if uploader != '>':
-                    title = scrapedtitle + " (" + uploader + ")"
+                    title = scrapedtitle + " (" + color_uploader(uploader) + ")"
                 else:
                     title = scrapedtitle
                     uploader=""
@@ -1632,7 +1638,7 @@ def foro(item):
                         extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
                         parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
 
-                    title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra + ("[" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
+                    title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra + ("[" + quality + "]" if quality else "")+" ##*NOTA*## (" + color_uploader(uploader) + ")"
                     
                     ignore_title = url+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
@@ -1807,7 +1813,7 @@ def search_parse(data, item):
             scrapedtitle = re.sub(r'https://[^/]+/[^/]+/([^/]+).*', '\\1', scrapedurl)
 
         if uploader != '>':
-            title = scrapedtitle + " (" + uploader + ")"
+            title = scrapedtitle + " (" + color_uploader(uploader) + ")"
         else:
             title = scrapedtitle
 
@@ -1870,7 +1876,7 @@ def search_parse(data, item):
             extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
             parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
 
-        title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + uploader + ")"
+        title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra +  (" [" + quality + "]" if quality else "")+" ##*NOTA*## (" + color_uploader(uploader) + ")"
 
         ignore_title = url+("["+section+"] " if section else "")+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
@@ -2291,7 +2297,7 @@ def find_video_mega_links(item, data):
 
                         content_title=cleanContentTitle(filename)
 
-                        title="[COLOR orange][B]"+content_title+"[/B][/COLOR] ("+item.uploader+")"
+                        title="[COLOR orange][B]"+content_title+"[/B][/COLOR] ("+color_uploader(item.uploader)+")"
 
                         itemlist.append(Item(channel=item.channel, id_topic=item.id_topic, viewcontent="movies", viewmode="list", action="get_video_mega_links_group",
                                          title=title, url=item.url, mc_url=mc_url,
@@ -2672,7 +2678,7 @@ def indice_links(item):
         scrapedtitle = parseScrapedTitle(rawscrapedtitle)
 
         if uploader != '>':
-            title = scrapedtitle + " (" + uploader + ")"
+            title = scrapedtitle + " (" + color_uploader(uploader) + ")"
         else:
             title = scrapedtitle
 
@@ -2711,7 +2717,7 @@ def indice_links(item):
             extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
             parsed_title['title'] = re.sub("Saga|Duolog.a|Trilog.a", "", parsed_title['title'], flags=re.IGNORECASE)
 
-        title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra + " [" + quality + "] ##*NOTA*## (" + uploader + ")"
+        title = "[COLOR darkorange][B]" + parsed_title['title'] + "[/B][/COLOR] " + extra + " [" + quality + "] ##*NOTA*## (" + color_uploader(uploader) + ")"
 
         ignore_title = url+parsed_title['title']+extra+("[" + quality + "]" if quality else "")+uploader
 
