@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.64"
+OMEGA_VERSION = "4.65"
 
 config.set_setting("unify", "false")
 
@@ -1394,6 +1394,34 @@ def bibliotaku_pelis_megacrypter(item):
     itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
+
+    trailer_item = item.clone()
+        
+    trailer_item.title="[B]BUSCAR TRAILER[/B]"
+
+    trailer_item.contentPlot= ""
+    
+    trailer_item.action="buscartrailer"
+    
+    trailer_item.channel="trailertools"
+
+    trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_nofolder.png"
+    
+    itemlist.append(trailer_item)
+
+    search_item = item.clone()
+
+    search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+
+    search_item.contentPlot= "Busca en NEI otros aportes con el mismo título"
+
+    search_item.action = "search_similares"
+
+    search_item.url=""
+
+    search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+
+    itemlist.append(search_item)
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
