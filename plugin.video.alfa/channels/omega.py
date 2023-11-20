@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.66"
+OMEGA_VERSION = "4.67"
 
 config.set_setting("unify", "false")
 
@@ -238,6 +238,8 @@ def login(force=False):
 
         if data.find(OMEGA_LOGIN) != -1:
             return True
+
+    xbmc.executebuiltin('Container.Refresh')
 
     httptools.downloadpage("https://noestasinvitado.com/login/", timeout=DEFAULT_HTTP_TIMEOUT)
 
@@ -574,7 +576,7 @@ def about_omega(item):
 def saltar_pagina(item):
     dialog = xbmcgui.Dialog()
     
-    d = dialog.numeric(0, '¿A QUÉ PÁGINA de ['+"+".join(item.generos)+'] QUIERES SALTAR?', str(item.page))
+    d = dialog.numeric(0, '¿A QUÉ PÁGINA DE ['+"+".join(item.generos)+'] QUIERES SALTAR?', str(item.page))
 
     try:
         item.page = int(d)
