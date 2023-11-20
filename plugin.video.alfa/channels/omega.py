@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.65"
+OMEGA_VERSION = "4.66"
 
 config.set_setting("unify", "false")
 
@@ -574,14 +574,16 @@ def about_omega(item):
 def saltar_pagina(item):
     dialog = xbmcgui.Dialog()
     
-    d = dialog.numeric(0, '¿A QUÉ PÁGINA QUIERES SALTAR?', str(item.page))
+    d = dialog.numeric(0, '¿A QUÉ PÁGINA de ['+"+".join(item.generos)+'] QUIERES SALTAR?', str(item.page))
 
     try:
         item.page = int(d)
+        return globals()[item.action_salto](item)
     except:
-        item.page = int(item.page)
+        pass
 
-    return globals()[item.action_salto](item)
+    xbmc.executebuiltin('Container.Refresh')
+    
 
 def buscar_por_genero(item):
     
