@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.67"
+OMEGA_VERSION = "4.68"
 
 config.set_setting("unify", "false")
 
@@ -1575,7 +1575,9 @@ def foro(item):
         retry = 0
 
         while len(itemlist) == 0 and retry < FORO_ITEMS_RETRY:
-            itemlist = find_video_mega_links(item, data) + find_video_gvideo_links(item, data)
+            mega_links = find_video_mega_links(item, data)
+            google_links = find_video_gvideo_links(item, data, (len(mega_links)==0))
+            itemlist = mega_links + google_links
             retry+=1
 
         if len(itemlist) == 0:
@@ -2115,7 +2117,7 @@ def cleanEpisodeNumber(s):
     return re.sub(r'([0-9]+) +([xXeE]) +([0-9]+)', '\\1\\2\\3', s)
 
 
-def find_video_gvideo_links(item, data):
+def find_video_gvideo_links(item, data, fa=False):
 
     msg_id = re.compile(r'subject_([0-9]+)', re.IGNORECASE).search(data)
 
@@ -2156,6 +2158,9 @@ def find_video_gvideo_links(item, data):
             itemlist.append(Item(channel=item.channel, visto_title=title, context=[{"title":"[B]MARCAR VISTO (OMEGA)[/B]", "action": "marcar_item_visto", "channel":"omega"}], action="play", server='gvideo', title=title,
                                  url=matches[0], mode=item.mode))
 
+        if fa:
+            itemlist.append(Item(channel=item.channel, title="[COLOR orange][B]CRÍTICAS DE FILMAFFINITY[/B][/COLOR]", viewcontent="movies", viewmode="list", contentPlot="[I]Críticas de: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leer_criticas_fa", year=item.infoLabels['year'], mode=item.mode, contentTitle=(item.contentSerieName if item.mode == "tvshow" else item.contentTitle), thumbnail="https://www.filmaffinity.com/images/logo4.png"))
+                    
         if item.id_topic:
             itemlist.append(Item(channel=item.channel, url_orig=item.url_orig, viewcontent="movies", viewmode="list", url=item.url, id_topic=item.id_topic, title="[B][COLOR lightgrey]MENSAJES DEL FORO[/COLOR][/B]", contentPlot="[I]Mensajes sobre: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leerMensajesHiloForo", thumbnail='https://noestasinvitado.com/logonegro2.png'))   
 
