@@ -9,7 +9,7 @@ import os
 from platformcode import logger
 
 
-CHUNK_SIZE = 1048576
+CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 
 class ChunkWriter():
 

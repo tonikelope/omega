@@ -180,20 +180,38 @@
       "lvalues": [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"]
     },
     {
+      "id": "omega_megalib_chunks",
+      "type": "list",
+      "label": "Tamaño del búffer (RAM) para MEGA:",
+      "default": 1,
+      "enabled": "eq(-16,false)+eq(-15,false)",
+      "visible": "eq(-16,false)+eq(-15,false)",
+      "lvalues": [ "50 MB", "100 MB", "150 MB", "200 MB", "250 MB", "300 MB" ]
+    },
+    {
+      "id": "omega_megalib_workers",
+      "type": "list",
+      "label": "Hilos de descarga de MEGA:",
+      "default": 3,
+      "enabled": "eq(-17,false)+eq(-16,false)",
+      "visible": "eq(-17,false)+eq(-16,false)",
+      "lvalues": [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"]
+    },
+    {
       "id": "omega_mega_proxy_list",
       "type": "text",
       "label": "Lista de proxys para MEGA (URL):",
       "default": "",
-      "enabled": "eq(-16,false)+eq(-15,false)",
-      "visible": "eq(-16,false)+eq(-15,false)"
+      "enabled": "eq(-18,false)+eq(-17,false)",
+      "visible": "eq(-18,false)+eq(-17,false)"
     },
     {
       "id": "omega_mega_premium",
       "type": "bool",
       "label": "Usar cuenta PREMIUM de MEGA",
       "default": false,
-      "enabled": "eq(-17,false)+eq(-16,false)",
-      "visible": "eq(-17,false)+eq(-16,false)"
+      "enabled": "eq(-19,false)+eq(-18,false)",
+      "visible": "eq(-19,false)+eq(-18,false)"
     },
     {
       "id": "omega_mega_email",

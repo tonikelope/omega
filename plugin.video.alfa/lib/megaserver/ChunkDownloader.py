@@ -6,10 +6,10 @@ import urllib.request, urllib.error, urllib.parse
 from . import Chunk
 import time
 import socket
-from platformcode import logger
+from platformcode import logger,config
 
-MAX_CHUNK_BUFFER_SIZE = 20
-BLOCK_SIZE = 16*1024
+MAX_CHUNK_BUFFER_SIZE = ((int(config.get_setting("omega_megalib_chunks", "omega"))+1)*10)
+BLOCK_SIZE = 8*1024
 SOCKET_TIMEOUT = 15
 FORCE_PROXY_MODE = False
 PAUSE_HTTP_429 = 10

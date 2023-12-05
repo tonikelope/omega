@@ -9,14 +9,14 @@ from . import ChunkWriter
 import time
 import os
 import urllib.request, urllib.error, urllib.parse
-from platformcode import platformtools,logger
+from platformcode import platformtools,logger,config
 from .crypto import *
 try:
     from Crypto.Util import Counter
 except ImportError:
     from Cryptodome.Util import Counter
 
-CHUNK_WORKERS = 6
+CHUNK_WORKERS = int(config.get_setting("omega_megalib_workers", "omega"))+1
 
 class Cursor(object):
     def __init__(self, file):
