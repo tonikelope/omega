@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.72"
+OMEGA_VERSION = "4.73"
 
 config.set_setting("unify", "false")
 
@@ -481,7 +481,7 @@ def ajustes(item):
     itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]PREFERENCIAS DE OMEGA[/B]",
+                    title="[COLOR yellow][B]PREFERENCIAS DE OMEGA[/B][/COLOR]",
                     action="settings_nei", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     itemlist.append(
