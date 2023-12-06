@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.71"
+OMEGA_VERSION = "4.72"
 
 config.set_setting("unify", "false")
 
@@ -102,7 +102,7 @@ LAST_ITEMS_MAX = 100
 
 FORO_ITEMS_RETRY = 3
 
-DEFAULT_HEADERS = {"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"}
+DEFAULT_HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"}
 
 FOROS_FINALES_NEI = ["ultrahd", "alta-definicion-(hd)", "definicion-estandar-(sd)", "ultra-definicion-(ultra-hd)", "alta-definicion-(hd)-52", "definicion-estandar-(sd)-51"]
 
