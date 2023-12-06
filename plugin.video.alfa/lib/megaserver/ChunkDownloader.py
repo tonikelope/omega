@@ -11,6 +11,7 @@ from platformcode import logger,config
 MAX_CHUNK_BUFFER_SIZE = ((int(config.get_setting("omega_megalib_chunks", "omega"))+1)*10)
 BLOCK_SIZE = 8*1024
 SOCKET_TIMEOUT = 15
+SOCKET_PROXY_TIMEOUT = 5
 FORCE_PROXY_MODE = False
 PAUSE_HTTP_429 = 10
 BLOCK_ERROR_PROXY = True
@@ -64,6 +65,8 @@ class ChunkDownloader():
 
 						self.proxy = self.proxy_manager.get_next_proxy()
 
+						self.cursor.turbo()
+
 						if not self.proxy:
 							logger.info("ChunkDownloader[%d] NO QUEDAN PROXYS" % self.id)
 							self.exit = True
@@ -95,7 +98,7 @@ class ChunkDownloader():
 							if self.proxy:
 								req.set_proxy(self.proxy, 'http')
 
-							connection = urllib.request.urlopen(req, timeout=SOCKET_TIMEOUT)
+							connection = urllib.request.urlopen(req, timeout=SOCKET_PROXY_TIMEOUT if self.proxy else SOCKET_TIMEOUT)
 
 							bytes_read = 0
 

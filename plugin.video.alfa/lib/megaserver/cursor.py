@@ -17,6 +17,7 @@ except ImportError:
     from Cryptodome.Util import Counter
 
 CHUNK_WORKERS = int(config.get_setting("omega_megalib_workers", "omega"))+1
+TURBO_CHUNK_WORKERS = 20
 
 class Cursor(object):
     def __init__(self, file):
@@ -29,6 +30,22 @@ class Cursor(object):
         self.initial_value = file.initial_value
         self.k = file.k
         self.proxy_manager = MegaProxyManager.MegaProxyManager()
+        self.turbo_mode = False
+        self.turbo_lock = threading.Lock()
+
+
+    def turbo(self):
+        if not self.turbo_mode:
+            with self.turbo_lock:
+                if not self.turbo_mode:
+                    self.turbo_mode = True
+                    logger.info("ACTIVANDO PROXY TURBO MODE!")
+                    for c in range(CHUNK_WORKERS-1, TURBO_CHUNK_WORKERS):
+                        chunk_downloader = ChunkDownloader.ChunkDownloader(c+1, self)
+                        self.chunk_downloaders.append(chunk_downloader)
+                        t = threading.Thread(target=chunk_downloader.run)
+                        t.daemon = True
+                        t.start()
 
 
     def mega_request(self, offset):

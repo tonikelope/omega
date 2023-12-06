@@ -23,6 +23,7 @@ class ChunkWriter():
 		self.cv_new_element = threading.Condition()
 		self.bytes_written = start_offset
 		self.exit = False
+		self.turbo = False
 		self.next_offset_required = start_offset
 		self.chunk_offset_lock = threading.Lock()
 		self.offset_rejected = queue.Queue()

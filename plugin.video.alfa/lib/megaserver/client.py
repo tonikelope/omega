@@ -60,7 +60,7 @@ class Client(object):
         
         if not self.error_509_notified:
             self.error_509_notified = True
-            xbmcgui.Dialog().notification('OMEGA', "AVISO: LÍMITE DE MEGA ALCANZADO (probando proxies...)",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification('OMEGA', "AVISO: LÍMITE DE MEGA ALCANZADO (probando proxys...)",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     def load_mega_proxy(self, host, port, password):
         try:

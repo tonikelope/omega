@@ -8,8 +8,8 @@ import threading
 import random
 from platformcode import config,logger
 
-PROXY_LIST_URL='https://raw.githubusercontent.com/tonikelope/megabasterd/proxy_list/proxy.txt'
-PROXY_BLOCK_TIME = 30
+PROXY_LIST_URL='https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/http.txt'
+PROXY_BLOCK_TIME = 120
 
 def synchronized_with_attr(lock_name):
     
@@ -50,7 +50,7 @@ class MegaProxyManager():
         try:
             logger.info(self.proxy_list_url)
 
-            req = urllib.request.Request(self.proxy_list_url, headers={"User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"})
+            req = urllib.request.Request(self.proxy_list_url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"})
 
             proxy_data = urllib.request.urlopen(req).read().decode("utf-8")
 
