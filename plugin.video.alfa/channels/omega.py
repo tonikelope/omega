@@ -28,7 +28,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.74"
+OMEGA_VERSION = "4.75"
 
 config.set_setting("unify", "false")
 
@@ -1432,9 +1432,20 @@ def bibliotaku_pelis_megacrypter(item):
     return itemlist
 
 
-def escribirMensajeHiloForo(item):
+def avisarEnlacesRotos(item):
+    escribirMensajeHiloForo(item, "Hola. Muchas gracias por este aporte. Desgraciadamente, parece que los enlaces no funcionan ¿podrías revisarlos, por favor? ¡GRACIAS!")
 
-    mensaje = xbmcgui.Dialog().input(item.contentPlot)
+
+def pedirEnlacesSinComprimir(item):
+    escribirMensajeHiloForo(item, "Hola. Muchas gracias por este aporte. ¿Podrías por favor subirlo sin comprimir en zip/rar/etc? ¡GRACIAS!")
+
+
+def escribirMensajeHiloForo(item, msg=None):
+
+    if not msg:
+        mensaje = xbmcgui.Dialog().input(item.contentPlot)
+    else:
+        mensaje = msg
 
     if mensaje:
 
@@ -1484,6 +1495,10 @@ def leerMensajesHiloForo(item):
         i+=1
 
     itemlist.append(Item(channel=item.channel, url_orig=(item.url_orig if 'url_orig' in item else None), id_topic=item.id_topic, fanart='https://noestasinvitado.com/logonegro2.png', contentPlot=item.contentPlot, url=item.url, thumbnail='https://noestasinvitado.com/logonegro2.png', action='escribirMensajeHiloForo', title='[B]ESCRIBIR UN MENSAJE[/B]'))
+
+    itemlist.append(Item(channel=item.channel, url_orig=(item.url_orig if 'url_orig' in item else None), id_topic=item.id_topic, fanart='https://noestasinvitado.com/logonegro2.png', contentPlot=item.contentPlot, url=item.url, thumbnail='https://noestasinvitado.com/logonegro2.png', action='avisarEnlacesRotos', title='[COLOR red][B]AVISAR DE ENLACES ROTOS[/B][/COLOR]'))
+
+    itemlist.append(Item(channel=item.channel, url_orig=(item.url_orig if 'url_orig' in item else None), id_topic=item.id_topic, fanart='https://noestasinvitado.com/logonegro2.png', contentPlot=item.contentPlot, url=item.url, thumbnail='https://noestasinvitado.com/logonegro2.png', action='pedirEnlacesSinComprimir', title='PEDIR ENLACES SIN COMPRIMIR'))
 
     return itemlist
 
