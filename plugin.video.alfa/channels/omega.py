@@ -19,6 +19,7 @@ import xbmcvfs
 import html
 import time
 import shutil
+import sys
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 from platformcode import config, logger, platformtools, updater
@@ -34,7 +35,7 @@ if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Andro
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.76"
+OMEGA_VERSION = "4.77"
 
 config.set_setting("unify", "false")
 
