@@ -25,10 +25,16 @@ from platformcode import config, logger, platformtools, updater
 from collections import OrderedDict, deque
 from datetime import datetime
 
+#Sucio
+if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Android"):
+    try:
+        sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
+    except Exception:
+        logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.75"
+OMEGA_VERSION = "4.76"
 
 config.set_setting("unify", "false")
 
