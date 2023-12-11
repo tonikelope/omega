@@ -1,20 +1,21 @@
 # -*- coding: utf-8 -*-
 #Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
 
+import time
+import os
+import urllib.request, urllib.error, urllib.parse
+from platformcode import platformtools,logger,config
 import threading
 from . import Chunk
 from . import ChunkDownloader
 from . import MegaProxyManager
 from . import ChunkWriter
-import time
-import os
-import urllib.request, urllib.error, urllib.parse
-from platformcode import platformtools,logger,config
 from .crypto import *
+
 try:
-    from Crypto.Util import Counter
-except ImportError:
     from Cryptodome.Util import Counter
+except:
+    from Crypto.Util import Counter
 
 CHUNK_WORKERS = int(config.get_setting("omega_megalib_workers", "omega"))+1
 TURBO_CHUNK_WORKERS = 20

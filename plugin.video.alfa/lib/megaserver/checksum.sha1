@@ -3,7 +3,7 @@ f727a4d085a4e3c88eae848b184276fe02bb3798  Chunk.py
 406129d8ea08e1a27b7bbbacaa61ff0c8be35b0c  ChunkWriter.py
 eb7087226174e66258308c2fa84f2c812679321a  client.py
 e74d3c426d7ac319b592e17c00c3833efacfcb71  crypto.py
-bcf491883dd06539903c8e9729fa66b1de7f00fa  cursor.py
+8ada77f90de1c5c42cafc68d5466c9653802b244  cursor.py
 603e113b64abc0836ee6cf4a8df93ffbe341a974  file.py
 b90db8783de1cfe40f241f106e0f86cee80dbce7  handler.py
 ed7044eb395caf6147dad23fb3fe1d9ee9d54c65  __init__.py
