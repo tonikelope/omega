@@ -2,6 +2,7 @@
 # https://github.com/tonikelope/omega
 
 import sys
+import xbmc
 
 if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Android"):
     try:
@@ -20,7 +21,6 @@ import re
 import socket
 import xml.etree.ElementTree as ET
 import urllib.request, urllib.error, urllib.parse
-import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcvfs
@@ -35,7 +35,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.78"
+OMEGA_VERSION = "4.79"
 
 config.set_setting("unify", "false")
 
