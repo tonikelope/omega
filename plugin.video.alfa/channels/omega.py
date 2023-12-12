@@ -1,6 +1,14 @@
 # -*- coding: utf-8 -*-
 # https://github.com/tonikelope/omega
 
+import sys
+
+if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Android"):
+    try:
+        sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
+    except Exception:
+        logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
+
 import base64
 import hashlib
 import json
@@ -19,23 +27,15 @@ import xbmcvfs
 import html
 import time
 import shutil
-import sys
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 from platformcode import config, logger, platformtools, updater
 from collections import OrderedDict, deque
 from datetime import datetime
 
-#Sucio
-if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Android"):
-    try:
-        sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
-    except Exception:
-        logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
-
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.77"
+OMEGA_VERSION = "4.78"
 
 config.set_setting("unify", "false")
 
