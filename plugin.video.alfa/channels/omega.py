@@ -30,12 +30,13 @@ import shutil
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 from platformcode import config, logger, platformtools, updater
+from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.79"
+OMEGA_VERSION = "4.80"
 
 config.set_setting("unify", "false")
 
@@ -1440,11 +1441,17 @@ def bibliotaku_pelis_megacrypter(item):
 
 
 def avisarEnlacesRotos(item):
-    escribirMensajeHiloForo(item, "Hola. Muchas gracias por este aporte. Desgraciadamente, parece que los enlaces no funcionan ¿podrías revisarlos, por favor? ¡GRACIAS!")
+    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿Seguro que quieres avisar de enlaces rotos?')
+
+    if ret:
+        escribirMensajeHiloForo(item, "Hola. Muchas gracias por este aporte. Desgraciadamente, parece que los enlaces no funcionan ¿podrías revisarlos, por favor? ¡GRACIAS!")
 
 
 def pedirEnlacesSinComprimir(item):
-    escribirMensajeHiloForo(item, "Hola. Muchas gracias por este aporte. ¿Podrías por favor subirlo sin comprimir en zip/rar/etc? ¡GRACIAS!")
+    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿Seguro que quieres pedir enlaces sin comprimir?')
+
+    if ret:
+        escribirMensajeHiloForo(item, "Hola. Muchas gracias por este aporte. ¿Podrías por favor subirlo sin comprimir en zip/rar/etc? ¡GRACIAS!")
 
 
 def escribirMensajeHiloForo(item, msg=None):
@@ -1493,6 +1500,8 @@ def leerMensajesHiloForo(item):
 
     itemlist = []
     
+    itemlist.append(Item(channel=item.channel, url_orig=(item.url_orig if 'url_orig' in item else None), id_topic=item.id_topic, fanart='https://noestasinvitado.com/logonegro2.png', contentPlot=item.contentPlot, url=item.url, thumbnail='https://noestasinvitado.com/logonegro2.png', action='QRMensajeForo', title='[COLOR yellow][B]MOSTRAR ENLACE QR[/B][/COLOR]'))
+
     i=0
     
     for msg in json_response:
@@ -1509,6 +1518,10 @@ def leerMensajesHiloForo(item):
 
     return itemlist
 
+
+def QRMensajeForo(item):
+    if dialog_qr_message(str(item.url), str(item.url), str(item.url)):
+        return ('QRCODE', False)
 
 def cargarMensajeForo(item):
     fecha_mensaje = datetime.fromtimestamp(int(item.msg['time'])).strftime('%d/%m/%y %H:%M')
