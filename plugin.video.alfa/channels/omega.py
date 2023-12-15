@@ -36,7 +36,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.80"
+OMEGA_VERSION = "4.81"
 
 config.set_setting("unify", "false")
 
@@ -189,6 +189,13 @@ if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
         if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
             os.remove(KODI_NEI_MC_CACHE_PATH)
 
+
+def buscar_titulo_tmdb(item):
+    otmdb=tmdb.Tmdb(texto_buscado=item.contentTitle, tipo="movie" if item.contentType == "movie" else "tv")
+    
+    results=otmdb.get_list_resultados()
+
+    tmdb_result = platformtools.show_video_info(results, item=item, caption=item.contentTitle)
 
 def color_uploader(uploader):
     return uploader if uploader!=OMEGA_LOGIN else "[COLOR yellow]"+uploader+"[/COLOR]"
@@ -1271,6 +1278,20 @@ def bibliotaku_series_temporadas(item):
 
             itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
+    search_item = item.clone()
+
+    search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+
+    search_item.contentPlot= "Busca en NEI otros aportes con el mismo título"
+
+    search_item.action = "search_similares"
+
+    search_item.url=""
+
+    search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+
+    itemlist.append(search_item)
+
     trailer_item = item.clone()
         
     trailer_item.title="[B]BUSCAR TRAILER[/B]"
@@ -1285,19 +1306,19 @@ def bibliotaku_series_temporadas(item):
     
     itemlist.append(trailer_item)
 
-    search_item = item.clone()
+    tmdb_item = item.clone()
 
-    search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+    tmdb_item.title = "[COLOR lightgray][B]BUSCAR INFORMACIÓN EN TMDB[/B][/COLOR]"
 
-    search_item.contentPlot= "Busca en NEI otros aportes con el mismo título"
+    tmdb_item.contentPlot= "Busca información en TMDB"
 
-    search_item.action = "search_similares"
+    tmdb_item.action = "buscar_titulo_tmdb"
 
-    search_item.url=""
+    tmdb_item.url=""
 
-    search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+    tmdb_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
-    itemlist.append(search_item)
+    itemlist.append(tmdb_item)
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
@@ -1407,6 +1428,20 @@ def bibliotaku_pelis_megacrypter(item):
 
     itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
+    search_item = item.clone()
+
+    search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+
+    search_item.contentPlot= "Busca en NEI otros aportes con el mismo título"
+
+    search_item.action = "search_similares"
+
+    search_item.url=""
+
+    search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+
+    itemlist.append(search_item)
+
     trailer_item = item.clone()
         
     trailer_item.title="[B]BUSCAR TRAILER[/B]"
@@ -1421,19 +1456,19 @@ def bibliotaku_pelis_megacrypter(item):
     
     itemlist.append(trailer_item)
 
-    search_item = item.clone()
+    tmdb_item = item.clone()
 
-    search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+    tmdb_item.title = "[COLOR lightgray][B]BUSCAR INFORMACIÓN EN TMDB[/B][/COLOR]"
 
-    search_item.contentPlot= "Busca en NEI otros aportes con el mismo título"
+    tmdb_item.contentPlot= "Busca información en TMDB"
 
-    search_item.action = "search_similares"
+    tmdb_item.action = "buscar_titulo_tmdb"
 
-    search_item.url=""
+    tmdb_item.url=""
 
-    search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+    tmdb_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
-    itemlist.append(search_item)
+    itemlist.append(tmdb_item)
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
@@ -1630,20 +1665,6 @@ def foro(item):
 
             itemlist.append(Item(channel=item.channel, folder=False, fanart=item.fanart, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
-        trailer_item = item.clone()
-        
-        trailer_item.title="[B]BUSCAR TRAILER[/B]"
-
-        trailer_item.contentPlot= ""
-        
-        trailer_item.action="buscartrailer"
-        
-        trailer_item.channel="trailertools"
-
-        trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_nofolder.png"
-        
-        itemlist.append(trailer_item)
-
         search_item = item.clone()
 
         search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
@@ -1657,6 +1678,34 @@ def foro(item):
         search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
         itemlist.append(search_item)
+
+        trailer_item = item.clone()
+        
+        trailer_item.title="[COLOR lightgray][B]BUSCAR TRAILER[/B][/COLOR]"
+
+        trailer_item.contentPlot= ""
+        
+        trailer_item.action="buscartrailer"
+        
+        trailer_item.channel="trailertools"
+
+        trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_nofolder.png"
+        
+        itemlist.append(trailer_item)
+
+        tmdb_item = item.clone()
+
+        tmdb_item.title = "[COLOR lightgray][B]BUSCAR INFORMACIÓN EN TMDB[/B][/COLOR]"
+
+        tmdb_item.contentPlot= "Busca información en TMDB"
+
+        tmdb_item.action = "buscar_titulo_tmdb"
+
+        tmdb_item.url=""
+
+        tmdb_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+
+        itemlist.append(tmdb_item)
 
         if 'generos' in item:
             generos_item = item.clone()
