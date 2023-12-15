@@ -36,7 +36,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.82"
+OMEGA_VERSION = "4.83"
 
 config.set_setting("unify", "false")
 
@@ -195,7 +195,7 @@ def buscar_titulo_tmdb(item):
     
     results=otmdb.get_list_resultados()
 
-    if len(results)>1:
+    if len(results)>0:
         tmdb_result = platformtools.show_video_info(results, item=item, caption=item.contentTitle)
 
 def color_uploader(uploader):
