@@ -36,7 +36,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.83"
+OMEGA_VERSION = "4.84"
 
 config.set_setting("unify", "false")
 
@@ -1250,8 +1250,6 @@ def bibliotaku_series_temporadas(item):
 
         itemlist = bibliotaku_series_megacrypter(item)
 
-        itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
         itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
     else:
@@ -1274,8 +1272,6 @@ def bibliotaku_series_temporadas(item):
 
             if item.id_topic:
                 itemlist.append(Item(channel=item.channel, scraped_title=item.scraped_title, ignore_title=item.ignore_title, url_orig=item.url_orig, id_topic=item.id_topic, url=item.url, viewcontent="movies", viewmode="list", title="[B][COLOR lightgrey]MENSAJES DEL FORO[/COLOR][/B]", contentPlot="[I]Mensajes sobre: "+(item.contentSerieName if item.mode == "tvshow" else item.contentTitle)+"[/I]", action="leerMensajesHiloForo", thumbnail='https://noestasinvitado.com/logonegro2.png'))   
-
-            itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
             itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
@@ -1306,6 +1302,20 @@ def bibliotaku_series_temporadas(item):
     trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_nofolder.png"
     
     itemlist.append(trailer_item)
+
+    custom_title_item=item.clone()
+
+    custom_title_item.title = "[COLOR lightgrey][B]ARREGLAR TÍTULO (CARÁTULA)[/B][/COLOR]"
+
+    custom_title_item.contentPlot= "Corrige el título en caso de que la carátula/sinopsis no cargue correctamente"
+
+    custom_title_item.action = "customize_title"
+
+    custom_title_item.url=""
+
+    custom_title_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"
+
+    itemlist.append(custom_title_item)
 
     tmdb_item = item.clone()
 
@@ -1425,8 +1435,6 @@ def bibliotaku_pelis_megacrypter(item):
             
     itemlist = get_video_mega_links_group(Item(channel=item.channel, scraped_title=item.scraped_title, ignore_title=item.ignore_title, url_orig=item.url_orig, viewcontent="movies", viewmode="list", id_topic=item.id_topic, mode=item.mode, action='', title='', url=item.url, mc_group_id=item.mc_group_id, infoLabels=infoLabels))
 
-    itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
     itemlist.append(Item(channel=item.channel, folder=False, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
     search_item = item.clone()
@@ -1456,6 +1464,20 @@ def bibliotaku_pelis_megacrypter(item):
     trailer_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_nofolder.png"
     
     itemlist.append(trailer_item)
+
+    custom_title_item=item.clone()
+
+    custom_title_item.title = "[COLOR lightgrey][B]ARREGLAR TÍTULO (CARÁTULA)[/B][/COLOR]"
+
+    custom_title_item.contentPlot= "Corrige el título en caso de que la carátula/sinopsis no cargue correctamente"
+
+    custom_title_item.action = "customize_title"
+
+    custom_title_item.url=""
+
+    custom_title_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"
+
+    itemlist.append(custom_title_item)
 
     tmdb_item = item.clone()
 
@@ -1550,7 +1572,7 @@ def leerMensajesHiloForo(item):
 
     itemlist.append(Item(channel=item.channel, url_orig=(item.url_orig if 'url_orig' in item else None), id_topic=item.id_topic, fanart='https://noestasinvitado.com/logonegro2.png', contentPlot=item.contentPlot, url=item.url, thumbnail='https://noestasinvitado.com/logonegro2.png', action='avisarEnlacesRotos', title='[COLOR red][B]AVISAR DE ENLACES ROTOS[/B][/COLOR]'))
 
-    itemlist.append(Item(channel=item.channel, url_orig=(item.url_orig if 'url_orig' in item else None), id_topic=item.id_topic, fanart='https://noestasinvitado.com/logonegro2.png', contentPlot=item.contentPlot, url=item.url, thumbnail='https://noestasinvitado.com/logonegro2.png', action='pedirEnlacesSinComprimir', title='PEDIR ENLACES SIN COMPRIMIR'))
+    itemlist.append(Item(channel=item.channel, url_orig=(item.url_orig if 'url_orig' in item else None), id_topic=item.id_topic, fanart='https://noestasinvitado.com/logonegro2.png', contentPlot=item.contentPlot, url=item.url, thumbnail='https://noestasinvitado.com/logonegro2.png', action='pedirEnlacesSinComprimir', title='[COLOR lightgray][B]PEDIR ENLACES SIN COMPRIMIR[/B][/COLOR]'))
 
     return itemlist
 
@@ -1662,8 +1684,6 @@ def foro(item):
             if item.uploader:
                 itemlist.append(Item(channel=item.channel, folder=False, fanart=item.fanart, title="[COLOR yellow][B]IGNORAR TODO EL CONTENIDO DE "+item.uploader+"[/B][/COLOR]", uploader=item.uploader, action="ignore_uploader", url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
         else:
-            itemlist.append(Item(channel=item.channel, folder=False, fanart=item.fanart, title="[COLOR lightgrey][B]PERSONALIZAR TÍTULO PARA CARÁTULA[/B][/COLOR]", action="customize_title", url="", scraped_title=item.scraped_title, ignore_title=item.ignore_title, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
-
             itemlist.append(Item(channel=item.channel, folder=False, fanart=item.fanart, title="[COLOR red][B]IGNORAR ESTE APORTE[/B][/COLOR]", action="ignore_item", ignore_confirmation=True, ignore_title=item.ignore_title, url="", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_error.png"))
 
         search_item = item.clone()
@@ -1694,11 +1714,25 @@ def foro(item):
         
         itemlist.append(trailer_item)
 
+        custom_title_item = item.clone()
+
+        custom_title_item.title = "[COLOR lightgrey][B]ARREGLAR TÍTULO (CARÁTULA)[/B][/COLOR]"
+
+        custom_title_item.contentPlot= "Corrige el título en caso de que la carátula/sinopsis no cargue correctamente (normalmente suele ser que el año de lanzamiento no es correcto)"
+
+        custom_title_item.action = "customize_title"
+
+        custom_title_item.url=""
+
+        custom_title_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"
+
+        itemlist.append(custom_title_item)
+
         tmdb_item = item.clone()
 
         tmdb_item.title = "[COLOR lightgray][B]BUSCAR INFORMACIÓN EN TMDB[/B][/COLOR]"
 
-        tmdb_item.contentPlot= "Busca información en TMDB"
+        tmdb_item.contentPlot= "Busca información en TMDB (útil para averiguar y corregir el año del título si la carátula no carga)"
 
         tmdb_item.action = "buscar_titulo_tmdb"
 
