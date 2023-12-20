@@ -36,7 +36,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.85"
+OMEGA_VERSION = "4.86"
 
 config.set_setting("unify", "false")
 
@@ -808,9 +808,13 @@ def contar_episodios(itemlist):
             if it.server == 'nei':
                 total+=1
     else:
+        temporadas=[]
+
         for it in itemlist:
             if it.action == 'get_video_mega_links_group':
-                total+=contar_episodios(get_video_mega_links_group(it))
+                temporadas.append(it)
+        
+        total+=contar_episodios(get_video_mega_links_group(temporadas[-1]))
 
     return total
 
