@@ -36,7 +36,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.84"
+OMEGA_VERSION = "4.85"
 
 config.set_setting("unify", "false")
 
@@ -67,6 +67,8 @@ KODI_USERDATA_PATH = xbmcvfs.translatePath('special://userdata/')
 KODI_HOME_PATH = xbmcvfs.translatePath('special://home/')
 
 KODI_NEI_LAST_ITEMS_PATH = KODI_USERDATA_PATH + 'kodi_nei_last'
+
+KODI_NEI_EPISODE_WATCHDOG_PATH = KODI_USERDATA_PATH + 'kodi_nei_episode_watchdog'
 
 KODI_NEI_HISTORY_PATH = KODI_USERDATA_PATH + 'kodi_nei_history'
 
@@ -113,6 +115,20 @@ FORO_ITEMS_RETRY = 3
 DEFAULT_HEADERS = {"User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"}
 
 FOROS_FINALES_NEI = ["ultrahd", "alta-definicion-(hd)", "definicion-estandar-(sd)", "ultra-definicion-(ultra-hd)", "alta-definicion-(hd)-52", "definicion-estandar-(sd)-51"]
+
+try:
+    lines = [line.rstrip('\n') for line in open(KODI_NEI_EPISODE_WATCHDOG_PATH)]
+
+    EPISODE_WATCHDOG = {}
+
+    for l in lines:
+        
+        parts = l.split('#')
+        
+        if len(parts) == 2:
+            EPISODE_WATCHDOG[base64.b64decode(parts[0]).decode('utf-8')] = parts[1]
+except:
+    EPISODE_WATCHDOG = {}
 
 try:
     LAST_ITEMS = deque([line.rstrip('\n') for line in open(KODI_NEI_LAST_ITEMS_PATH)], maxlen=LAST_ITEMS_MAX)
@@ -287,8 +303,7 @@ def kodi_advancedsettings(verbose=True):
 
     if not verbose or ret:
     
-        if os.path.exists(xbmcvfs.translatePath('special://userdata/advancedsettings.xml')):
-            os.rename(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'), xbmcvfs.translatePath('special://userdata/advancedsettings.xml')+"."+str(int(time.time()))+".bak")
+        os.rename(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'), xbmcvfs.translatePath('special://userdata/advancedsettings.xml')+"."+str(int(time.time()))+".bak")
         
         settings_xml = ET.ElementTree(ET.Element('advancedsettings'))
 
@@ -433,6 +448,12 @@ def mainlist(item):
                     channel=item.channel,
                     title="[COLOR yellow][B]HISTORIAL[/B][/COLOR]",
                     action="getLastItemList", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_all.png"))
+
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[B]TUS EPISODIOS NUEVOS[/B]",
+                    action="lista_series_con_nuevos_episodios", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", viewcontent="movies", viewmode="poster", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_news.png"))
 
             itemlist.append(Item(channel=item.channel, title="[B]PELÍCULAS[/B]", viewcontent="movies", viewmode="list", section="PELÍCULAS", mode="movie", action="foro",
                                  url="https://noestasinvitado.com/peliculas/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_movie.png"))
@@ -603,6 +624,47 @@ def saltar_pagina(item):
     xbmc.executebuiltin('Container.Refresh')
     
 
+def watchdog_episodios(item):
+    if not item.parent_item_url in EPISODE_WATCHDOG:
+        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿AÑADIR SERIE AL VIGILANTE DE NUEVOS EPISODIOS?')
+
+        if ret:
+            EPISODE_WATCHDOG[item.parent_item_url]=0
+            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS ACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+    else:
+        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿QUITAR SERIE DEL VIGILANTE DE NUEVOS EPISODIOS?')
+
+        if ret:
+            del EPISODE_WATCHDOG[item.parent_item_url]
+            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS DESACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+
+    with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
+        for k in EPISODE_WATCHDOG.keys():
+            file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
+
+
+def update_watchdog_episodes(item_url, count):
+    EPISODE_WATCHDOG[item_url]=count
+
+    with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
+        for k in EPISODE_WATCHDOG.keys():
+            file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
+
+
+def lista_series_con_nuevos_episodios(item):
+    itemlist = []
+
+    for k in EPISODE_WATCHDOG.keys():
+        episodios_actuales = contar_episodios(foro(Item().fromurl(k), watchdog=False))
+
+        if int(episodios_actuales) != int(EPISODE_WATCHDOG[k]):
+            i = Item().fromurl(k)
+            i.action = 'foro'
+            itemlist.append(i)
+
+    return itemlist
+
+
 def buscar_por_genero(item):
     
     if item.page == 0:
@@ -735,6 +797,22 @@ def buscar_por_genero(item):
                 i.title = i.title.replace('##*NOTA*##', '')
 
         return itemlist
+
+
+def contar_episodios(itemlist):
+
+    total = 0
+
+    if itemlist[0].server == 'nei':
+        for it in itemlist:
+            if it.server == 'nei':
+                total+=1
+    else:
+        for it in itemlist:
+            if it.action == 'get_video_mega_links_group':
+                total+=contar_episodios(get_video_mega_links_group(it))
+
+    return total
 
 
 def update_favourites(item):
@@ -1629,7 +1707,7 @@ def getLastItemList(item):
 
 
 
-def foro(item):
+def foro(item, watchdog=True):
     logger.info("channels.omega foro")
 
     if item.xxx and os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
@@ -1699,6 +1777,28 @@ def foro(item):
         search_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
         itemlist.append(search_item)
+        
+        if item.contentSerieName!="":
+
+            watchdog_item = item.clone()
+
+            watchdog_item.parent_item_url = item.tourl()
+
+            if item.tourl() in EPISODE_WATCHDOG:
+                watchdog_item.title = "[COLOR yellow][B]DESACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
+            else:
+                watchdog_item.title = "[COLOR lightgray][B]ACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
+
+            watchdog_item.contentPlot= "Añade esta serie al vigilante de nuevos episodios"
+
+            watchdog_item.action = "watchdog_episodios"
+
+            watchdog_item.thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_news.png"
+
+            itemlist.append(watchdog_item)
+
+            if watchdog and item.tourl() in EPISODE_WATCHDOG:
+                update_watchdog_episodes(item.tourl(), contar_episodios(itemlist))
 
         trailer_item = item.clone()
         
