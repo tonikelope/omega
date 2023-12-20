@@ -36,7 +36,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.88"
+OMEGA_VERSION = "4.89"
 
 config.set_setting("unify", "false")
 
@@ -814,7 +814,7 @@ def contar_episodios(itemlist):
             if it.action == 'get_video_mega_links_group':
                 temporadas.append(it)
         
-        total+=contar_episodios(get_video_mega_links_group(temporadas[-1]))
+        total+=len(temporadas)+contar_episodios(get_video_mega_links_group(temporadas[-1]))
 
     return total
 
