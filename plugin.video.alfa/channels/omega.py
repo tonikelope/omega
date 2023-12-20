@@ -36,7 +36,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.87"
+OMEGA_VERSION = "4.88"
 
 config.set_setting("unify", "false")
 
@@ -626,13 +626,13 @@ def saltar_pagina(item):
 
 def watchdog_episodios(item):
     if not item.parent_item_url in EPISODE_WATCHDOG:
-        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿AÑADIR SERIE AL VIGILANTE DE NUEVOS EPISODIOS?')
+        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿AÑADIR SERIE AL VIGILANTE DE EPISODIOS?')
 
         if ret:
-            EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(k), watchdog=False))
+            EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), watchdog=False))
             xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS ACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
     else:
-        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿QUITAR SERIE DEL VIGILANTE DE NUEVOS EPISODIOS?')
+        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿QUITAR SERIE DEL VIGILANTE DE EPISODIOS?')
 
         if ret:
             del EPISODE_WATCHDOG[item.parent_item_url]
