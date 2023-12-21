@@ -36,7 +36,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.89"
+OMEGA_VERSION = "4.90"
 
 config.set_setting("unify", "false")
 
@@ -491,6 +491,7 @@ def mainlist(item):
                     title="[B]AJUSTES[/B]",
                     action="ajustes", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
+            itemlist.append(Item(channel=item.channel, title="[B]FORZAR RE-LOGIN EN NEI[/B]", action="force_login", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
             itemlist.append(
                 Item(
@@ -508,6 +509,9 @@ def mainlist(item):
                 Item(channel=item.channel,
                      title="[COLOR darkorange][B]Habilita tu cuenta de NEI en preferencias.[/B][/COLOR]",
                      action="settings_nei", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+            itemlist.append(Item(channel=item.channel, title="[B]FORZAR RE-LOGIN EN NEI[/B]", action="force_login", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
+
 
     return itemlist
 
@@ -580,12 +584,6 @@ def ajustes(item):
             title="Regenerar miniaturas (todo KODI)",
             action="thumbnail_refresh", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
-    itemlist.append(
-        Item(
-            channel=item.channel,
-            title="[B]FORZAR RE-LOGIN EN NEI[/B]",
-            action="force_login", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
-
     if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
         itemlist.append(
             Item(
@@ -625,12 +623,16 @@ def saltar_pagina(item):
     
 
 def watchdog_episodios(item):
+
     if not item.parent_item_url in EPISODE_WATCHDOG:
         ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿AÑADIR SERIE AL VIGILANTE DE EPISODIOS?')
 
         if ret:
+            pDialog = xbmcgui.DialogProgress()
+            pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Actualizando contador de episodios...')
             EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), watchdog=False))
             xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS ACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            pDialog.close()
     else:
         ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿QUITAR SERIE DEL VIGILANTE DE EPISODIOS?')
 
@@ -654,13 +656,37 @@ def update_watchdog_episodes(item_url, count):
 def lista_series_con_nuevos_episodios(item):
     itemlist = []
 
+    pDialog = xbmcgui.DialogProgress()
+    
+    pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Comprobando series...')
+
+    tot_series = len(EPISODE_WATCHDOG)
+
+    c=0
+
+    pro=0
+
     for k in EPISODE_WATCHDOG.keys():
-        episodios_actuales = contar_episodios(foro(Item().fromurl(k), watchdog=False))
+        
+        i = Item().fromurl(k)
+
+        pDialog.update(pro, "Comprobando "+i.contentSerieName+" ...")
+
+        episodios_actuales = contar_episodios(foro(i, watchdog=False))
 
         if int(episodios_actuales) != int(EPISODE_WATCHDOG[k]):
-            i = Item().fromurl(k)
             i.action = 'foro'
             itemlist.append(i)
+
+        c+=1
+
+        pro = int((c/tot_series)*100)
+
+        if pDialog.iscanceled():
+            itemlist = []
+            break
+
+    pDialog.close()
 
     return itemlist
 
@@ -1802,7 +1828,13 @@ def foro(item, watchdog=True):
             itemlist.append(watchdog_item)
 
             if watchdog and item.tourl() in EPISODE_WATCHDOG:
+                pDialog = xbmcgui.DialogProgress()
+    
+                pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Actualizando contador de episodios...')
+
                 update_watchdog_episodes(item.tourl(), contar_episodios(itemlist))
+
+                pDialog.close()
 
         trailer_item = item.clone()
         
