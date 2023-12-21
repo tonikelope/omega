@@ -3,11 +3,13 @@
 
 import sys
 import xbmc
+import xbmcgui
 
 if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Android"):
     try:
         sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
     except Exception:
+        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR FIX PYTHON PATH",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
         logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
 
 import base64
@@ -22,7 +24,6 @@ import socket
 import xml.etree.ElementTree as ET
 import urllib.request, urllib.error, urllib.parse
 import xbmcaddon
-import xbmcgui
 import xbmcvfs
 import html
 import time
@@ -36,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.90"
+OMEGA_VERSION = "4.91"
 
 config.set_setting("unify", "false")
 
@@ -546,6 +547,12 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
+            title="[COLOR red][B]PURGAR VIGILANTE DE EPISODIOS[/B][/COLOR]",
+            action="clean_vigilante", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
             title="[B]GESTIONAR APORTES IGNORADOS[/B]", viewcontent="movies", viewmode="list",
             action="clean_ignored_items", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
@@ -990,6 +997,11 @@ def backup_omega_userdata(item, save_dir=None):
             os.makedirs(omega_data_tmp_dir+"userdata/addon_data/plugin.video.alfa/settings_channels/", exist_ok=True)
             
             try:
+                shutil.copy(KODI_USERDATA_PATH+"kodi_nei_episode_watchdog", omega_data_tmp_dir+"userdata/kodi_nei_episode_watchdog")
+            except:
+                pass
+
+            try:
                 shutil.copy(KODI_USERDATA_PATH+"kodi_nei_last", omega_data_tmp_dir+"userdata/kodi_nei_last")
             except:
                 pass
@@ -1032,6 +1044,11 @@ def restore_omega_userdata(item):
             shutil.unpack_archive(backup_file, omega_data_tmp_dir, 'zip')
             
             backup_omega_userdata(item, KODI_USERDATA_PATH)
+
+            try:
+                shutil.copy(omega_data_tmp_dir+"userdata/kodi_nei_episode_watchdog", KODI_USERDATA_PATH+"kodi_nei_episode_watchdog" )
+            except:
+                pass
 
             try:
                 shutil.copy(omega_data_tmp_dir+"userdata/kodi_nei_last", KODI_USERDATA_PATH+"kodi_nei_last" )
@@ -1114,6 +1131,19 @@ def clean_history(item):
         except:
             pass
 
+
+def clean_vigilante(item):
+    if xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)',
+                              '¿Estás seguro de que quieres borrar todas las series del VIGILANTE de EPISODIOS?'):
+
+        try:
+            os.remove(KODI_NEI_EPISODE_WATCHDOG_PATH)
+            EPISODE_WATCHDOG.clear()
+            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS PURGADO",
+                                          os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
+                                                       'channels', 'thumb', 'omega.gif'), 5000)
+        except:
+            pass
 
 def clean_ignored_items(item):
     
@@ -1817,7 +1847,7 @@ def foro(item, watchdog=True):
             if item.tourl() in EPISODE_WATCHDOG:
                 watchdog_item.title = "[COLOR yellow][B]DESACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
             else:
-                watchdog_item.title = "[COLOR lightgray][B]ACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
+                watchdog_item.title = "[COLOR yellow][B]ACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
 
             watchdog_item.contentPlot= "Añade esta serie al vigilante de nuevos episodios"
 
