@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.99"
+OMEGA_VERSION = "5.0"
 
 config.set_setting("unify", "false")
 
@@ -652,15 +652,17 @@ def watchdog_episodios(item):
             file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
 
 
-def update_watchdog_episodes(item_url, new_count):
+def update_watchdog_episodes(item_url, new_count, serie_name):
     
     episodios=EPISODE_WATCHDOG[item_url]
 
     EPISODE_WATCHDOG[item_url]=new_count
 
-    if int(episodios)<int(new_count):
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "HAY EPISODIOS NUEVOS ("+str(int(new_count)-int(episodios))+")", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+    nuevos = int(new_count)-int(episodios)
 
+    if int(episodios)<int(new_count):
+        xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', ("HAY ("str(nuevos)+ ") EPISODIOS NUEVOS de\n\n" if nuevos > 1 else "HAY NUEVO EPISODIO de\n\n")+serie_name)
+        
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
         for k in EPISODE_WATCHDOG.keys():
             file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
@@ -1869,7 +1871,7 @@ def foro(item, watchdog=True):
     
                 pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Actualizando contador de episodios...')
 
-                update_watchdog_episodes(item.tourl(), contar_episodios(itemlist))
+                update_watchdog_episodes(item.tourl(), contar_episodios(itemlist), item.contentSerieName)
 
                 pDialog.close()
 
