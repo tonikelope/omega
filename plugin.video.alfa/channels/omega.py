@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.5"
+OMEGA_VERSION = "5.6"
 
 config.set_setting("unify", "false")
 
@@ -688,9 +688,13 @@ def lista_series_con_nuevos_episodios(item):
 
     pro=0
 
+    series=[]
+
     for k in EPISODE_WATCHDOG.keys():
         
         i = Item().fromurl(k)
+
+        series.append(i.contentSerieName)
 
         pDialog.update(pro, "["+str(c+1)+"/"+str(tot_series)+"] Comprobando "+i.contentSerieName+" ...")
 
@@ -711,7 +715,7 @@ def lista_series_con_nuevos_episodios(item):
     pDialog.close()
 
     if len(itemlist) == 0:
-        xbmcgui.Dialog().ok(dialog_title(), "NO HAY EPISODIOS NUEVOS EN NINGUNA DE LAS SERIES QUE SIGUES")
+        xbmcgui.Dialog().ok(dialog_title(), "NO HAY EPISODIOS NUEVOS EN NINGUNA DE LAS SERIES QUE SIGUES ("+', '.join(series)+")")
         return False
 
     return itemlist
