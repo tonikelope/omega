@@ -9,7 +9,7 @@ if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Andro
     try:
         sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
     except Exception:
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR FIXING LINUX PYTHON PATH",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', "ERROR AL APLICAR EL PARCHE DE PATH DE PYTHON PARA LINUX")
         logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
 
 import base64
@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.1"
+OMEGA_VERSION = "5.2"
 
 config.set_setting("unify", "false")
 
@@ -661,7 +661,7 @@ def update_watchdog_episodes(item_url, new_count, serie_name):
     nuevos = int(new_count)-int(episodios)
 
     if int(episodios)<int(new_count):
-        xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', ("HAY ("+str(nuevos)+") EPISODIOS NUEVOS de\n\n" if nuevos > 1 else "HAY NUEVO EPISODIO de\n\n")+serie_name)
+        xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', ("HAY ("+str(nuevos)+") EPISODIOS NUEVOS de " if nuevos > 1 else "HAY NUEVO EPISODIO de ")+serie_name)
         
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
         for k in EPISODE_WATCHDOG.keys():
