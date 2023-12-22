@@ -9,7 +9,7 @@ if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Andro
     try:
         sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
     except Exception:
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR FIX PYTHON PATH",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR FIXING LINUX PYTHON PATH",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
         logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
 
 import base64
@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.96"
+OMEGA_VERSION = "4.97"
 
 config.set_setting("unify", "false")
 
@@ -659,7 +659,7 @@ def update_watchdog_episodes(item_url, new_count):
     EPISODE_WATCHDOG[item_url]=new_count
 
     if int(episodios)<int(new_count):
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "["+str(int(new_count)-int(episodios))+"] EPISODIOS NUEVOS", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "HAY EPISODIOS NUEVOS ("+str(int(new_count)-int(episodios))+")", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
         for k in EPISODE_WATCHDOG.keys():
