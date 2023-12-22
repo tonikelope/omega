@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.97"
+OMEGA_VERSION = "4.98"
 
 config.set_setting("unify", "false")
 
@@ -1799,7 +1799,8 @@ def foro(item, watchdog=True):
         action = "foro"
     else:
 
-        updateLastItems(item)
+        if watchdog:
+            updateLastItems(item)
 
         video_links = True
 
