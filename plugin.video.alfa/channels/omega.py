@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.98"
+OMEGA_VERSION = "4.99"
 
 config.set_setting("unify", "false")
 
@@ -1856,7 +1856,7 @@ def foro(item, watchdog=True):
             else:
                 watchdog_item.title = "[COLOR yellow][B]ACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
 
-            watchdog_item.contentPlot= "Añade esta serie al vigilante de nuevos episodios"
+            watchdog_item.contentPlot= ""
 
             watchdog_item.action = "watchdog_episodios"
 
