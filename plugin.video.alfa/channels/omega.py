@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.2"
+OMEGA_VERSION = "5.3"
 
 config.set_setting("unify", "false")
 
@@ -659,13 +659,13 @@ def update_watchdog_episodes(item_url, new_count, serie_name):
     EPISODE_WATCHDOG[item_url]=new_count
 
     nuevos = int(new_count)-int(episodios)
-
-    if int(episodios)<int(new_count):
-        xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', ("HAY ("+str(nuevos)+") EPISODIOS NUEVOS de " if nuevos > 1 else "HAY NUEVO EPISODIO de ")+serie_name)
-        
+  
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
         for k in EPISODE_WATCHDOG.keys():
             file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
+
+    if int(episodios)<int(new_count):
+        xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', "Hay EPISODIO(s) NUEVO(s) de "+serie_name)
 
 
 def lista_series_con_nuevos_episodios(item):
