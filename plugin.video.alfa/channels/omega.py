@@ -9,7 +9,7 @@ if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Andro
     try:
         sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
     except Exception:
-        xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', "ERROR AL APLICAR EL PARCHE DE PATH DE PYTHON PARA LINUX")
+        xbmcgui.Dialog().ok(dialog_title(), "ERROR AL APLICAR EL PARCHE DE PATH DE PYTHON PARA LINUX")
         logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
 
 import base64
@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.3"
+OMEGA_VERSION = "5.4"
 
 config.set_setting("unify", "false")
 
@@ -254,6 +254,13 @@ def forceView(mode):
         logger.info("channels.omega FORCE VIEW"+str(VIEW_MODES[mode][skin]))
 
 
+def notification_title():
+    return 'OMEGA ' + OMEGA_VERSION
+
+
+def dialog_title():
+    return 'OMEGA ' + OMEGA_VERSION + ' (by tonikelope)'
+
 
 def get_omega_resource_path(resource):
 
@@ -285,11 +292,11 @@ def login(force=False):
         if data.find(OMEGA_LOGIN) != -1:
             setNEITopicsPerPage(ITEMS_PER_PAGE)
 
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "¡Bienvenido " + OMEGA_LOGIN + "!",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "¡Bienvenido " + OMEGA_LOGIN + "!",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
             return True
 
-    xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR AL HACER LOGIN EN NEI",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+    xbmcgui.Dialog().notification(notification_title(), "ERROR AL HACER LOGIN EN NEI",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     return False
 
@@ -300,7 +307,7 @@ def kodi_advancedsettings(verbose=True):
     new_readfactor = str((int(config.get_setting("omega_kodi_readfactor", "omega"))+1)*4)
 
     if verbose:
-        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Nuevo tamaño de búffer de video de KODI: '+new_memorysize+' bytes\nNueva velocidad de llenado del búffer: '+new_readfactor_mul+'x\n\n¿APLICAR NUEVOS VALORES?')
+        ret = xbmcgui.Dialog().yesno(dialog_title(), 'Nuevo tamaño de búffer de video de KODI: '+new_memorysize+' bytes\nNueva velocidad de llenado del búffer: '+new_readfactor_mul+'x\n\n¿APLICAR NUEVOS VALORES?')
 
     if not verbose or ret:
     
@@ -336,9 +343,9 @@ def kodi_advancedsettings(verbose=True):
         settings_xml.write(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'))
 
         if verbose:
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "Ajustes avanzados regenerados", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "Ajustes avanzados regenerados", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
-            ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
+            ret = xbmcgui.Dialog().yesno(dialog_title(), 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
 
             if ret:
                 xbmc.executebuiltin('RestartApp')
@@ -404,7 +411,7 @@ def mega_login(verbose):
             logger.info("channels.omega "+login_msg+" "+MEGA_EMAIL)
 
             if verbose:
-                xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, login_msg,
+                xbmcgui.Dialog().notification(notification_title(), login_msg,
                                               os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                            'channels', 'thumb', 'omega.gif'), 5000)
         else:
@@ -412,7 +419,7 @@ def mega_login(verbose):
             logger.info("channels.omega ERROR AL HACER LOGIN EN MEGA: " + MEGA_EMAIL)
 
             if verbose:
-                xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR AL HACER LOGIN EN MEGA",
+                xbmcgui.Dialog().notification(notification_title(), "ERROR AL HACER LOGIN EN MEGA",
                                               os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                            'channels', 'thumb', 'omega.gif'), 5000)
     return mega_sid
@@ -424,7 +431,7 @@ def mainlist(item):
     itemlist = []
 
     if not OMEGA_LOGIN:
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR AL HACER LOGIN EN NEI",
+        xbmcgui.Dialog().notification(notification_title(), "ERROR AL HACER LOGIN EN NEI",
                                       os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                    'channels', 'thumb', 'omega.gif'), 5000)
         itemlist.append(
@@ -612,7 +619,7 @@ def force_login(item):
 
 
 def about_omega(item):
-    xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su cojonudo trabajo y por supuesto, a MEGA).\n\nCARPE DIEM')
+    xbmcgui.Dialog().ok(dialog_title(), 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su cojonudo trabajo y por supuesto, a MEGA).\n\nCARPE DIEM')
 
 
 def saltar_pagina(item):
@@ -632,20 +639,20 @@ def saltar_pagina(item):
 def watchdog_episodios(item):
 
     if not item.parent_item_url in EPISODE_WATCHDOG:
-        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿AÑADIR SERIE AL VIGILANTE DE EPISODIOS?')
+        ret = xbmcgui.Dialog().yesno(dialog_title(), '¿AÑADIR SERIE AL VIGILANTE DE EPISODIOS?')
 
         if ret:
             pDialog = xbmcgui.DialogProgress()
-            pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Actualizando contador de episodios...')
+            pDialog.create(dialog_title(), 'Actualizando contador de episodios...')
             EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), watchdog=False))
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS ACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS ACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             pDialog.close()
     else:
-        ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿QUITAR SERIE DEL VIGILANTE DE EPISODIOS?')
+        ret = xbmcgui.Dialog().yesno(dialog_title(), '¿QUITAR SERIE DEL VIGILANTE DE EPISODIOS?')
 
         if ret:
             del EPISODE_WATCHDOG[item.parent_item_url]
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS DESACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS DESACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
         for k in EPISODE_WATCHDOG.keys():
@@ -665,7 +672,7 @@ def update_watchdog_episodes(item_url, new_count, serie_name):
             file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
 
     if int(episodios)<int(new_count):
-        xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', "Hay EPISODIO(s) NUEVO(s) de "+serie_name)
+        xbmcgui.Dialog().ok(dialog_title(), "Hay EPISODIO(s) NUEVO(s) de "+serie_name)
 
 
 def lista_series_con_nuevos_episodios(item):
@@ -675,7 +682,7 @@ def lista_series_con_nuevos_episodios(item):
 
     pDialog = xbmcgui.DialogProgress()
     
-    pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Comprobando series ('+str(tot_series)+')...')
+    pDialog.create(dialog_title(), 'Comprobando series ('+str(tot_series)+')...')
 
     c=0
 
@@ -862,7 +869,7 @@ def contar_episodios(itemlist):
 
 def update_favourites(item):
 
-    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿Seguro que quieres regenerar el icono de favoritos?')
+    ret = xbmcgui.Dialog().yesno(dialog_title(), '¿Seguro que quieres regenerar el icono de favoritos?')
 
     if ret:
 
@@ -889,19 +896,19 @@ def update_favourites(item):
             favourites_xml.getroot().append(omega)
             favourites_xml.write(xbmcvfs.translatePath('special://userdata/favourites.xml'))
 
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, 'Icono de favoritos regenerado', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), 'Icono de favoritos regenerado', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
-            ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
+            ret = xbmcgui.Dialog().yesno(dialog_title(), 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
 
             if ret:
                 xbmc.executebuiltin('RestartApp')
 
         except Exception as e:
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, 'ERROR al intentar regenerar el icono de favoritos', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), 'ERROR al intentar regenerar el icono de favoritos', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 def thumbnail_refresh(item):
 
-    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿SEGURO?')
+    ret = xbmcgui.Dialog().yesno(dialog_title(), '¿SEGURO?')
 
     if ret:
 
@@ -910,15 +917,15 @@ def thumbnail_refresh(item):
 
             shutil.rmtree(xbmcvfs.translatePath('special://userdata/Thumbnails'))
 
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, 'Miniaturas regeneradas', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), 'Miniaturas regeneradas', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
-            ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
+            ret = xbmcgui.Dialog().yesno(dialog_title(), 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
 
             if ret:
                 xbmc.executebuiltin('RestartApp')
 
         except Exception as e:
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, 'ERROR al intentar regenerar miniaturas', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), 'ERROR al intentar regenerar miniaturas', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def settings_nei(item):
@@ -965,7 +972,7 @@ def xxx_off(item):
             f = open(KODI_USERDATA_PATH + 'omega_xxx', "w+")
             f.write(pass_hash)
             f.close()
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "Porno desactivado",
+            xbmcgui.Dialog().notification(notification_title(), "Porno desactivado",
                                           os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                        'channels', 'thumb', 'omega.gif'), 5000)
             xbmc.executebuiltin('Container.Refresh')
@@ -984,10 +991,10 @@ def xxx_on(item):
 
             if hashlib.md5(password.encode('utf-8')).hexdigest() == file_pass:
                 os.remove(KODI_USERDATA_PATH + 'omega_xxx')
-                xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "Porno reactivado", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+                xbmcgui.Dialog().notification(notification_title(), "Porno reactivado", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
                 xbmc.executebuiltin('Container.Refresh')
             else:
-                xbmcgui.Dialog().ok('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Contraseña para reactivar el porno incorrecta')
+                xbmcgui.Dialog().ok(dialog_title(), 'Contraseña para reactivar el porno incorrecta')
     else:
         xbmc.executebuiltin('Container.Refresh')
 
@@ -1037,9 +1044,9 @@ def backup_omega_userdata(item, save_dir=None):
             shutil.make_archive(save_path+'/omega_backup_data_'+str(int(time.time())), 'zip', omega_data_tmp_dir)
 
             if not save_dir:
-                xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "BACKUP CREADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+                xbmcgui.Dialog().notification(notification_title(), "BACKUP CREADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
     except:
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR AL CREAR EL BACKUP", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        xbmcgui.Dialog().notification(notification_title(), "ERROR AL CREAR EL BACKUP", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def restore_omega_userdata(item):
@@ -1083,14 +1090,14 @@ def restore_omega_userdata(item):
             except:
                 pass
 
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "BACKUP RESTAURADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "BACKUP RESTAURADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             
-            ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
+            ret = xbmcgui.Dialog().yesno(dialog_title(), 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
 
             if ret:
                 xbmc.executebuiltin('RestartApp')
     except:
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "ERROR AL RESTAURAR EL BACKUP", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        xbmcgui.Dialog().notification(notification_title(), "ERROR AL RESTAURAR EL BACKUP", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def clean_cache(item):
@@ -1105,7 +1112,7 @@ def clean_cache(item):
         os.remove(KODI_NEI_MC_CACHE_PATH)
         KODI_NEI_MC_CACHE = {}
 
-    xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION,
+    xbmcgui.Dialog().notification(notification_title(),
                                   "CACHÉ PURGADA (" + str(conta_files) + " archivos eliminados)",
                                   os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
                                                'thumb', 'omega.gif'), 5000)
@@ -1113,13 +1120,13 @@ def clean_cache(item):
 
 
 def clean_last(item):
-    if xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)',
+    if xbmcgui.Dialog().yesno(dialog_title(),
                               '¿Estás seguro de que quieres borrar tu historial?'):
 
         try:
             os.remove(KODI_NEI_LAST_ITEMS_PATH)
             LAST_ITEMS.clear()
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "HISTORIAL ELIMINADO",
+            xbmcgui.Dialog().notification(notification_title(), "HISTORIAL ELIMINADO",
                                           os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                        'channels', 'thumb', 'omega.gif'), 5000)
         except:
@@ -1127,13 +1134,13 @@ def clean_last(item):
 
 
 def clean_history(item):
-    if xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)',
+    if xbmcgui.Dialog().yesno(dialog_title(),
                               '¿Estás seguro de que quieres borrar las marcas de las películas y capítulos de series que has visto?'):
 
         try:
             os.remove(KODI_NEI_HISTORY_PATH)
             HISTORY.clear()
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "MARCAS DE VISTO ELIMINADAS",
+            xbmcgui.Dialog().notification(notification_title(), "MARCAS DE VISTO ELIMINADAS",
                                           os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                        'channels', 'thumb', 'omega.gif'), 5000)
         except:
@@ -1141,13 +1148,13 @@ def clean_history(item):
 
 
 def clean_vigilante(item):
-    if xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)',
+    if xbmcgui.Dialog().yesno(dialog_title(),
                               '¿Estás seguro de que quieres borrar todas las series del VIGILANTE de EPISODIOS?'):
 
         try:
             os.remove(KODI_NEI_EPISODE_WATCHDOG_PATH)
             EPISODE_WATCHDOG.clear()
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS PURGADO",
+            xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS PURGADO",
                                           os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media',
                                                        'channels', 'thumb', 'omega.gif'), 5000)
         except:
@@ -1164,7 +1171,7 @@ def clean_ignored_items(item):
 
 
 def remove_ignored_item(item):
-    if xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿Estás seguro de que quieres sacar este aporte de tus ignorados?'):
+    if xbmcgui.Dialog().yesno(dialog_title(), '¿Estás seguro de que quieres sacar este aporte de tus ignorados?'):
 
         try:
             if item.ignore_title in ITEM_BLACKLIST:
@@ -1176,7 +1183,7 @@ def remove_ignored_item(item):
                 for ignore in ITEM_BLACKLIST:
                     file.write((ignore + "\n"))
 
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "APORTE RESTAURADO",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "APORTE RESTAURADO",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
         except:
             pass
 
@@ -1645,14 +1652,14 @@ def bibliotaku_pelis_megacrypter(item):
 
 
 def avisarEnlacesRotos(item):
-    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿Seguro que quieres avisar de enlaces rotos?')
+    ret = xbmcgui.Dialog().yesno(dialog_title(), '¿Seguro que quieres avisar de enlaces rotos?')
 
     if ret:
         escribirMensajeHiloForo(item, "Hola. Muchas gracias por este aporte. Desgraciadamente, parece que los enlaces no funcionan ¿podrías revisarlos, por favor? ¡GRACIAS!")
 
 
 def pedirEnlacesSinComprimir(item):
-    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿Seguro que quieres pedir enlaces sin comprimir?')
+    ret = xbmcgui.Dialog().yesno(dialog_title(), '¿Seguro que quieres pedir enlaces sin comprimir?')
 
     if ret:
         escribirMensajeHiloForo(item, "Hola. Muchas gracias por este aporte. ¿Podrías por favor subirlo sin comprimir en zip/rar/etc? ¡GRACIAS!")
@@ -1681,7 +1688,7 @@ def escribirMensajeHiloForo(item, msg=None):
 
         httptools.downloadpage(res_post_url, post=res_post_data, timeout=DEFAULT_HTTP_TIMEOUT)
 
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, '¡MENSAJE ENVIADO! (es posible que tengas que refrescar la lista para verlo)', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        xbmcgui.Dialog().notification(notification_title(), '¡MENSAJE ENVIADO! (es posible que tengas que refrescar la lista para verlo)', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
         xbmc.executebuiltin('Container.Refresh')
 
@@ -1689,7 +1696,7 @@ def escribirMensajeHiloForo(item, msg=None):
 def darGraciasMensajeForo(item):
     httptools.downloadpage(re.sub(r'/msg.*?$','/',item.url)+ '?action=thankyou;msg='+item.msg['id_msg'], timeout=DEFAULT_HTTP_TIMEOUT)
 
-    xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, 'HAS DADO LAS GRACIAS A: '+item.msg['nick'], os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+    xbmcgui.Dialog().notification(notification_title(), 'HAS DADO LAS GRACIAS A: '+item.msg['nick'], os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     xbmc.executebuiltin('Container.Refresh')
 
@@ -1869,7 +1876,7 @@ def foro(item, watchdog=True):
             if watchdog and item.tourl() in EPISODE_WATCHDOG:
                 pDialog = xbmcgui.DialogProgress()
     
-                pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Actualizando contador de episodios...')
+                pDialog.create(dialog_title(), 'Actualizando contador de episodios...')
 
                 update_watchdog_episodes(item.tourl(), contar_episodios(itemlist), item.contentSerieName)
 
@@ -2463,7 +2470,7 @@ def find_video_gvideo_links(item, data, fa=False):
 
 def ignore_uploader(item):
     
-    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿SEGURO QUE QUIERES IGNORAR TODO EL CONTENIDO DE '+item.uploader+'?')
+    ret = xbmcgui.Dialog().yesno(dialog_title(), '¿SEGURO QUE QUIERES IGNORAR TODO EL CONTENIDO DE '+item.uploader+'?')
 
     if ret:
 
@@ -2474,14 +2481,14 @@ def ignore_uploader(item):
 
         config.set_setting("omega_blacklist_uploaders", ",".join(UPLOADERS_BLACKLIST), "omega")
 
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, item.uploader+ " añadid@ a IGNORADOS",
+        xbmcgui.Dialog().notification(notification_title(), item.uploader+ " añadid@ a IGNORADOS",
                                       os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
                                                    'thumb', 'omega.gif'), 5000)
         xbmc.executebuiltin('Container.Refresh')
 
 
 def debugNotification(msg):
-    xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels','thumb', 'omega.gif'), 5000)
+    xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels','thumb', 'omega.gif'), 5000)
 
 
 def getMegacrypterFilename(url):
@@ -3206,7 +3213,7 @@ def marcar_item_visto(item, notify=True, novisto=True):
             file.write((checksum + "\n"))
 
         if notify:
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "MARCADO COMO VISTO (puede que tengas que refrescar la página)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "MARCADO COMO VISTO (puede que tengas que refrescar la página)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
     
     elif novisto:
         HISTORY.remove(checksum)
@@ -3216,7 +3223,7 @@ def marcar_item_visto(item, notify=True, novisto=True):
                 file.write((visto + "\n"))
 
         if notify:
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "MARCADO COMO NO VISTO (puede que tengas que refrescar la página)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "MARCADO COMO NO VISTO (puede que tengas que refrescar la página)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def customize_title(item):
@@ -3239,12 +3246,12 @@ def customize_title(item):
             for k in CUSTOM_TITLES.keys():
                 file.write((k + "#" + base64.b64encode(CUSTOM_TITLES[k].encode('utf-8')).decode('utf-8') + "\n"))
 
-        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "TÍTULO PERSONALIZADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        xbmcgui.Dialog().notification(notification_title(), "TÍTULO PERSONALIZADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def ignore_item(item):
 
-    ret = xbmcgui.Dialog().yesno('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', '¿SEGURO QUE QUIERES IGNORAR ESTE APORTE?') if item.ignore_confirmation else True
+    ret = xbmcgui.Dialog().yesno(dialog_title(), '¿SEGURO QUE QUIERES IGNORAR ESTE APORTE?') if item.ignore_confirmation else True
 
     if ret:
 
@@ -3254,7 +3261,7 @@ def ignore_item(item):
             with open(KODI_NEI_BLACKLIST_ITEM_PATH, "a+") as file:
                 file.write((item.ignore_title + "\n"))
 
-            xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "APORTE IGNORADO (puede que tengas que refrescar la página actual para que desaparezca)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "APORTE IGNORADO (puede que tengas que refrescar la página actual para que desaparezca)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
 
 def extract_year(title):
@@ -3419,13 +3426,13 @@ def check_nei_connector_integrity():
     return modified
 
 if CHECK_STUFF_INTEGRITY and check_mega_lib_integrity():
-    xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION,
+    xbmcgui.Dialog().notification(notification_title(),
                                   "Librería de MEGA/MegaCrypter reparada/actualizada",
                                   os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
                                                'thumb', 'omega.gif'), 5000)
 
 if CHECK_STUFF_INTEGRITY and check_nei_connector_integrity():
-    xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "Conector de NEI reparado/actualizado",
+    xbmcgui.Dialog().notification(notification_title(), "Conector de NEI reparado/actualizado",
                                   os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
                                                'thumb', 'omega.gif'), 5000)
 
