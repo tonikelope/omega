@@ -9,7 +9,7 @@ if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Andro
     try:
         sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
     except Exception:
-        xbmcgui.Dialog().ok(dialog_title(), "ERROR AL APLICAR EL PARCHE DE PATH DE PYTHON PARA LINUX")
+        xbmcgui.Dialog().ok(dialog_title(), "ERROR AL CORREGIR EL PATH DE PYTHON EN LINUX")
         logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
 
 import base64
@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.4"
+OMEGA_VERSION = "5.5"
 
 config.set_setting("unify", "false")
 
@@ -709,6 +709,10 @@ def lista_series_con_nuevos_episodios(item):
             break
 
     pDialog.close()
+
+    if len(itemlist) == 0:
+        xbmcgui.Dialog().ok(dialog_title(), "NO HAY EPISODIOS NUEVOS EN NINGUNA DE LAS SERIES QUE SIGUES")
+        return False
 
     return itemlist
 
