@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.93"
+OMEGA_VERSION = "4.94"
 
 config.set_setting("unify", "false")
 
@@ -636,7 +636,7 @@ def watchdog_episodios(item):
 
         if ret:
             pDialog = xbmcgui.DialogProgress()
-            pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope) - VIGILANTE DE EPISODIOS', 'Actualizando contador de episodios...')
+            pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Actualizando contador de episodios...')
             EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), watchdog=False))
             xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "VIGILANTE DE EPISODIOS ACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             pDialog.close()
@@ -652,8 +652,14 @@ def watchdog_episodios(item):
             file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
 
 
-def update_watchdog_episodes(item_url, count):
-    EPISODE_WATCHDOG[item_url]=count
+def update_watchdog_episodes(item_url, new_count):
+    
+    episodios=EPISODE_WATCHDOG[item_url]
+
+    EPISODE_WATCHDOG[item_url]=new_count
+
+    if episodios<new_count:
+        xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "["+str(new_count-episodios)+"] EPISODIOS NUEVOS", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
         for k in EPISODE_WATCHDOG.keys():
@@ -667,7 +673,7 @@ def lista_series_con_nuevos_episodios(item):
 
     pDialog = xbmcgui.DialogProgress()
     
-    pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope) - VIGILANTE DE EPISODIOS', 'Comprobando series ('+str(tot_series)+')...')
+    pDialog.create('OMEGA ' + OMEGA_VERSION + ' (by tonikelope)', 'Comprobando series ('+str(tot_series)+')...')
 
     c=0
 
