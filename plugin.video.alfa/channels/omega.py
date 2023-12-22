@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "4.94"
+OMEGA_VERSION = "4.95"
 
 config.set_setting("unify", "false")
 
@@ -658,7 +658,7 @@ def update_watchdog_episodes(item_url, new_count):
 
     EPISODE_WATCHDOG[item_url]=new_count
 
-    if episodios<new_count:
+    if int(episodios)<int(new_count):
         xbmcgui.Dialog().notification('OMEGA ' + OMEGA_VERSION, "["+str(new_count-episodios)+"] EPISODIOS NUEVOS", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
