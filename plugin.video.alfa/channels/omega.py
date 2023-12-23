@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.7"
+OMEGA_VERSION = "5.8"
 
 config.set_setting("unify", "false")
 
@@ -681,7 +681,7 @@ def lista_series_con_nuevos_episodios(item):
     tot_series = len(EPISODE_WATCHDOG)
 
     if tot_series == 0:
-        xbmcgui.Dialog().ok(dialog_title(), "NO TIENES SERIES EN EL VIGILANTE DE SERIES (tienes que activar el vigilante de series en aquellas que quieras seguir)")
+        xbmcgui.Dialog().ok(dialog_title(), "NO HAS AÑADIDO AÚN NINGUNA SERIE AL VIGILANTE DE EPISODIOS")
         return False
     else:
 
