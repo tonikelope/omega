@@ -10,7 +10,7 @@ if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Andro
         sys.path.insert(1, '/usr/lib/python'+str(sys.version_info[0])+'.'+str(sys.version_info[1])+'/site-packages')
     except Exception:
         xbmcgui.Dialog().ok(dialog_title(), "ERROR AL CORREGIR EL PATH DE PYTHON EN LINUX")
-        logger.info("channels.omega LINUX PATH PATCH FIX FAILED!")
+        logger.info("channels.omega ERROR AL CORREGIR EL PATH DE PYTHON EN LINUX")
 
 import base64
 import hashlib
@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.6"
+OMEGA_VERSION = "5.7"
 
 config.set_setting("unify", "false")
 
@@ -644,7 +644,7 @@ def watchdog_episodios(item):
         if ret:
             pDialog = xbmcgui.DialogProgress()
             pDialog.create(dialog_title(), 'Actualizando contador de episodios...')
-            EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), watchdog=False))
+            EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), episode_count_call=True))
             xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS ACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             pDialog.close()
     else:
@@ -680,45 +680,50 @@ def lista_series_con_nuevos_episodios(item):
 
     tot_series = len(EPISODE_WATCHDOG)
 
-    pDialog = xbmcgui.DialogProgress()
-    
-    pDialog.create(dialog_title(), 'Comprobando series ('+str(tot_series)+')...')
-
-    c=0
-
-    pro=0
-
-    series=[]
-
-    for k in EPISODE_WATCHDOG.keys():
-        
-        i = Item().fromurl(k)
-
-        series.append(i.contentSerieName)
-
-        pDialog.update(pro, "["+str(c+1)+"/"+str(tot_series)+"] Comprobando "+i.contentSerieName+" ...")
-
-        episodios_actuales = contar_episodios(foro(i, watchdog=False))
-
-        if int(episodios_actuales) != int(EPISODE_WATCHDOG[k]):
-            i.action = 'foro'
-            itemlist.append(i)
-
-        c+=1
-
-        pro = int((c/tot_series)*100)
-
-        if pDialog.iscanceled():
-            itemlist = []
-            break
-
-    pDialog.close()
-
-    if len(itemlist) == 0:
-        xbmcgui.Dialog().ok(dialog_title(), "NO HAY EPISODIOS NUEVOS EN NINGUNA DE LAS SERIES QUE SIGUES ("+', '.join(series)+")")
+    if tot_series == 0:
+        xbmcgui.Dialog().ok(dialog_title(), "NO TIENES SERIES EN EL VIGILANTE DE SERIES (tienes que activar el vigilante de series en aquellas que quieras seguir)")
         return False
+    else:
 
-    return itemlist
+        pDialog = xbmcgui.DialogProgress()
+        
+        pDialog.create(dialog_title(), 'Comprobando series ('+str(tot_series)+')...')
+
+        c=0
+
+        pro=0
+
+        series=[]
+
+        for k in EPISODE_WATCHDOG.keys():
+            
+            i = Item().fromurl(k)
+
+            series.append(i.contentSerieName)
+
+            pDialog.update(pro, "["+str(c+1)+"/"+str(tot_series)+"] Comprobando "+i.contentSerieName+" ...")
+
+            episodios_actuales = contar_episodios(foro(i, episode_count_call=True))
+
+            if int(episodios_actuales) != int(EPISODE_WATCHDOG[k]):
+                i.action = 'foro'
+                itemlist.append(i)
+
+            c+=1
+
+            pro = int((c/tot_series)*100)
+
+            if pDialog.iscanceled():
+                itemlist = []
+                break
+
+        pDialog.close()
+
+        if len(itemlist) == 0:
+            xbmcgui.Dialog().ok(dialog_title(), "NO HAY EPISODIOS NUEVOS EN NINGUNA DE LAS SERIES QUE SIGUES ("+', '.join(series)+")")
+            return False
+
+        return itemlist
 
 
 def buscar_por_genero(item):
@@ -1790,7 +1795,7 @@ def getLastItemList(item):
 
 
 
-def foro(item, watchdog=True):
+def foro(item, episode_count_call=False):
     logger.info("channels.omega foro")
 
     if item.xxx and os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
@@ -1816,7 +1821,7 @@ def foro(item, watchdog=True):
         action = "foro"
     else:
 
-        if watchdog:
+        if not episode_count_call:
             updateLastItems(item)
 
         video_links = True
@@ -1881,7 +1886,7 @@ def foro(item, watchdog=True):
 
             itemlist.append(watchdog_item)
 
-            if watchdog and item.tourl() in EPISODE_WATCHDOG:
+            if not episode_count_call and item.tourl() in EPISODE_WATCHDOG:
                 pDialog = xbmcgui.DialogProgress()
     
                 pDialog.create(dialog_title(), 'Actualizando contador de episodios...')
@@ -2063,21 +2068,22 @@ def foro(item, watchdog=True):
             title = ""
             itemlist.append(Item(channel=item.channel, thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png", fanart=item.fanart, parent_title=item.parent_title, viewcontent="movies", viewmode="poster", mode=item.mode, section=item.section, action="foro", title=title, url=url))
 
-        tmdb.set_infoLabels_itemlist(itemlist, True)
+        if not episode_count_call:
+            tmdb.set_infoLabels_itemlist(itemlist, True)
 
-        for i in itemlist:
-            if i.infoLabels and 'rating' in i.infoLabels:
+            for i in itemlist:
+                if i.infoLabels and 'rating' in i.infoLabels:
 
-                if i.infoLabels['rating'] >= 7.0:
-                    rating_text = "[B][COLOR lightgreen][" + str(round(i.infoLabels['rating'],1)) + "][/COLOR][/B]"
-                elif i.infoLabels['rating'] < 5.0:
-                    rating_text = "[B][COLOR red][" + str(round(i.infoLabels['rating'],1)) + "][/COLOR][/B]"
+                    if i.infoLabels['rating'] >= 7.0:
+                        rating_text = "[B][COLOR lightgreen][" + str(round(i.infoLabels['rating'],1)) + "][/COLOR][/B]"
+                    elif i.infoLabels['rating'] < 5.0:
+                        rating_text = "[B][COLOR red][" + str(round(i.infoLabels['rating'],1)) + "][/COLOR][/B]"
+                    else:
+                        rating_text = "[B][" + str(round(i.infoLabels['rating'],1)) + "][/B]"
+
+                    i.title = i.title.replace('##*NOTA*##', rating_text)
                 else:
-                    rating_text = "[B][" + str(round(i.infoLabels['rating'],1)) + "][/B]"
-
-                i.title = i.title.replace('##*NOTA*##', rating_text)
-            else:
-                i.title = i.title.replace('##*NOTA*##', '')
+                    i.title = i.title.replace('##*NOTA*##', '')
 
     return itemlist
 
