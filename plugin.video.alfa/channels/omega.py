@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.9"
+OMEGA_VERSION = "5.10"
 
 config.set_setting("unify", "false")
 
@@ -554,7 +554,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[COLOR red][B]PURGAR VIGILANTE DE EPISODIOS[/B][/COLOR]",
+            title="[COLOR red][B]VACIAR VIGILANTE DE EPISODIOS[/B][/COLOR]",
             action="clean_vigilante", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     itemlist.append(
@@ -619,7 +619,7 @@ def force_login(item):
 
 
 def about_omega(item):
-    xbmcgui.Dialog().ok(dialog_title(), 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su cojonudo trabajo y por supuesto, a MEGA).\n\nCARPE DIEM')
+    xbmcgui.Dialog().ok(dialog_title(), 'Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su gran trabajo y por supuesto, a MEGA).\n\nCARPE DIEM')
 
 
 def saltar_pagina(item):
@@ -645,14 +645,14 @@ def watchdog_episodios(item):
             pDialog = xbmcgui.DialogProgress()
             pDialog.create(dialog_title(), 'Actualizando contador de episodios...')
             EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), episode_count_call=True))
-            xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS ACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS ACTIVADO PARA "+item.contentSerieName, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             pDialog.close()
     else:
         ret = xbmcgui.Dialog().yesno(dialog_title(), '¿QUITAR SERIE DEL VIGILANTE DE EPISODIOS?')
 
         if ret:
             del EPISODE_WATCHDOG[item.parent_item_url]
-            xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS DESACTIVADO PARA ESTA SERIE", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS DESACTIVADO PARA "+item.contentSerieName, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
         for k in EPISODE_WATCHDOG.keys():
@@ -681,7 +681,7 @@ def lista_series_con_nuevos_episodios(item):
     tot_series = len(EPISODE_WATCHDOG)
 
     if tot_series == 0:
-        xbmcgui.Dialog().ok(dialog_title(), "NO HAS AÑADIDO AÚN NINGUNA SERIE AL VIGILANTE DE EPISODIOS")
+        xbmcgui.Dialog().ok(dialog_title(), "[B]NO HAS AÑADIDO AÚN NINGUNA SERIE AL VIGILANTE DE EPISODIOS[/B]")
         return False
     else:
 
@@ -721,9 +721,8 @@ def lista_series_con_nuevos_episodios(item):
 
         if len(itemlist) == 0:
             xbmcgui.Dialog().ok(dialog_title(), "[B]NO HAY EPISODIOS NUEVOS[/B] EN NINGUNA DE LAS SERIES QUE SIGUES: "+', '.join(series))
-            return False
-
-        return itemlist
+        else:
+            return itemlist
 
 
 def buscar_por_genero(item):
@@ -1129,7 +1128,7 @@ def clean_cache(item):
                                   "CACHÉ PURGADA (" + str(conta_files) + " archivos eliminados)",
                                   os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels',
                                                'thumb', 'omega.gif'), 5000)
-    platformtools.itemlist_refresh()
+    xbmc.executebuiltin('Container.Refresh')
 
 
 def clean_last(item):
