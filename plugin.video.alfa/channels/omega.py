@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.10"
+OMEGA_VERSION = "5.11"
 
 config.set_setting("unify", "false")
 
@@ -701,7 +701,7 @@ def lista_series_con_nuevos_episodios(item):
 
             series.append(i.contentSerieName)
 
-            pDialog.update(pro, "["+str(c+1)+"/"+str(tot_series)+"] Comprobando "+i.contentSerieName+" ...")
+            pDialog.update(pro, "["+str(c+1)+"/"+str(tot_series)+"] Comprobando [B]"+i.contentSerieName+"[/B] ...")
 
             episodios_actuales = contar_episodios(foro(i, episode_count_call=True))
 
@@ -1888,7 +1888,7 @@ def foro(item, episode_count_call=False):
             if not episode_count_call and item.tourl() in EPISODE_WATCHDOG:
                 pDialog = xbmcgui.DialogProgress()
     
-                pDialog.create(dialog_title(), 'Actualizando contador de episodios...')
+                pDialog.create(dialog_title(), 'Actualizando vigilante de episodios...')
 
                 update_watchdog_episodes(item.tourl(), contar_episodios(itemlist), item.contentSerieName)
 
