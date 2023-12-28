@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.11"
+OMEGA_VERSION = "5.12"
 
 config.set_setting("unify", "false")
 
@@ -554,6 +554,12 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
+            title="[B]GESTIONAR VIGILANTE DE EPISODIOS[/B]", viewcontent="movies", viewmode="list",
+            action="clean_vigilante_items", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
             title="[COLOR red][B]VACIAR VIGILANTE DE EPISODIOS[/B][/COLOR]",
             action="clean_vigilante", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
@@ -643,7 +649,7 @@ def watchdog_episodios(item):
 
         if ret:
             pDialog = xbmcgui.DialogProgress()
-            pDialog.create(dialog_title(), 'Actualizando contador de episodios...')
+            pDialog.create(dialog_title(), 'Actualizando [COLOR yellow][B]vigilante de episodios[/B][/COLOR]...')
             EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), episode_count_call=True))
             xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS ACTIVADO PARA "+item.contentSerieName, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             pDialog.close()
@@ -687,7 +693,7 @@ def lista_series_con_nuevos_episodios(item):
 
         pDialog = xbmcgui.DialogProgress()
         
-        pDialog.create(dialog_title(), 'Comprobando series ('+str(tot_series)+')...')
+        pDialog.create(dialog_title(), 'Comprobando series ([COLOR yellow][B]'+str(tot_series)+'[/B][/COLOR])...')
 
         c=0
 
@@ -701,7 +707,7 @@ def lista_series_con_nuevos_episodios(item):
 
             series.append(i.contentSerieName)
 
-            pDialog.update(pro, "["+str(c+1)+"/"+str(tot_series)+"] Comprobando [B]"+i.contentSerieName+"[/B] ...")
+            pDialog.update(pro, "[B]["+str(c+1)+"/"+str(tot_series)+"][/B] Comprobando episodios de [COLOR yellow][B]"+i.contentSerieName+"[/B][/COLOR] ...")
 
             episodios_actuales = contar_episodios(foro(i, episode_count_call=True))
 
@@ -720,7 +726,7 @@ def lista_series_con_nuevos_episodios(item):
         pDialog.close()
 
         if len(itemlist) == 0:
-            xbmcgui.Dialog().ok(dialog_title(), "[B]NO HAY EPISODIOS NUEVOS[/B] EN NINGUNA DE LAS SERIES QUE SIGUES: "+', '.join(series))
+            xbmcgui.Dialog().ok(dialog_title(), "[COLOR yellow][B]NO HAY EPISODIOS NUEVOS[/B][/COLOR] EN NINGUNA DE LAS SERIES QUE SIGUES: [B]"+', '.join(series)+"[/B]")
         else:
             return itemlist
 
@@ -1189,15 +1195,44 @@ def remove_ignored_item(item):
             if item.ignore_title in ITEM_BLACKLIST:
                 ITEM_BLACKLIST.remove(item.ignore_title)
 
-            os.remove(KODI_NEI_BLACKLIST_ITEM_PATH)
-            
             with open(KODI_NEI_BLACKLIST_ITEM_PATH, "w+") as file:
                 for ignore in ITEM_BLACKLIST:
                     file.write((ignore + "\n"))
 
-            xbmcgui.Dialog().notification(notification_title(), "APORTE RESTAURADO",os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), "APORTE RESTAURADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
         except:
             pass
+
+        xbmc.executebuiltin('Container.Refresh')
+
+
+def clean_vigilante_items(item):
+    
+    itemlist=[]
+
+    for k in EPISODE_WATCHDOG.keys():
+        i=Item().fromurl(k)
+        itemlist.append(Item(channel=item.channel, contentSerieName=i.contentSerieName, title="[B]"+i.contentSerieName+"[/B]", vigilante_k=k, action="remove_vigilante_item"))
+
+    return itemlist
+
+
+def remove_vigilante_item(item):
+    if xbmcgui.Dialog().yesno(dialog_title(), '¿Estás seguro de que quieres sacar '+item.contentSerieName+' del VIGILANTE DE EPISODIOS?'):
+
+        try:
+            if item.vigilante_k in EPISODE_WATCHDOG:
+                del EPISODE_WATCHDOG[item.vigilante_k]
+
+            with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
+                for k in EPISODE_WATCHDOG.keys():
+                    file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
+
+            xbmcgui.Dialog().notification(notification_title(), item.contentSerieName+" SACADA DEL VIGILANTE DE EPISODIOS", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+        except:
+            pass
+
+        xbmc.executebuiltin('Container.Refresh')
 
 
 def isVideoFilename(filename):
@@ -1888,7 +1923,7 @@ def foro(item, episode_count_call=False):
             if not episode_count_call and item.tourl() in EPISODE_WATCHDOG:
                 pDialog = xbmcgui.DialogProgress()
     
-                pDialog.create(dialog_title(), 'Actualizando vigilante de episodios...')
+                pDialog.create(dialog_title(), 'Actualizando [COLOR yellow][B]vigilante de episodios[/B][/COLOR]...')
 
                 update_watchdog_episodes(item.tourl(), contar_episodios(itemlist), item.contentSerieName)
 
@@ -2418,7 +2453,8 @@ def replaceIntegersToRomans(s):
 def cleanContentTitle(s):
     s = re.sub(r'  *', ' ', s)
     s = s.replace('-', ' ')
-    s = re.sub(r'[\(\[][^\)\]]+[\)\]]', '', s)
+    s = re.sub(r'[\[][^\]]+[\]]', '', s)
+    s = re.sub(r'\( *?\d{4} *?\)', '', s)
     s = re.sub(r'\.[^.]+$', '', s)
     s = cleanEpisodeNumber(s)
     s = re.sub('^(Saga|Trilog.a|Duolog*a) ' , '', s)
@@ -3176,7 +3212,10 @@ def format_bytes(bytes, precision=2):
 
 
 def extract_title(title):
-    pattern = re.compile(r'^[^\[\]()]+', re.IGNORECASE)
+    
+    title = re.sub('\( *?\d{4} *?\)' , '', title)
+
+    pattern = re.compile(r'^[^\[\]]+', re.IGNORECASE)
 
     res = pattern.search(title)
 
