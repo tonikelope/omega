@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.12"
+OMEGA_VERSION = "5.13"
 
 config.set_setting("unify", "false")
 
@@ -645,20 +645,17 @@ def saltar_pagina(item):
 def watchdog_episodios(item):
 
     if not item.parent_item_url in EPISODE_WATCHDOG:
-        ret = xbmcgui.Dialog().yesno(dialog_title(), '¿AÑADIR SERIE AL VIGILANTE DE EPISODIOS?')
-
-        if ret:
+      
+        if xbmcgui.Dialog().yesno(dialog_title(), '¿[B]METER[/B] [COLOR yellow][B]'+item.contentSerieName+'[/B][/COLOR] en el [B]vigilante de episodios[/B]?'):
             pDialog = xbmcgui.DialogProgress()
             pDialog.create(dialog_title(), 'Actualizando [COLOR yellow][B]vigilante de episodios[/B][/COLOR]...')
             EPISODE_WATCHDOG[item.parent_item_url]=contar_episodios(foro(Item().fromurl(item.parent_item_url), episode_count_call=True))
             xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS ACTIVADO PARA "+item.contentSerieName, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             pDialog.close()
-    else:
-        ret = xbmcgui.Dialog().yesno(dialog_title(), '¿QUITAR SERIE DEL VIGILANTE DE EPISODIOS?')
 
-        if ret:
-            del EPISODE_WATCHDOG[item.parent_item_url]
-            xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS DESACTIVADO PARA "+item.contentSerieName, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+    elif xbmcgui.Dialog().yesno(dialog_title(), '¿[B]QUITAR[/B] [COLOR yellow][B]'+item.contentSerieName+'[/B][/COLOR] del [B]vigilante de episodios[/B]?'):
+        del EPISODE_WATCHDOG[item.parent_item_url]
+        xbmcgui.Dialog().notification(notification_title(), "VIGILANTE DE EPISODIOS DESACTIVADO PARA "+item.contentSerieName, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
     with open(KODI_NEI_EPISODE_WATCHDOG_PATH, "w+") as file:
         for k in EPISODE_WATCHDOG.keys():
@@ -693,7 +690,7 @@ def lista_series_con_nuevos_episodios(item):
 
         pDialog = xbmcgui.DialogProgress()
         
-        pDialog.create(dialog_title(), 'Comprobando series ([COLOR yellow][B]'+str(tot_series)+'[/B][/COLOR])...')
+        pDialog.create(dialog_title(), 'Comprobando series del [B]vigilante de episodios[/B] ([COLOR yellow][B]'+str(tot_series)+'[/B][/COLOR])...')
 
         c=0
 
@@ -1189,7 +1186,7 @@ def clean_ignored_items(item):
 
 
 def remove_ignored_item(item):
-    if xbmcgui.Dialog().yesno(dialog_title(), '¿Estás seguro de que quieres sacar este aporte de tus ignorados?'):
+    if xbmcgui.Dialog().yesno(dialog_title(), '¿Estás seguro de que quieres quitar este aporte de tus ignorados?'):
 
         try:
             if item.ignore_title in ITEM_BLACKLIST:
@@ -1218,7 +1215,7 @@ def clean_vigilante_items(item):
 
 
 def remove_vigilante_item(item):
-    if xbmcgui.Dialog().yesno(dialog_title(), '¿Estás seguro de que quieres sacar '+item.contentSerieName+' del VIGILANTE DE EPISODIOS?'):
+    if xbmcgui.Dialog().yesno(dialog_title(), '¿Estás seguro de que quieres [B]QUITAR[/B] [COLOR yellow][B]'+item.contentSerieName+'[/B][/COLOR] del [B]vigilante de episodios[/B]?'):
 
         try:
             if item.vigilante_k in EPISODE_WATCHDOG:
@@ -1228,7 +1225,7 @@ def remove_vigilante_item(item):
                 for k in EPISODE_WATCHDOG.keys():
                     file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
 
-            xbmcgui.Dialog().notification(notification_title(), item.contentSerieName+" SACADA DEL VIGILANTE DE EPISODIOS", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            xbmcgui.Dialog().notification(notification_title(), item.contentSerieName+" QUITAR DEL VIGILANTE DE EPISODIOS", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
         except:
             pass
 
