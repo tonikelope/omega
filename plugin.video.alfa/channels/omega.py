@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.13"
+OMEGA_VERSION = "5.14"
 
 config.set_setting("unify", "false")
 
@@ -675,7 +675,7 @@ def update_watchdog_episodes(item_url, new_count, serie_name):
             file.write((base64.b64encode(k.encode('utf-8')).decode('utf-8') + "#" + str(EPISODE_WATCHDOG[k])) + "\n")
 
     if int(episodios)<int(new_count):
-        xbmcgui.Dialog().ok(dialog_title(), "[B]HAY EPISODIO/s NUEVO/s[/B] de "+serie_name)
+        xbmcgui.Dialog().ok(dialog_title(), "[COLOR yellow][B]HAY EPISODIO/s NUEVO/s de "+serie_name+"[/B][/COLOR]")
 
 
 def lista_series_con_nuevos_episodios(item):
