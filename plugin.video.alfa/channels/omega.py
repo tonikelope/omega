@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.15"
+OMEGA_VERSION = "5.16"
 
 config.set_setting("unify", "false")
 
@@ -2060,7 +2060,7 @@ def foro(item, episode_count_call=False):
                         else:
                             thumbnail = get_omega_resource_path("series_uhd.png" if item.mode == "tvshow" else "pelis_uhd.png")
 
-                            if 'Animación' in item.title or 'Animación' in title:
+                            if 'Anim' in item.title or 'Anim' in title:
                                 thumbnail = get_omega_resource_path("series_ani_uhd.png")
 
                     elif '(HD)' in item.title or '(HD)' in title:
@@ -2069,7 +2069,7 @@ def foro(item, episode_count_call=False):
                         else:
                             thumbnail = get_omega_resource_path("series_hd.png" if item.mode == "tvshow" else "pelis_hd.png")
 
-                            if 'Animación' in item.title or 'Animación' in title:
+                            if 'Anim' in item.title or 'Anim' in title:
                                 thumbnail = get_omega_resource_path("series_ani_hd.png")
 
                     elif '(SD)' in item.title or '(SD)' in title:
@@ -2078,7 +2078,7 @@ def foro(item, episode_count_call=False):
                         else:
                             thumbnail = get_omega_resource_path("series_sd.png" if item.mode == "tvshow" else "pelis_sd.png")
 
-                            if 'Animación' in item.title or 'Animación' in title:
+                            if 'Anim' in item.title or 'Anim' in title:
                                 thumbnail = get_omega_resource_path("series_ani_sd.png")
 
                     elif ('3D' in item.title or '3D' in title) and item.mode != "tvshow":
@@ -2361,7 +2361,7 @@ def indices(item):
             else:
                 thumbnail = get_omega_resource_path("series_uhd.png" if 'Series' in cat else "pelis_uhd.png")
                 
-                if 'Animación' in cat:
+                if 'Anim' in cat:
                     thumbnail = get_omega_resource_path("series_ani_uhd.png")
         elif 'HD' in cat:
             if 'Español' in cat:
@@ -2369,7 +2369,7 @@ def indices(item):
             else:
                 thumbnail = get_omega_resource_path("series_hd.png" if 'Series' in cat else "pelis_hd.png")
 
-                if 'Animación' in cat:
+                if 'Anim' in cat:
                     thumbnail = get_omega_resource_path("series_ani_hd.png")
         elif 'SD' in cat:
             if 'Español' in cat:
@@ -2377,7 +2377,7 @@ def indices(item):
             else:
                 thumbnail = get_omega_resource_path("series_sd.png" if 'Series' in cat else "pelis_sd.png")
 
-                if 'Animación' in cat:
+                if 'Anim' in cat:
                     thumbnail = get_omega_resource_path("series_ani_sd.png")
         elif '3D' in cat and item.mode != "tvshow":
             thumbnail = get_omega_resource_path("pelis_3d_es.png" if ('Español' in item.title or 'Español' in title) else "pelis_3d.png")
