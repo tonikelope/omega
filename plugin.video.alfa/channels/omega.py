@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.16"
+OMEGA_VERSION = "5.17"
 
 config.set_setting("unify", "false")
 
@@ -2360,29 +2360,16 @@ def indices(item):
                 thumbnail = get_omega_resource_path("series_uhd_es.png" if 'Series' in cat else "pelis_uhd_es.png")
             else:
                 thumbnail = get_omega_resource_path("series_uhd.png" if 'Series' in cat else "pelis_uhd.png")
-                
-                if 'Anim' in cat:
-                    thumbnail = get_omega_resource_path("series_ani_uhd.png")
         elif 'HD' in cat:
             if 'Español' in cat:
                 thumbnail = get_omega_resource_path("series_hd_es.png" if 'Series' in cat else "pelis_hd_es.png")
             else:
                 thumbnail = get_omega_resource_path("series_hd.png" if 'Series' in cat else "pelis_hd.png")
-
-                if 'Anim' in cat:
-                    thumbnail = get_omega_resource_path("series_ani_hd.png")
         elif 'SD' in cat:
             if 'Español' in cat:
                 thumbnail = get_omega_resource_path("series_sd_es.png" if 'Series' in cat else "pelis_sd_es.png")
             else:
                 thumbnail = get_omega_resource_path("series_sd.png" if 'Series' in cat else "pelis_sd.png")
-
-                if 'Anim' in cat:
-                    thumbnail = get_omega_resource_path("series_ani_sd.png")
-        elif '3D' in cat and item.mode != "tvshow":
-            thumbnail = get_omega_resource_path("pelis_3d_es.png" if ('Español' in item.title or 'Español' in title) else "pelis_3d.png")
-        elif '1970' in cat and item.mode != "tvshow":
-            thumbnail = get_omega_resource_path("pelis_clasicas.png")
         elif 'Series' in cat:
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_tvshow.png"
         else:
