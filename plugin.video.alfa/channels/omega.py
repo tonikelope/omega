@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.17"
+OMEGA_VERSION = "5.18"
 
 config.set_setting("unify", "false")
 
@@ -467,18 +467,18 @@ def mainlist(item):
                                  url="https://noestasinvitado.com/peliculas/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_movie.png"))
             itemlist.append(Item(channel=item.channel, title="[B]SERIES[/B]", viewcontent="movies", viewmode="list",section="SERIES", mode="tvshow", action="foro",
                                  url="https://noestasinvitado.com/series/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_tvshow.png"))
-            itemlist.append(Item(channel=item.channel, title="Documentales", viewcontent="movies", viewmode="list", section="Documentales", mode="movie", action="foro",
+            itemlist.append(Item(channel=item.channel, title="[B]DOCUMENTALES[/B]", viewcontent="movies", viewmode="list", section="Documentales", mode="movie", action="foro",
                                  url="https://noestasinvitado.com/documentales/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_documentary.png"))
-            itemlist.append(Item(channel=item.channel, title="Deportes", viewcontent="movies", viewmode="list", section="Vídeos deportivos", mode="movie", action="foro",
+            itemlist.append(Item(channel=item.channel, title="[B]DEPORTES[/B]", viewcontent="movies", viewmode="list", section="Vídeos deportivos", mode="movie", action="foro",
                                  url="https://noestasinvitado.com/deportes/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_sport.png"))
-            itemlist.append(Item(channel=item.channel, title="Anime", viewcontent="movies", viewmode="list", action="foro", section="Anime",
+            itemlist.append(Item(channel=item.channel, title="[B]ANIME[/B]", viewcontent="movies", viewmode="list", action="foro", section="Anime",
                                  url="https://noestasinvitado.com/anime/", mode="movie", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_anime.png"))
-            itemlist.append(Item(channel=item.channel, title="Bibliotaku", viewcontent="movies", viewmode="list", action="bibliotaku", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/akantor.gif"))
+            itemlist.append(Item(channel=item.channel, title="[B]Bibliotaku[/B]", viewcontent="movies", viewmode="list", action="bibliotaku", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.omega/resources/akantor.gif"))
             
             if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
-                itemlist.append(Item(channel=item.channel, title="ADULTOS +18", viewcontent="movies", viewmode="list", mode="movie", section="Adultos", action="foro",
+                itemlist.append(Item(channel=item.channel, title="[B]ADULTOS +18[/B]", viewcontent="movies", viewmode="list", mode="movie", section="Adultos", action="foro",
                                      url="https://noestasinvitado.com/18-15/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_adult.png", xxx=True))
-            itemlist.append(Item(channel=item.channel, title="Listados alfabéticos", viewcontent="movies", viewmode="list", mode="movie", section="Listados", action="indices",
+            itemlist.append(Item(channel=item.channel, title="[B]LISTADO ALFABÉTICO[/B]", viewcontent="movies", viewmode="list", mode="movie", section="Listados", action="indices",
                                  url="https://noestasinvitado.com/indices/", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_movie_az.png"))
             
             itemlist.append(
@@ -583,38 +583,38 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="Preferencias de ALFA",
+            title="[B]Preferencias de ALFA[/B]",
             action="settings_alfa", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     itemlist.append(
         Item(
             channel=item.channel,
-            title="Comprobar actualización de ALFA",
+            title="[B]Comprobar actualización de ALFA[/B]",
             action="check_alfa_update", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
     itemlist.append(
         Item(
             channel=item.channel,
-            title="Regenerar icono de FAVORITOS",
+            title="[B]Regenerar icono de FAVORITOS[/B]",
             action="update_favourites", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
     itemlist.append(
         Item(
             channel=item.channel,
-            title="Regenerar miniaturas (todo KODI)",
+            title="[B]Regenerar miniaturas (todo KODI)[/B]",
             action="thumbnail_refresh", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png"))
 
     if not os.path.exists(KODI_USERDATA_PATH + 'omega_xxx'):
         itemlist.append(
             Item(
                 channel=item.channel,
-                title="DESACTIVAR CONTENIDO PARA ADULTOS",
+                title="[B]DESACTIVAR CONTENIDO PARA ADULTOS[/B]",
                 action="xxx_off", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
     else:
         itemlist.append(
             Item(
                 channel=item.channel,
-                title="REACTIVAR CONTENIDO PARA ADULTOS",
+                title="[B]REACTIVAR CONTENIDO PARA ADULTOS[/B]",
                 action="xxx_on", fanart="special://home/addons/plugin.video.omega/resources/fanart.png", thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"))
 
     return itemlist
@@ -2058,35 +2058,34 @@ def foro(item, episode_count_call=False):
                         if 'Español' in item.title or 'Español' in title:
                             thumbnail = get_omega_resource_path("series_uhd_es.png" if item.mode == "tvshow" else "pelis_uhd_es.png")
                         else:
-                            thumbnail = get_omega_resource_path("series_uhd.png" if item.mode == "tvshow" else "pelis_uhd.png")
-
-                            if 'Anim' in item.title or 'Anim' in title:
-                                thumbnail = get_omega_resource_path("series_ani_uhd.png")
-
+                            thumbnail = get_omega_resource_path(("series_ani_uhd.png" if 'Animación' in item.title or 'Animación' in title else "series_uhd.png") if item.mode == "tvshow" else "pelis_uhd.png")
                     elif '(HD)' in item.title or '(HD)' in title:
                         if 'Español' in item.title or 'Español' in title:
                             thumbnail = get_omega_resource_path("series_hd_es.png" if item.mode == "tvshow" else "pelis_hd_es.png")
                         else:
-                            thumbnail = get_omega_resource_path("series_hd.png" if item.mode == "tvshow" else "pelis_hd.png")
-
-                            if 'Anim' in item.title or 'Anim' in title:
-                                thumbnail = get_omega_resource_path("series_ani_hd.png")
-
+                            thumbnail = get_omega_resource_path(("series_ani_hd.png" if 'Animación' in item.title or 'Animación' in title else "series_hd.png") if item.mode == "tvshow" else "pelis_hd.png")
                     elif '(SD)' in item.title or '(SD)' in title:
                         if 'Español' in item.title or 'Español' in title:
                             thumbnail = get_omega_resource_path("series_sd_es.png" if item.mode == "tvshow" else "pelis_sd_es.png")
                         else:
-                            thumbnail = get_omega_resource_path("series_sd.png" if item.mode == "tvshow" else "pelis_sd.png")
-
-                            if 'Anim' in item.title or 'Anim' in title:
-                                thumbnail = get_omega_resource_path("series_ani_sd.png")
-
+                            thumbnail = get_omega_resource_path(("series_ani_sd.png" if 'Animación' in item.title or 'Animación' in title else "series_sd.png") if item.mode == "tvshow" else "pelis_sd.png")
                     elif ('3D' in item.title or '3D' in title) and item.mode != "tvshow":
                         thumbnail = get_omega_resource_path("pelis_3d_es.png" if ('Español' in item.title or 'Español' in title) else "pelis_3d.png")
                     elif ('1970' in item.title or '1970' in title) and item.mode != "tvshow":
                         thumbnail = get_omega_resource_path("pelis_clasicas.png")
+                    elif 'Anime' in item.title or 'Anime' in title:
+                        if 'Español' in item.title or 'Español' in title:
+                            if 'Serie' in item.title or 'Serie' in title:
+                                thumbnail = get_omega_resource_path("anime_series_uhd_es.png" if '4K' in item.title or '4K' in title else "anime_series_es.png")
+                            else:
+                                thumbnail = get_omega_resource_path("anime_pelis_uhd_es.png" if '4K' in item.title or '4K' in title else "anime_pelis_es.png")
+                        else:
+                            if 'Serie' in item.title or 'Serie' in title:
+                                thumbnail = get_omega_resource_path("anime_series_uhd.png" if '4K' in item.title or '4K' in title else "anime_series.png")
+                            else:
+                                thumbnail = get_omega_resource_path("anime_pelis_uhd.png" if '4K' in item.title or '4K' in title else "anime_pelis.png")
 
-                    title = "["+ item.section + "] " + title
+                    title = "[B]["+ item.section + "][/B] " + title
                     
                     item.parent_title = title.strip()
 
@@ -2355,7 +2354,11 @@ def indices(item):
 
         thumbnail = ""
 
-        if 'Ultra HD' in cat:
+        if 'XXX' in cat:
+            thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_adult.png"
+        elif 'Deportes' in cat:
+            thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_sport.png"
+        elif 'Ultra HD' in cat:
             if 'Español' in cat:
                 thumbnail = get_omega_resource_path("series_uhd_es.png" if 'Series' in cat else "pelis_uhd_es.png")
             else:
@@ -2370,6 +2373,19 @@ def indices(item):
                 thumbnail = get_omega_resource_path("series_sd_es.png" if 'Series' in cat else "pelis_sd_es.png")
             else:
                 thumbnail = get_omega_resource_path("series_sd.png" if 'Series' in cat else "pelis_sd.png")
+        elif 'Anime' in cat:
+            if 'Español' in cat:
+                if 'Serie' in cat:
+                    thumbnail = get_omega_resource_path("anime_series_uhd_es.png" if '4K' in cat or '4K' in cat else "anime_series_es.png")
+                else:
+                    thumbnail = get_omega_resource_path("anime_pelis_uhd_es.png" if '4K' in cat or '4K' in cat else "anime_pelis_es.png")
+            else:
+                if 'Serie' in cat:
+                    thumbnail = get_omega_resource_path("anime_series_uhd.png" if '4K' in cat or '4K' in cat else "anime_series.png")
+                else:
+                    thumbnail = get_omega_resource_path("anime_pelis_uhd.png" if '4K' in cat or '4K' in cat else "anime_pelis.png")
+        elif 'clásicas' in cat:
+            thumbnail = get_omega_resource_path("pelis_clasicas.png")
         elif 'Series' in cat:
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_tvshow.png"
         else:
@@ -2381,7 +2397,7 @@ def indices(item):
             mode = "movie"
         elif 'Series' in cat:
             mode="tvshow"
-        else:
+        elif thumbnail=="":
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_movie.png"
 
         itemlist.append(Item(channel=item.channel, viewcontent="movies", viewmode="list", cat=cat, title=cat, mode=mode, action="gen_index", url="https://noestasinvitado.com/indices/", thumbnail=thumbnail))
