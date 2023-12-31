@@ -37,7 +37,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.18"
+OMEGA_VERSION = "5.19"
 
 config.set_setting("unify", "false")
 
@@ -2054,6 +2054,8 @@ def foro(item, episode_count_call=False):
 
                 else:
                     
+                    title = "[B]["+ item.section + "][/B] " + title
+
                     if '(Ultra HD)' in item.title or '(Ultra HD)' in title:
                         if 'Español' in item.title or 'Español' in title:
                             thumbnail = get_omega_resource_path("series_uhd_es.png" if item.mode == "tvshow" else "pelis_uhd_es.png")
@@ -2085,8 +2087,6 @@ def foro(item, episode_count_call=False):
                             else:
                                 thumbnail = get_omega_resource_path("anime_pelis_uhd.png" if '4K' in item.title or '4K' in title else "anime_pelis.png")
 
-                    title = "[B]["+ item.section + "][/B] " + title
-                    
                     item.parent_title = title.strip()
 
                     content_title = ""
