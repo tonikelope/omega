@@ -46,7 +46,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.20"
+OMEGA_VERSION = "5.21"
 
 config.set_setting("unify", "false")
 
@@ -3434,6 +3434,9 @@ def foro(item, episode_count_call=False):
         m = re.compile(
             r'action="http[^"]+action=post2".*?input.*?"topic".*?"(.*?)"', re.DOTALL
         ).search(data)
+
+        if not m:
+            return []
 
         id_topic = m.group(1)
 
