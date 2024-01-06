@@ -46,7 +46,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.21"
+OMEGA_VERSION = "5.22"
 
 config.set_setting("unify", "false")
 
@@ -4559,7 +4559,7 @@ def cleanContentTitle(s):
     s = s.replace("-", " ")
     s = re.sub(r"[\[][^\]]+[\]]", "", s)
     s = re.sub(r"\( *?\d{4} *?\)", "", s)
-    s = re.sub(r"\.[^.]+$", "", s)
+    s = re.sub(r"\.[^.]+(?:\.part.*?)?$", "", s)
     s = cleanEpisodeNumber(s)
     s = re.sub("^(Saga|Trilog.a|Duolog*a) ", "", s)
     # s = replaceRomansToIntegers(s) ESTO HAY QUE REVISARLO ¿Qué hacemos con las i latinas mayúsculas?
@@ -6058,7 +6058,7 @@ def ignore_item(item):
 
 
 def extract_year(title):
-    pattern = re.compile(r"[\(\[][^\]\)\w]*([0-9]{4})[^p]", re.IGNORECASE)
+    pattern = re.compile(r"[\(\[][^\]\)\w]* *?([0-9]{4}) *?[^p]", re.IGNORECASE)
 
     res = pattern.search(title)
 
