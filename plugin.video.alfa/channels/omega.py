@@ -46,7 +46,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.22"
+OMEGA_VERSION = "5.23"
 
 config.set_setting("unify", "false")
 
@@ -4949,7 +4949,7 @@ def find_video_mega_links(item, data):
                         elif id[2]:
                             mc_url = id[2]
 
-                        content_title = cleanContentTitle(filename)
+                        content_title = re.sub(r"[\(][^\)]*?[\)]", "", cleanContentTitle(filename))
 
                         title = (
                             "[COLOR orange][B]"
