@@ -37,6 +37,7 @@ import xbmcvfs
 import html
 import time
 import shutil
+from functools import cmp_to_key
 from core.item import Item
 from core import httptools, scrapertools, tmdb
 from platformcode import config, logger, platformtools, updater
@@ -46,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.25"
+OMEGA_VERSION = "5.26"
 
 config.set_setting("unify", "false")
 
@@ -2140,6 +2141,10 @@ def remove_ignored_item(item):
         xbmc.executebuiltin("Container.Refresh")
 
 
+def compare_item_titles(x,y):
+    return -1 if x.title<y.title else (0 if x.title == y.title else 1)
+
+
 def clean_vigilante_items(item):
 
     itemlist = []
@@ -2155,6 +2160,8 @@ def clean_vigilante_items(item):
                 action="remove_vigilante_item",
             )
         )
+
+    itemlist.sort(key=cmp_to_key(compare_item_titles))
 
     return itemlist
 
@@ -3400,6 +3407,18 @@ def getLastItemList(item):
     return itemlist
 
 
+def find_item_in_episode_watchdog(item):
+
+    for i_key in EPISODE_WATCHDOG.keys():
+        
+        i = Item().fromurl(i_key)
+        
+        if i_key == item.tourl() or i.url == item.url:
+            return i_key
+
+    return None
+
+
 def foro(item, episode_count_call=False):
     logger.info("channels.omega foro")
 
@@ -3550,24 +3569,20 @@ def foro(item, episode_count_call=False):
 
             watchdog_item.parent_item_url = item.tourl()
 
-            if item.tourl() in EPISODE_WATCHDOG:
-                watchdog_item.title = (
-                    "[COLOR yellow][B]DESACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
-                )
-            else:
+            if not find_item_in_episode_watchdog(item):
                 watchdog_item.title = (
                     "[COLOR yellow][B]ACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
                 )
 
-            watchdog_item.contentPlot = ""
+                watchdog_item.contentPlot = ""
 
-            watchdog_item.action = "watchdog_episodios"
+                watchdog_item.action = "watchdog_episodios"
 
-            watchdog_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_news.png"
+                watchdog_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_news.png"
 
-            itemlist.append(watchdog_item)
+                itemlist.append(watchdog_item)
 
-            if not episode_count_call and item.tourl() in EPISODE_WATCHDOG:
+            if not episode_count_call and find_item_in_episode_watchdog(item):
                 pDialog = xbmcgui.DialogProgress()
 
                 pDialog.create(
@@ -3576,7 +3591,7 @@ def foro(item, episode_count_call=False):
                 )
 
                 update_watchdog_episodes(
-                    item.tourl(), contar_episodios(itemlist), item.contentSerieName
+                    find_item_in_episode_watchdog(item), contar_episodios(itemlist), item.contentSerieName
                 )
 
                 pDialog.close()
