@@ -47,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.27"
+OMEGA_VERSION = "5.28"
 
 config.set_setting("unify", "false")
 
@@ -678,7 +678,7 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[COLOR darkorange][B]BUSCAR POR género[/B][/COLOR]",
+                    title="[COLOR darkorange][B]BUSCAR POR GÉNERO[/B][/COLOR]",
                     action="buscar_por_genero",
                     fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
                     viewcontent="movies",
