@@ -47,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.28"
+OMEGA_VERSION = "5.29"
 
 config.set_setting("unify", "false")
 
@@ -3888,6 +3888,8 @@ def foro(item, episode_count_call=False):
                                     if "4K" in item.title or "4K" in title
                                     else "anime_pelis.png"
                                 )
+                    else:
+                        thumbnail = item.thumbnail
 
                     item.parent_title = title.strip()
 
@@ -4167,28 +4169,29 @@ def search_parse(data, item):
             quality = "SD"
             section = "SERIES"
 
-        if "/ultrahd-espanol/" in url or "/ultrahd-vo/" in url:
-            content_type = "movie"
-            quality = "UHD"
-            section = "PELÍCULAS"
-        elif "/hd-espanol/" in url or "/hd-v-o-v-o-s/" in url:
-            content_type = "movie"
-            quality = "HD"
-            section = "PELÍCULAS"
-        elif (
-            "/sd-espanol/" in url
-            or "/sd-v-o-v-o-s/" in url
-            or "/sd-animacion/" in url
-            or "/3d-/" in url
-            or "/cine-clasico-/" in url
-        ):
-            content_type = "movie"
-            content_serie_name = content_title
-            quality = "SD"
-            section = "PELÍCULAS"
-        elif not quality:
-            content_type = "movie"
-            quality = parsed_title["quality"]
+        if section == "":
+            if "/ultrahd-espanol/" in url or "/ultrahd-vo/" in url:
+                content_type = "movie"
+                quality = "UHD"
+                section = "PELÍCULAS"
+            elif "/hd-espanol/" in url or "/hd-v-o-v-o-s/" in url:
+                content_type = "movie"
+                quality = "HD"
+                section = "PELÍCULAS"
+            elif (
+                "/sd-espanol/" in url
+                or "/sd-v-o-v-o-s/" in url
+                or "/sd-animacion/" in url
+                or "/3d-/" in url
+                or "/cine-clasico-/" in url
+            ):
+                content_type = "movie"
+                content_serie_name = content_title
+                quality = "SD"
+                section = "PELÍCULAS"
+            elif not quality:
+                content_type = "movie"
+                quality = parsed_title["quality"]
 
         info_labels = {"year": parsed_title["year"]}
 
