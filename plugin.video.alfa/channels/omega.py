@@ -46,7 +46,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.24"
+OMEGA_VERSION = "5.25"
 
 config.set_setting("unify", "false")
 
@@ -5151,7 +5151,7 @@ def find_video_mega_links(item, data):
 
 
 def clean_title(title):
-    return re.sub(" +", "", title)
+    return re.sub(" +", " ", title)
 
 
 def get_video_mega_links_group(item):
