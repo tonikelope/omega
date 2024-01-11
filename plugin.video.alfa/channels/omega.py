@@ -46,7 +46,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.23"
+OMEGA_VERSION = "5.24"
 
 config.set_setting("unify", "false")
 
@@ -2648,9 +2648,9 @@ def bibliotaku_series(item):
             else:
                 rating_text = "[B][" + str(round(i.infoLabels["rating"], 1)) + "][/B]"
 
-            i.title = i.title.replace("##*NOTA*##", rating_text)
+            i.title = clean_title(i.title.replace("##*NOTA*##", rating_text))
         else:
-            i.title = i.title.replace("##*NOTA*##", "")
+            i.title = clean_title(i.title.replace("##*NOTA*##", ""))
 
     return itemlist
 
@@ -3969,9 +3969,9 @@ def foro(item, episode_count_call=False):
                             "[B][" + str(round(i.infoLabels["rating"], 1)) + "][/B]"
                         )
 
-                    i.title = i.title.replace("##*NOTA*##", rating_text)
+                    i.title = clean_title(i.title.replace("##*NOTA*##", rating_text))
                 else:
-                    i.title = i.title.replace("##*NOTA*##", "")
+                    i.title = clean_title(i.title.replace("##*NOTA*##", ""))
 
     return itemlist
 
@@ -4187,7 +4187,7 @@ def search_parse(data, item):
             + parsed_title["title"]
             + "[/B][/COLOR] "
             + extra
-            + (" [" + quality + "]" if quality else "")
+            + ("[" + quality + "]" if quality else "")
             + " ##*NOTA*## ("
             + color_uploader(uploader)
             + ")"
@@ -4265,9 +4265,9 @@ def search_parse(data, item):
             else:
                 rating_text = "[B][" + str(round(i.infoLabels["rating"], 1)) + "][/B]"
 
-            i.title = i.title.replace("##*NOTA*##", rating_text)
+            i.title = clean_title(i.title.replace("##*NOTA*##", rating_text))
         else:
-            i.title = i.title.replace("##*NOTA*##", "")
+            i.title = clean_title(i.title.replace("##*NOTA*##", ""))
 
     return itemlist
 
@@ -5148,6 +5148,10 @@ def find_video_mega_links(item, data):
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
     return itemlist
+
+
+def clean_title(title):
+    return re.sub(" +", "", title)
 
 
 def get_video_mega_links_group(item):
