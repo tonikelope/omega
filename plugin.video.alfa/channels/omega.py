@@ -47,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.29"
+OMEGA_VERSION = "5.30"
 
 config.set_setting("unify", "false")
 
@@ -1292,7 +1292,7 @@ def buscar_por_genero(item):
             .decode("utf-8-sig")
         )
 
-        boards = {"pelis": ["44", "47", "229"], "series": ["53", "59", "235"]}
+        boards = {"pelis": ["44", "47", "229"], "series": ["53", "59", "235", "62"]}
 
         itemlist = []
 
