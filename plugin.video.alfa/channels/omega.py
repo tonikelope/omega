@@ -47,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.26"
+OMEGA_VERSION = "5.27"
 
 config.set_setting("unify", "false")
 
@@ -662,7 +662,32 @@ def mainlist(item):
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_news.png",
                 )
             )
-
+            
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[COLOR darkorange][B]BUSCAR POR TÍTULO[/B][/COLOR]",
+                    action="search",
+                    fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
+                    viewcontent="movies",
+                    viewmode="poster",
+                    thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_generic.png",
+                )
+            )
+            
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[COLOR darkorange][B]BUSCAR POR género[/B][/COLOR]",
+                    action="buscar_por_genero",
+                    fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
+                    viewcontent="movies",
+                    viewmode="poster",
+                    thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png",
+                    page=0,
+                )
+            )
+            
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -677,6 +702,7 @@ def mainlist(item):
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_movie.png",
                 )
             )
+            
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -691,6 +717,7 @@ def mainlist(item):
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_videolibrary_tvshow.png",
                 )
             )
+            
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -705,6 +732,7 @@ def mainlist(item):
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_documentary.png",
                 )
             )
+            
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -719,6 +747,7 @@ def mainlist(item):
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_sport.png",
                 )
             )
+            
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -733,6 +762,7 @@ def mainlist(item):
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_anime.png",
                 )
             )
+            
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -773,31 +803,6 @@ def mainlist(item):
                     url="https://noestasinvitado.com/indices/",
                     fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_channels_movie_az.png",
-                )
-            )
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="[COLOR darkorange][B]BUSCAR (por título)[/B][/COLOR]",
-                    action="search",
-                    fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
-                    viewcontent="movies",
-                    viewmode="poster",
-                    thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_generic.png",
-                )
-            )
-
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="[COLOR darkorange][B]BUSCAR (por género)[/B][/COLOR]",
-                    action="buscar_por_genero",
-                    fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
-                    viewcontent="movies",
-                    viewmode="poster",
-                    thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png",
-                    page=0,
                 )
             )
 
@@ -881,6 +886,28 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
+            title="[B]GESTIONAR VIGILANTE DE EPISODIOS[/B]",
+            viewcontent="movies",
+            viewmode="list",
+            action="clean_vigilante_items",
+            fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
+            thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
+        )
+    )
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[COLOR red][B]VACIAR VIGILANTE DE EPISODIOS[/B][/COLOR]",
+            action="clean_vigilante",
+            fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
+            thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
+        )
+    )
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
             title="[B]PURGAR CACHÉ[/B]",
             action="clean_cache",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
@@ -903,28 +930,6 @@ def ajustes(item):
             channel=item.channel,
             title="[COLOR red][B]BORRAR MARCAS DE VÍDEOS VISTOS[/B][/COLOR]",
             action="clean_history",
-            fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
-            thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
-        )
-    )
-
-    itemlist.append(
-        Item(
-            channel=item.channel,
-            title="[B]GESTIONAR VIGILANTE DE EPISODIOS[/B]",
-            viewcontent="movies",
-            viewmode="list",
-            action="clean_vigilante_items",
-            fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
-            thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
-        )
-    )
-
-    itemlist.append(
-        Item(
-            channel=item.channel,
-            title="[COLOR red][B]VACIAR VIGILANTE DE EPISODIOS[/B][/COLOR]",
-            action="clean_vigilante",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
         )
@@ -2169,9 +2174,9 @@ def clean_vigilante_items(item):
 def remove_vigilante_item(item):
     if xbmcgui.Dialog().yesno(
         dialog_title(),
-        "¿Estás seguro de que quieres [B]QUITAR[/B] [COLOR yellow][B]"
+        "¿Estás seguro de que quieres [B]ELIMINAR[/B] [COLOR yellow][B]"
         + item.contentSerieName
-        + "[/B][/COLOR] del [B]vigilante de episodios[/B]?",
+        + "[/B][/COLOR] del [B]VIGILANTE DE EPISODIOS[/B]?",
     ):
 
         try:
@@ -2191,7 +2196,7 @@ def remove_vigilante_item(item):
 
             xbmcgui.Dialog().notification(
                 notification_title(),
-                item.contentSerieName + " QUITAR DEL VIGILANTE DE EPISODIOS",
+                item.contentSerieName + " ELIMINADO DEL VIGILANTE DE EPISODIOS",
                 os.path.join(
                     xbmcaddon.Addon().getAddonInfo("path"),
                     "resources",
