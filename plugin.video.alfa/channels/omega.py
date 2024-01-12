@@ -47,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.32"
+OMEGA_VERSION = "5.33"
 
 config.set_setting("unify", "false")
 
@@ -2162,7 +2162,7 @@ def clean_vigilante_items(item):
                 contentSerieName=i.contentSerieName,
                 title="[B]" + i.contentSerieName + "[/B]",
                 vigilante_k=k,
-                contentPlot="(CLICK PARA SACAR SERIE DEL VIGILANTE DE SERIES)"
+                contentPlot="(CLICK PARA SACAR SERIE DEL VIGILANTE DE SERIES)",
                 action="remove_vigilante_item",
             )
         )
