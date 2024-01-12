@@ -47,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.31"
+OMEGA_VERSION = "5.32"
 
 config.set_setting("unify", "false")
 
@@ -918,7 +918,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[COLOR red][B]BORRAR HISTORIAL DE APORTES VISITADOS[/B][/COLOR]",
+            title="[B]BORRAR HISTORIAL[/B]",
             action="clean_last",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
@@ -980,7 +980,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]COMPROBAR ACTUALIZACIÓN DE ALFA[/B]",
+            title="[B]COMPROBAR FIX URGENTE DE ALFA[/B]",
             action="check_alfa_update",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
@@ -1038,7 +1038,7 @@ def force_login(item):
 def about_omega(item):
     xbmcgui.Dialog().ok(
         dialog_title(),
-        "Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su gran trabajo y por supuesto, a MEGA).\n\nCARPE DIEM",
+        "Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su gran trabajo y por supuesto, a MEGA).\n\n[B]CARPE DIEM[/B]",
     )
 
 
@@ -2162,6 +2162,7 @@ def clean_vigilante_items(item):
                 contentSerieName=i.contentSerieName,
                 title="[B]" + i.contentSerieName + "[/B]",
                 vigilante_k=k,
+                contentPlot="(CLICK PARA SACAR SERIE DEL VIGILANTE DE SERIES)"
                 action="remove_vigilante_item",
             )
         )
