@@ -636,7 +636,7 @@ def pageURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=
 
     if progress_bar:
         pbar = xbmcgui.DialogProgressBG()   
-        pbar.create('OMEGA', 'Preparando enlace DEBRID (paciencia)...')
+        pbar.create('OMEGA', 'Cocinando enlace DEBRID (paciencia)...')
     
     if 'megacrypter.noestasinvitado' in page_url:
 
@@ -759,7 +759,9 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
             page_urls = page_url.split('#')
 
-            pbar.create('OMEGA', 'Preparando enlace MULTI('+str(len(page_urls)-1)+') (paciencia)...')
+            pbar = xbmcgui.DialogProgressBG()
+
+            pbar.create('OMEGA', 'Cocinando vídeo troceado MULTI('+str(len(page_urls)-1)+') (paciencia)...')
 
             pbar_increment = round(100/(len(page_urls)-1))
 
