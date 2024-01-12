@@ -47,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.33"
+OMEGA_VERSION = "5.34"
 
 config.set_setting("unify", "false")
 
