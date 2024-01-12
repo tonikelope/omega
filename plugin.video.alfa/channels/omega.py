@@ -47,7 +47,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True
 
-OMEGA_VERSION = "5.30"
+OMEGA_VERSION = "5.31"
 
 config.set_setting("unify", "false")
 
@@ -4186,7 +4186,6 @@ def search_parse(data, item):
                 or "/cine-clasico-/" in url
             ):
                 content_type = "movie"
-                content_serie_name = content_title
                 quality = "SD"
                 section = "PELÍCULAS"
             elif not quality:
