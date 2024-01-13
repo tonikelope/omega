@@ -459,6 +459,13 @@ except:
     proxy_server = None
 
 
+def close_background_pbar(pbar):
+    pbar.close()
+
+    while not pbar.isFinished():
+        time.sleep(0.250)
+
+
 def megacrypter2debrid(link, clean=True, account=1):
 
     global DEBRID_ACCOUNT_FREE_SPACE
@@ -645,7 +652,7 @@ def pageURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=
         if not fid_hash:
             if progress_bar:
                 pbar.update(100)
-                pbar.close()
+                close_background_pbar(pbar)
             xbmcgui.Dialog().notification('OMEGA', "ERROR: POSIBLE ENLACE MEGACRYPTER CADUCADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             return [["NEI DEBRID ERROR (posible enlace de MegaCrypter caducado (sal y vuelve a entrar en la carpeta))", ""]]
 
@@ -670,7 +677,7 @@ def pageURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=
                 if not response:
                     if progress_bar:
                         pbar.update(100)
-                        pbar.close()
+                        close_background_pbar(pbar)
                     xbmcgui.Dialog().notification('OMEGA', "ERROR: REVISA TU CUENTA DE MEGA AUXILIAR", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
                     return [["NEI DEBRID ERROR (revisa que haya espacio suficiente en tu cuenta de MEGA auxiliar)", ""]]
 
@@ -726,7 +733,7 @@ def pageURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=
 
     if progress_bar:
         pbar.update(100)
-        pbar.close()
+        close_background_pbar(pbar)
     
     return urls
 
@@ -744,7 +751,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     if proxy_server:
         start_proxy()
 
-    pbar.close()
+    close_background_pbar(pbar)
 
     if page_url[0]=='*':
         #ENLACE MULTI-BASTERD (vídeo troceado con MegaBasterd) 
@@ -832,7 +839,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
                 i+=1
 
-            pbar.close()
+            close_background_pbar(pbar)
 
             if not megacrypter2debrid_error:
 
