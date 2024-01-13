@@ -36,7 +36,7 @@ DEBRID_PROXY_PORT = int(config.get_setting("omega_debrid_proxy_port", "omega").s
 OMEGA_REALDEBRID = config.get_setting("omega_realdebrid", "omega")
 OMEGA_ALLDEBRID = config.get_setting("omega_alldebrid", "omega")
 
-MAX_PBAR_CLOSE_WAIT = 3000
+MAX_PBAR_CLOSE_WAIT = 5000
 MEGACRYPTER2DEBRID_ENDPOINT = 'https://noestasinvitado.com/megacrypter2debrid.php'
 MEGACRYPTER2DEBRID_TIMEOUT = 300 #Cuando aumente la demanda habrá que implementar en el server de NEI un sistema de polling asíncrono
 MEGACRYPTER2DEBRID_MULTI_RETRY = 5
@@ -466,8 +466,8 @@ def thread_close_pbar(pbar):
     wait=0
 
     while not pbar.isFinished() and wait<MAX_PBAR_CLOSE_WAIT:
-        time.sleep(0.250)
-        wait+=0.250
+        time.sleep(1)
+        wait+=1
 
 
 def close_background_pbar(pbar):
