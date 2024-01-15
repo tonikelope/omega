@@ -158,7 +158,7 @@ class DebridProxyChunkWriter():
 
 
     def check_exit(self):
-        return (self.url != DEBRID_PROXY_FILE_URL.url or not xbmc.Player().isPlaying())
+        return (self.url != DEBRID_PROXY_FILE_URL.url)
 
     
     def run(self):
