@@ -36,7 +36,7 @@ DEBRID_PROXY_PORT = int(config.get_setting("omega_debrid_proxy_port", "omega").s
 OMEGA_REALDEBRID = config.get_setting("omega_realdebrid", "omega")
 OMEGA_ALLDEBRID = config.get_setting("omega_alldebrid", "omega")
 
-MAX_PBAR_CLOSE_WAIT = 5
+MAX_PBAR_CLOSE_WAIT = 3
 MEGACRYPTER2DEBRID_ENDPOINT = 'https://noestasinvitado.com/megacrypter2debrid.php'
 MEGACRYPTER2DEBRID_TIMEOUT = 300 #Cuando aumente la demanda habrá que implementar en el server de NEI un sistema de polling asíncrono
 MEGACRYPTER2DEBRID_MULTI_RETRY = 5
@@ -154,17 +154,22 @@ class DebridProxyChunkWriter():
         self.next_offset_required = start_offset
         self.chunk_offset_lock = threading.Lock()
         self.chunk_queue_lock = threading.Lock()
+        self.url = DEBRID_PROXY_FILE_URL.url
 
 
+    def check_exit(self):
+        return (self.url != DEBRID_PROXY_FILE_URL.url and not xbmc.Player().isPlaying())
+
+    
     def run(self):
 
         logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] HELLO')
 
         try:
 
-            while not self.exit and self.bytes_written < self.end_offset:
+            while not self.check_exit() and not self.exit and self.bytes_written < self.end_offset:
                 
-                while not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
+                while not self.check_exit() and not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
 
                     with self.chunk_queue_lock:
 
@@ -178,7 +183,7 @@ class DebridProxyChunkWriter():
 
                     self.bytes_written+=len(current_chunk)
                     
-                if not self.exit and self.bytes_written < self.end_offset:
+                if not self.check_exit() and not self.exit and self.bytes_written < self.end_offset:
                     
                     with self.cv_new_element:
                         self.cv_new_element.wait(1)
