@@ -27,7 +27,7 @@ Incluye un servidor proxy http local que permite:
     2) Permite usar enlaces MegaCrypter con Real/Alldebrid.
     3) Reproducir por streaming vídeos troceados de forma transparente para el reproductor de KODI.
 
-Enlaces de vídeo que maneja este conector:
+Enlaces de vídeo que maneja este conector: 
 
     1) Enlaces de MegaCrypter/MEGA (SIN trocear) con Real/Alldebrid desactivado -> se reproducen con la librería de MEGA (parcheada por OMEGA para soportar descarga multi-hilo).
     2) Enlaces de MegaCrypter/MEGA (troceados o no) con Real/Alldebrid activado -> se reproducen con este proxy.
