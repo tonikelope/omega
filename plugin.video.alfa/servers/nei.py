@@ -911,16 +911,16 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
             if not megacrypter2debrid_error:
 
-            	"""
-            	Ahora generamos la tabla de traducción multi_urls_ranges con las URLS Real/Alldebrid de cada trozo y 
-            	los rangos de bytes absolutos que más tarde usará el proxy para traducir al vuelo las peticiones de 
-            	rangos de bytes absolutos del reproductor de vídeo de KODI por rangos parciales de cada trozo.
-            	[
-            	(absolute_start_offset, absolute_end_offset, debrid_url_1), 
-            	(absolute_start_offset, absolute_end_offset, debrid_url_2),
-            	(absolute_start_offset, absolute_end_offset, debrid_url_3),
-            	...]
-            	"""
+                """
+                Ahora generamos la tabla de traducción multi_urls_ranges con las URLS Real/Alldebrid de cada trozo y 
+                los rangos de bytes absolutos que más tarde usará el proxy para traducir al vuelo las peticiones de 
+                rangos de bytes absolutos del reproductor de vídeo de KODI por rangos parciales de cada trozo.
+                [
+                (absolute_start_offset, absolute_end_offset, debrid_url_1), 
+                (absolute_start_offset, absolute_end_offset, debrid_url_2),
+                (absolute_start_offset, absolute_end_offset, debrid_url_3),
+                ...]
+                """
 
                 logger.info(multi_video_proxy_urls)
 
