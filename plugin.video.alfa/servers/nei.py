@@ -1,6 +1,11 @@
 # -*- coding: utf-8 -*-
 
 """
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
 
  _   _ _____ ___ ____  _____ ____  ____  ___ ____  
 | \ | | ____|_ _|  _ \| ____| __ )|  _ \|_ _|  _ \ 
@@ -15,12 +20,12 @@
  \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
                                   |_|         
                                   
-Conector de vídeo para noestasinvitado.com
+Conector de vídeo para noestasinvitado.com (OMEGA)
 
-Incluye un servidor proxy DEBRID de vídeo local que permite:
+Incluye un servidor proxy http local que permite:
     1) Aumentar velocidad de descarga de Real/Alldebrid al utilizar conexiones paralelas.
     2) Permite usar enlaces MegaCrypter con Real/Alldebrid.
-    3) Incluye soporte para manejar vídeos troceados de forma transparente para el reproductor de KODI.
+    3) Manejar vídeos troceados de forma transparente para el reproductor de KODI.
 
 Enlaces de vídeo que maneja este conector:
 
