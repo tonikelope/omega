@@ -1,6 +1,28 @@
 # -*- coding: utf-8 -*-
 # https://github.com/tonikelope/omega
 
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+                                 
+CANAL de ALFA (KODI) PARA NOESTASINVITADO.COM
+
+Incluye librería de MEGA modificada para soportar enlaces MegaCrypter 
+y descarga multi-hilo
+
+"""
+
+
 import sys
 import xbmc
 import xbmcgui
@@ -45,9 +67,9 @@ from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
 
-CHECK_STUFF_INTEGRITY = True
+CHECK_STUFF_INTEGRITY = True #Sobreescribimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.35"
+OMEGA_VERSION = "5.36"
 
 config.set_setting("unify", "false")
 
