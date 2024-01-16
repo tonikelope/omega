@@ -719,7 +719,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     logger.info('DEBRID USANDO CACHE -> '+fid_hash)
                     
                     if progress_bar:
-                        pbar.update(0, 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
+                        pbar.update(100, 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
 
                 except:
                     urls = None
@@ -769,7 +769,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     logger.info('DEBRID USANDO CACHE -> '+fid_hash)
 
                     if progress_bar:
-                        pbar.update(0, 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
+                        pbar.update(100, 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
 
                 except:
                     urls = None
