@@ -696,11 +696,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
 
     if progress_bar:
         pbar = xbmcgui.DialogProgressBG()
-
-        if cache:
-            pbar.create('OMEGA', 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
-        else:   
-            pbar.create('OMEGA', 'Cocinando enlace ['+getDebridServiceString()+'] (paciencia)...')
+        pbar.create('OMEGA', 'Cocinando enlace ['+getDebridServiceString()+'] (paciencia)...')
     
     if 'megacrypter.noestasinvitado' in page_url:
 
@@ -719,7 +715,12 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
             with open(filename_hash, "rb") as file:
                 try:
                     urls = pickle.load(file)
+                    
                     logger.info('DEBRID USANDO CACHE -> '+fid_hash)
+                    
+                    if progress_bar:
+                        pbar.update(0, 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
+
                 except:
                     urls = None
 
@@ -764,7 +765,12 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
             with open(filename_hash, "rb") as file:
                 try:
                     urls = pickle.load(file)
+                    
                     logger.info('DEBRID USANDO CACHE -> '+fid_hash)
+
+                    if progress_bar:
+                        pbar.update(0, 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
+
                 except:
                     urls = None
        
