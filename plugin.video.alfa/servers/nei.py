@@ -941,7 +941,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
                 first_multi_proxy_url = multi_video_proxy_urls[0][0][1]
 
-                #Se usa el hash de la primera URL Real/Alldebrid (sin "sin proxyficar") como ID del fichero de traducción de rangos
+                #Se usa el hash de la primera URL Real/Alldebrid (sin "proxyficar") como ID del fichero de traducción de rangos
                 hash_url = hashlib.sha256(proxy2DebridURL(first_multi_proxy_url).encode('utf-8')).hexdigest()
                 filename_hash = KODI_TEMP_PATH + 'kodi_nei_multi_' + hash_url
 
