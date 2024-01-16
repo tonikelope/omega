@@ -69,7 +69,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True #Sobreescribimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.36"
+OMEGA_VERSION = "5.37"
 
 config.set_setting("unify", "false")
 
@@ -1092,14 +1092,19 @@ def watchdog_episodios(item):
             + item.contentSerieName
             + "[/B][/COLOR] en el [B]vigilante de episodios[/B]?",
         ):
-            pDialog = xbmcgui.DialogProgress()
-            pDialog.create(
-                dialog_title(),
-                "Actualizando [COLOR yellow][B]vigilante de episodios[/B][/COLOR]...",
-            )
+            
+            pbar = xbmcgui.DialogProgressBG()
+            
+            pbar.create('OMEGA', 'Activando vigilante de episodios para '+item.contentSerieName)
+            
             EPISODE_WATCHDOG[item.parent_item_url] = contar_episodios(
                 foro(Item().fromurl(item.parent_item_url), episode_count_call=True)
             )
+
+            pbar.update(100)
+
+            pbar.close()
+
             xbmcgui.Dialog().notification(
                 notification_title(),
                 "VIGILANTE DE EPISODIOS ACTIVADO PARA " + item.contentSerieName,
@@ -1113,7 +1118,6 @@ def watchdog_episodios(item):
                 ),
                 5000,
             )
-            pDialog.close()
 
     elif xbmcgui.Dialog().yesno(
         dialog_title(),
@@ -3613,18 +3617,17 @@ def foro(item, episode_count_call=False):
                 itemlist.append(watchdog_item)
 
             if not episode_count_call and find_item_in_episode_watchdog(item):
-                pDialog = xbmcgui.DialogProgress()
-
-                pDialog.create(
-                    dialog_title(),
-                    "Actualizando [COLOR yellow][B]vigilante de episodios[/B][/COLOR]...",
-                )
+                pbar = xbmcgui.DialogProgressBG()
+            
+                pbar.create('OMEGA', 'Actualizando vigilante de episodios para '+item.contentSerieName)
 
                 update_watchdog_episodes(
                     find_item_in_episode_watchdog(item), contar_episodios(itemlist), item.contentSerieName
                 )
 
-                pDialog.close()
+                pbar.update(100)
+
+                pbar.close()
 
         trailer_item = item.clone()
 
