@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
-# Extraído de la librería de MEGA de richardasaurus y ampliado por tonikelope para OMEGA (Python3)
+
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+                                 
+Extraído de la librería de MEGA de richardasaurus y ampliado por tonikelope para OMEGA (Python3)
+
+"""
 
 import re
 from .crypto import *

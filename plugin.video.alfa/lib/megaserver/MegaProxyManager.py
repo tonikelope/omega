@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
-# tonikelope para OMEGA
+
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+                                
+Soporte de lista de proxys para esquivar límite de descarga diario de MEGA
+
+"""
 
 import urllib.request, urllib.error, urllib.parse
 import collections
@@ -43,7 +60,7 @@ class MegaProxyManager():
         client.error_509_notify()
 
     @synchronized_with_attr("lock")
-    def refresh_proxy_list(self):
+    def __refresh_proxy_list(self):
 
         self.proxy_list.clear()
         
@@ -66,17 +83,17 @@ class MegaProxyManager():
     def get_next_proxy(self):
 
         if len(self.proxy_list) == 0:
-            self.refresh_proxy_list()
+            self.__refresh_proxy_list()
             return next(iter(self.proxy_list.items()))[0] if len(self.proxy_list) > 0 else None
         else:
-            next_proxy = self.get_next_rand_proxy()
+            next_proxy = self.__get_next_rand_proxy()
 
             if next_proxy:
                 return next_proxy
 
-            self.refresh_proxy_list()
+            self.__refresh_proxy_list()
 
-            return self.get_next_rand_proxy()
+            return self.__get_next_rand_proxy()
 
     @synchronized_with_attr("lock")
     def block_proxy(self,proxy):
@@ -86,7 +103,7 @@ class MegaProxyManager():
 
     
     @synchronized_with_attr("lock")
-    def get_next_rand_proxy(self):
+    def __get_next_rand_proxy(self):
         
         pos = random.randint(0, len(self.proxy_list)-1)
 

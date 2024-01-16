@@ -1,5 +1,24 @@
 # -*- coding: utf-8 -*-
-#Basado en el código de gschizas y modificado por tonikelope para OMEGA
+
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+                                 
+MEGACRYPTER REVERSE MODE
+
+Basado en el código de gschizas y modificado por tonikelope para OMEGA
+
+"""
 
 import socket
 import select
@@ -59,13 +78,13 @@ class MegaProxyServer(Thread):
         self.stop = True
 
     @synchronized
-    def is_stop_server(self):
+    def __is_stop_server(self):
         return self.stop
 
     def run(self):
         self.input_list.append(self.server)
 
-        while not self.is_stop_server():
+        while not self.__is_stop_server():
             ss = select.select
             inputready, outputready, exceptready = ss(self.input_list, [], [], 1.0)
             for self.s in inputready:

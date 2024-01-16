@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
-#Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
+
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+                                 
+Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
+
+"""
 
 import http.server
 import urllib.parse
@@ -16,7 +33,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
     def log_message(self, format, *args):
         pass
 
-    def parse_range(self, range):
+    def __parse_range(self, range):
         if range:
             m = re.compile(r'bytes=(\d+)-(\d+)?').match(range)
             if m:
@@ -39,7 +56,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
                     else:
                         break
 
-    def send_pls(self, files):
+    def __send_pls(self, files):
         playlist = "[playlist]\n\n"
         for x, f in enumerate(files):
             playlist += "File" + str(x + 1) + "=http://" + self.server._client.ip + ":" + str(
@@ -60,7 +77,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             time.sleep(1)
 
         if url == "/playlist.pls":
-            self.send_pls(self.server._client.files)
+            self.__send_pls(self.server._client.files)
             return False
 
         if not self.server._client.file or urllib.parse.unquote(url)[1:] != self.server._client.file.name:
@@ -72,8 +89,8 @@ class Handler(http.server.BaseHTTPRequestHandler):
         if self.server._client.file and urllib.parse.unquote(url)[1:] == self.server._client.file.name:
             range = False
             self.offset = 0
-            size, mime = self._file_info()
-            start, end = self.parse_range(self.headers.get('Range', ""))
+            size, mime = self.__file_info()
+            start, end = self.__parse_range(self.headers.get('Range', ""))
             self.size = size
 
             if start is not None:
@@ -85,13 +102,13 @@ class Handler(http.server.BaseHTTPRequestHandler):
             else:
                 range = None
 
-            self.send_resp_header(mime, size, range)
+            self.__send_resp_header(mime, size, range)
             return True
 
         else:
             self.send_error(404, 'Not Found')
 
-    def _file_info(self):
+    def __file_info(self):
         size = self.server._client.file.size
         ext = os.path.splitext(self.server._client.file.name)[1]
         mime = self.server._client.VIDEO_EXTS.get(ext)
@@ -99,7 +116,7 @@ class Handler(http.server.BaseHTTPRequestHandler):
             mime = 'application/octet-stream'
         return size, mime
 
-    def send_resp_header(self, cont_type, size, range=False):
+    def __send_resp_header(self, cont_type, size, range=False):
 
         if range:
             self.send_response(206, 'Partial Content')

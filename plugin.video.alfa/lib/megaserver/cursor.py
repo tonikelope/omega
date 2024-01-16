@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
-#Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
+
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+                                 
+Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
+
+"""
 
 import time
 import os
@@ -54,14 +71,14 @@ class Cursor(object):
             self._file.url = self._file.refreshMegaDownloadUrl()
 
         try:
-            self.start_multi_download(offset)
-            self.prepare_decoder(offset)
+            self.__start_multi_download(offset)
+            self.__prepare_decoder(offset)
         except Exception as e:
             logger.info(str(e))
             self.stop_multi_download()
             
 
-    def start_multi_download(self, offset):
+    def __start_multi_download(self, offset):
 
         self.pipe_r,self.pipe_w=os.pipe()
 
@@ -163,7 +180,7 @@ class Cursor(object):
         return self.decryptor.decrypt(data)
 
 
-    def prepare_decoder(self, offset):
+    def __prepare_decoder(self, offset):
         initial_value = self.initial_value + int(offset / 16)
         self.decryptor = AES.new(a32_to_str(self.k), AES.MODE_CTR, counter=Counter.new(128, initial_value=initial_value))
         rest = offset - int(offset / 16) * 16

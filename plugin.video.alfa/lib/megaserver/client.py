@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
-#Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
+
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+                                 
+Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
+
+"""
 
 import base64
 import hashlib
@@ -44,7 +61,7 @@ class Client(object):
         self.error_509_notified = False
 
         self._server = Server((self.ip, self.port), Handler, client=self)
-        self.add_url(url)
+        self.__add_url(url)
         self.start()
 
     def start(self):
@@ -101,7 +118,7 @@ class Client(object):
                 files.append({"name": n, "url": u, "size": s})
         return files
 
-    def add_url(self, url):
+    def __add_url(self, url):
 
         logger.info(url)
 
@@ -193,13 +210,13 @@ class Client(object):
     def mega_api_req(self, req, get=""):
         seqno = random.randint(0, 0xFFFFFFFF)
         url = 'https://g.api.mega.co.nz/cs?id=%d%s' % (seqno, get)
-        return json.loads(self.post(url, json.dumps([req])))[0]
+        return json.loads(self.__post(url, json.dumps([req])))[0]
 
     def mc_api_req(self, api_url, req):
-        res = self.post(api_url, json.dumps(req))
+        res = self.__post(api_url, json.dumps(req))
         return json.loads(res)
 
-    def post(self, url, data):
+    def __post(self, url, data):
         import ssl
         from functools import wraps
 

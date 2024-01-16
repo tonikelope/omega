@@ -1,5 +1,22 @@
 # -*- coding: utf-8 -*-
-#Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
+
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+                                 
+Basado en la librería de MEGA que programó divadr y modificado por tonikelope para dar soporte MULTI-THREAD + MEGACRYPTER
+
+"""
 
 import urllib.request, urllib.error, urllib.parse
 import threading
@@ -41,7 +58,7 @@ class File(object):
         return c
 
 
-    def checkMegaDownloadUrl(self, url):
+    def __checkMegaDownloadUrl(self, url):
 
         print(("Checking MEGA DL URL %s" % url))
 
@@ -94,14 +111,14 @@ class File(object):
 
             url = self.url
         
-            while not url or not self.checkMegaDownloadUrl(url):
-                url=self.get_new_url_from_api()
+            while not url or not self.__checkMegaDownloadUrl(url):
+                url=self.__get_new_url_from_api()
 
             self.url = url
 
             return url
 
-    def get_new_url_from_api(self):
+    def __get_new_url_from_api(self):
         if self.folder_id:
             file = self._client.api_req({"a": "g", "g": 1, "n": self.file_id}, "&n=" + self.folder_id)
             return file["g"]
