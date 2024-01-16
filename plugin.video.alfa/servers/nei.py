@@ -719,7 +719,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     logger.info('DEBRID USANDO CACHE -> '+fid_hash)
                     
                     if progress_bar:
-                        pbar.update(100, 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
+                        pbar.update(100, 'USANDO CACHÉ...')
 
                 except:
                     urls = None
@@ -769,7 +769,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     logger.info('DEBRID USANDO CACHE -> '+fid_hash)
 
                     if progress_bar:
-                        pbar.update(100, 'Cocinando enlace ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
+                        pbar.update(100, 'USANDO CACHÉ...')
 
                 except:
                     urls = None
@@ -914,7 +914,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                 pbar_counter+=min(pbar_increment, 100-pbar_counter)
                 
                 if use_cache:
-                    pbar.update(pbar_counter, 'Cocinando enlace troceado MULTI('+str(len(page_urls)-1)+') ['+getDebridServiceString()+'] (USANDO CACHÉ) (paciencia)...')
+                    pbar.update(pbar_counter, 'USANDO CACHÉ...')
                 else:
                     pbar.update(pbar_counter)
 
