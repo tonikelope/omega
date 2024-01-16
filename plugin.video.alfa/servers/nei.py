@@ -154,22 +154,17 @@ class DebridProxyChunkWriter():
         self.next_offset_required = start_offset
         self.chunk_offset_lock = threading.Lock()
         self.chunk_queue_lock = threading.Lock()
-        self.url = DEBRID_PROXY_FILE_URL.url
 
 
-    def check_exit(self):
-        return (self.url != DEBRID_PROXY_FILE_URL.url)
-
-    
     def run(self):
 
         logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] HELLO')
 
         try:
 
-            while not self.check_exit() and not self.exit and self.bytes_written < self.end_offset:
+            while not self.exit and self.bytes_written < self.end_offset:
                 
-                while not self.check_exit() and not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
+                while not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
 
                     with self.chunk_queue_lock:
 
@@ -183,7 +178,7 @@ class DebridProxyChunkWriter():
 
                     self.bytes_written+=len(current_chunk)
                     
-                if not self.check_exit() and not self.exit and self.bytes_written < self.end_offset:
+                if not self.exit and self.bytes_written < self.end_offset:
                     
                     with self.cv_new_element:
                         self.cv_new_element.wait(1)
