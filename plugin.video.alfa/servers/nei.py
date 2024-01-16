@@ -1,8 +1,20 @@
 # -*- coding: utf-8 -*-
 
-# Versión modificada del conector de MEGA para noestasinvitado.com
-# Soporte para usar MegaCrypter con RealDebrid / Alldebrid
-# Soporte para streaming de vídeo de ficheros grandes troceados con MegaBasterd
+"""
+
+Conector de vídeo para noestasinvitado.com
+
+Incluye un servidor proxy DEBRID de vídeo local que permite:
+    1) Aumentar velocidad de descarga de Real/Alldebrid al utilizar conexiones paralelas de descarga.
+    2) Permite usar enlaces MegaCrypter con Real/Alldebrid.
+    3) Soporte para manejar vídeos troceados de forma transparente para el reproductor de KODI.
+
+Enlaces de vídeo que maneja este conector:
+
+    1) Enlaces de MegaCrypter/MEGA (SIN trocear) con Real/Alldebrid desactivado -> se reproducen con la librería de MEGA (parcheada por OMEGA para soportar descarga multi-hilo)
+    2) Enlaces de MegaCrypter/MEGA (troceados o no) con Real/Alldebrid activado -> se reproducen con este proxy.
+
+"""
 
 from core import httptools, scrapertools
 from platformcode import config, logger, platformtools
@@ -40,8 +52,8 @@ MAX_PBAR_CLOSE_WAIT = 3
 MEGACRYPTER2DEBRID_ENDPOINT = 'https://noestasinvitado.com/megacrypter2debrid.php'
 MEGACRYPTER2DEBRID_TIMEOUT = 300 #Cuando aumente la demanda habrá que implementar en el server de NEI un sistema de polling asíncrono
 MEGACRYPTER2DEBRID_MULTI_RETRY = 5
-DEBRID_PROXY_FILE_URL = None
-DEBRID_PROXY_URL_LOCK = threading.Lock()
+VIDEO_MULTI_DEBRID_URL = None
+VIDEO_MULTI_DEBRID_URL_LOCK = threading.Lock()
 
 CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 WORKERS = int(config.get_setting("omega_debrid_proxy_workers", "omega"))+1
@@ -58,13 +70,18 @@ except:
     DEBRID_AUX_MEGA_ACCOUNTS = []
 
 
+"""
+Esta clase convierte una URL de Real/Alldebrid normal en una múltiple para manejar ficheros de vídeo troceados sin compresión zip, rar, etc (al estilo MegaBasterd o el comando de Unix split)
+Recibe una URL normal y carga un fichero de texto con las URLS de las diferentes partes del vídeo
+"""
 class multiPartVideoURL():
     def __init__(self, url):
         self.url = url
-        self.multi_urls = self.updateMulti() #multi_urls es una lista de tuplas [(absolute_start_offset, absolute_end_offset, url1), (absolute_start_offset, absolute_end_offset, url2)...]
-        self.updateSizeAndRanges()
+        self.multi_urls = self.__loadMultiURLFile()
+        self.__updateSizeAndRanges()
         
-    def updateMulti(self):
+    #Devuelve una lista de tuplas [(absolute_start_offset, absolute_end_offset, url1), (absolute_start_offset, absolute_end_offset, url2)...] si el vídeo está troceado
+    def __loadMultiURLFile(self):
         hash_url = hashlib.sha256(self.url.encode('utf-8')).hexdigest()
 
         filename_hash = KODI_TEMP_PATH + 'kodi_nei_multi_' + hash_url
@@ -79,7 +96,8 @@ class multiPartVideoURL():
 
         return None
 
-    def updateSizeAndRanges(self):
+    #Carga el tamaño del vídeo y si el servidor acepta consultas parciales por rangos 
+    def __updateSizeAndRanges(self):
 
         if self.multi_urls:
 
@@ -87,19 +105,19 @@ class multiPartVideoURL():
             self.size = 0
 
             for url in self.multi_urls:
-                data = self.getUrlSizeAndRanges(url[2])
+                data = self.__getUrlSizeAndRanges(url[2])
                 self.size+=data[0]
 
                 if self.accept_ranges:
                     self.accept_ranges = data[1]
 
         else:
-            self.size, self.accept_ranges = self.getUrlSizeAndRanges(self.url)
+            self.size, self.accept_ranges = self.__getUrlSizeAndRanges(self.url)
 
         if not self.accept_ranges:
             xbmcgui.Dialog().notification('OMEGA', "ESTE VÍDEO NO PERMITE AVANZAR/RETROCEDER", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
 
-    def getUrlSizeAndRanges(self, url):
+    def __getUrlSizeAndRanges(self, url):
         request = urllib.request.Request(url, method='HEAD')
         response = urllib.request.urlopen(request)
 
@@ -108,7 +126,9 @@ class multiPartVideoURL():
         else:
             return (-1, False)
 
-    def getPartialRanges(self, start_offset, end_offset):
+    
+    #Este método traduce una petición de un rango de bytes absoluto en una lista de tuplas con rangos parciales de las diferentes URLS involucradas (en caso de que el vídeo esté troceado)
+    def absolute2PartialRanges(self, start_offset, end_offset):
         if self.multi_urls == None:
             return [(start_offset, end_offset, self.url)]
         else:
@@ -140,7 +160,9 @@ class multiPartVideoURL():
             return rangos_parciales
 
 
-class DebridProxyChunkWriter():
+#Esta clase se encarga de mandarle al reproductor de vídeo de KODI el rango de bytes que ha solicitado
+#Los lee de una cola de chunks que van llenando varios workers de la clase NeiDebridVideoProxyChunkDownloader
+class NeiDebridVideoProxyChunkWriter():
 
     def __init__(self, wfile, start_offset, end_offset):
         self.start_offset = start_offset
@@ -195,6 +217,7 @@ class DebridProxyChunkWriter():
         logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] BYE')
 
 
+    #Método público que utilizan los workers de descargar para saber cuál es el siguiente chunk que hay que descargar
     def nextOffset(self):
         
         with self.chunk_offset_lock:
@@ -206,11 +229,12 @@ class DebridProxyChunkWriter():
         return next_offset
 
 
-class DebridProxyChunkDownloader():
+#Clase de los workers de descarga.
+class NeiDebridVideoProxyChunkDownloader():
     
     def __init__(self, id, chunk_writer):
         self.id = id
-        self.url = DEBRID_PROXY_FILE_URL
+        self.url = VIDEO_MULTI_DEBRID_URL
         self.exit = False
         self.chunk_writer = chunk_writer
 
@@ -228,7 +252,7 @@ class DebridProxyChunkDownloader():
 
                 final = min(inicio + CHUNK_SIZE - 1, self.chunk_writer.end_offset)
 
-                partial_ranges = self.url.getPartialRanges(inicio, final)
+                partial_ranges = self.url.absolute2PartialRanges(inicio, final) #Si el vídeo está troceado, es posible que el chunk tenga bytes de diferentes URLs
 
                 while not self.chunk_writer.exit and not self.exit and len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE and offset!=self.chunk_writer.bytes_written:
                     with self.chunk_writer.cv_queue_full:
@@ -301,7 +325,12 @@ class DebridProxyChunkDownloader():
 
         logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' BYE')
 
-class DebridProxy(BaseHTTPRequestHandler):
+
+"""
+Esta clase crea un servidor PROXY HTTP para manejar las peticiones del reproductor de vídeo de KODI y simular que los vídeos troceados no lo son.
+Además mejora la velocidad de descarga de Real/Alldebrid al utilizar múltiples workers.
+"""
+class NeiDebridVideoProxy(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
 
@@ -313,16 +342,16 @@ class DebridProxy(BaseHTTPRequestHandler):
 
         else:
 
-            self.updateURL()
+            self.__updateURL()
 
-            if DEBRID_PROXY_FILE_URL.size < 0:
+            if VIDEO_MULTI_DEBRID_URL.size < 0:
                 
                 self.send_response(503)
                 self.end_headers()
 
             else:
 
-                self.sendResponseHeaders()
+                self.__sendResponseHeaders()
 
     
     def do_GET(self):
@@ -335,24 +364,24 @@ class DebridProxy(BaseHTTPRequestHandler):
 
         else:
 
-            self.updateURL()
+            self.__updateURL()
 
-            if DEBRID_PROXY_FILE_URL.size < 0:
+            if VIDEO_MULTI_DEBRID_URL.size < 0:
                 
                 self.send_response(503)
                 self.end_headers()
 
             else:
 
-                range_request = self.sendResponseHeaders()
+                range_request = self.__sendResponseHeaders()
                 
                 if range_request:
-                    chunk_writer = DebridProxyChunkWriter(self.wfile, int(range_request[0]), int(range_request[1]) if range_request[1] else int(DEBRID_PROXY_FILE_URL.size -1))
+                    chunk_writer = NeiDebridVideoProxyChunkWriter(self.wfile, int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
 
                     chunk_downloaders=[]
 
                     for c in range(0,WORKERS):
-                        chunk_downloader = DebridProxyChunkDownloader(c+1, chunk_writer)
+                        chunk_downloader = NeiDebridVideoProxyChunkDownloader(c+1, chunk_writer)
                         chunk_downloaders.append(chunk_downloader)
                         t = threading.Thread(target=chunk_downloader.run)
                         t.daemon = True
@@ -366,49 +395,49 @@ class DebridProxy(BaseHTTPRequestHandler):
                         downloader.exit = True
                 else:
 
-                    if DEBRID_PROXY_FILE_URL.multi_urls:
-                        for murl in DEBRID_PROXY_FILE_URL.multi_urls:
+                    if VIDEO_MULTI_DEBRID_URL.multi_urls:
+                        for murl in VIDEO_MULTI_DEBRID_URL.multi_urls:
                             request = urllib.request.Request(murl[2])
                             with urllib.request.urlopen(request) as response:
                                 shutil.copyfileobj(response, self.wfile)
                     else:
-                        request = urllib.request.Request(DEBRID_PROXY_FILE_URL.url)
+                        request = urllib.request.Request(VIDEO_MULTI_DEBRID_URL.url)
                         with urllib.request.urlopen(request) as response:
                             shutil.copyfileobj(response, self.wfile)
 
     
-    def updateURL(self):
-        global DEBRID_PROXY_FILE_URL
+    def __updateURL(self):
+        global VIDEO_MULTI_DEBRID_URL
 
         url = proxy2DebridURL(self.path)
 
         logger.debug(url)
 
-        with DEBRID_PROXY_URL_LOCK:
+        with VIDEO_MULTI_DEBRID_URL_LOCK:
         
-            if not DEBRID_PROXY_FILE_URL or DEBRID_PROXY_FILE_URL.url != url:
+            if not VIDEO_MULTI_DEBRID_URL or VIDEO_MULTI_DEBRID_URL.url != url:
             
-                DEBRID_PROXY_FILE_URL = multiPartVideoURL(url)
+                VIDEO_MULTI_DEBRID_URL = multiPartVideoURL(url)
 
 
-    def sendResponseHeaders(self):
-        range_request = self.parseRequestRanges()
+    def __sendResponseHeaders(self):
+        range_request = self.__parseRequestRanges()
 
-        if not range_request or not DEBRID_PROXY_FILE_URL.accept_ranges:
-            self.sendCompleteResponseHeaders()
+        if not range_request or not VIDEO_MULTI_DEBRID_URL.accept_ranges:
+            self.__sendCompleteResponseHeaders()
             return False
         else:
 
             inicio = int(range_request[0])
 
-            final = int(range_request[1]) if range_request[1] else (int(DEBRID_PROXY_FILE_URL.size) - 1)
+            final = int(range_request[1]) if range_request[1] else (int(VIDEO_MULTI_DEBRID_URL.size) - 1)
 
-            self.sendPartialResponseHeaders(inicio, final)
+            self.__sendPartialResponseHeaders(inicio, final)
 
             return range_request
 
     
-    def parseRequestRanges(self):
+    def __parseRequestRanges(self):
 
         if 'Range' in self.headers:
 
@@ -421,9 +450,9 @@ class DebridProxy(BaseHTTPRequestHandler):
             return None
 
     
-    def sendPartialResponseHeaders(self, inicio, final):
+    def __sendPartialResponseHeaders(self, inicio, final):
 
-        headers = {'Accept-Ranges':'bytes', 'Content-Length': str(int(final)-int(inicio)+1), 'Content-Range': 'bytes '+str(inicio)+'-'+str(final)+'/'+str(DEBRID_PROXY_FILE_URL.size), 'Content-Disposition':'attachment', 'Content-Type':'application/octet-stream', 'Connection':'close'}
+        headers = {'Accept-Ranges':'bytes', 'Content-Length': str(int(final)-int(inicio)+1), 'Content-Range': 'bytes '+str(inicio)+'-'+str(final)+'/'+str(VIDEO_MULTI_DEBRID_URL.size), 'Content-Disposition':'attachment', 'Content-Type':'application/octet-stream', 'Connection':'close'}
 
         self.send_response(206)
 
@@ -436,8 +465,8 @@ class DebridProxy(BaseHTTPRequestHandler):
         self.end_headers()
 
     
-    def sendCompleteResponseHeaders(self):
-        headers = {'Accept-Ranges':'bytes' if DEBRID_PROXY_FILE_URL.accept_ranges else 'none', 'Content-Length': str(DEBRID_PROXY_FILE_URL.size), 'Content-Disposition':'attachment', 'Content-Type':'application/octet-stream', 'Connection':'close'}
+    def __sendCompleteResponseHeaders(self):
+        headers = {'Accept-Ranges':'bytes' if VIDEO_MULTI_DEBRID_URL.accept_ranges else 'none', 'Content-Length': str(VIDEO_MULTI_DEBRID_URL.size), 'Content-Disposition':'attachment', 'Content-Type':'application/octet-stream', 'Connection':'close'}
 
         self.send_response(200)
 
@@ -454,28 +483,14 @@ class DebridProxy(BaseHTTPRequestHandler):
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
+
 try:
-    proxy_server = ThreadingSimpleServer((DEBRID_PROXY_HOST, DEBRID_PROXY_PORT), DebridProxy)
+    proxy_server = ThreadingSimpleServer((DEBRID_PROXY_HOST, DEBRID_PROXY_PORT), NeiDebridVideoProxy)
 except:
-    proxy_server = None
+    proxy_server = None 
 
 
-def thread_close_pbar(pbar):
-    pbar.close()
-
-    wait=0
-
-    while not pbar.isFinished() and wait<MAX_PBAR_CLOSE_WAIT:
-        time.sleep(1)
-        wait+=1
-
-
-def close_background_pbar(pbar):
-    t = threading.Thread(target=thread_close_pbar, args=(pbar,))
-    t.setDaemon(True)
-    t.start()
-
-
+#Este método convierte un enlace de MegaCrypter en un enlace temporal auxiliar de MEGA. Devuelve el enlace de MEGA (compatible con Real/Alldebrid) y un hash del FID del fichero original de MEGA
 def megacrypter2debrid(link, clean=True, account=1):
 
     global DEBRID_ACCOUNT_FREE_SPACE
@@ -524,6 +539,7 @@ def megacrypter2debrid(link, clean=True, account=1):
         return None
 
 
+#Este método es como el anterior pero devuelve sólo el hash del FID del fichero de MEGA original (útil para realizar cacheos)
 def megacrypter2debridHASH(link):
     megacrypter_link = link.split('#')
 
@@ -551,6 +567,7 @@ def megacrypter2debridHASH(link):
         return None
 
 
+#Este método redirige la reproducción o bien a la libería de MEGA o al proxy de este fichero
 def test_video_exists(page_url):
     
     if OMEGA_REALDEBRID or OMEGA_ALLDEBRID:
@@ -570,6 +587,7 @@ def test_video_exists(page_url):
     return True, ""
 
 
+#Para comprobar si las urls de Real/Alldebrid cacheadas aún funcionan
 def check_debrid_urls(itemlist):
 
     try:
@@ -594,7 +612,7 @@ def check_debrid_urls(itemlist):
     return False
 
 
-
+#Comprueba la cache de URLS de Real/Alldebrid
 def pageURL2DEBRIDCheckCache(page_url):
 
     if 'megacrypter.noestasinvitado' in page_url:
@@ -647,6 +665,7 @@ def getDebridServiceString():
         return None
 
 
+#Este método convierte un enlace de MEGA/MegaCrypter en uno de Real/Alldebrid ("proxyficado" para el reproductor de KODI)
 def pageURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1):
 
     global DEBRID_ACCOUNT_FREE_SPACE
@@ -748,6 +767,11 @@ def pageURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=
     return urls
 
 
+"""
+Este método principalmente se encarga de convertir un enlace MegaCrypter troceado en un enlace MULTI-URL 
+(genera el fichero con las múltiples urls de Real/Alldebrid que luego usará el proxy de vídeo para traducir 
+las peticiones del reproductor de vídeo de KODI)
+"""
 def get_video_url(page_url, premium=False, user="", password="", video_password=""):
 
     global DEBRID_ACCOUNT_FREE_SPACE
@@ -758,13 +782,14 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
     pbar.create('OMEGA', 'Cargando conector NEI...')
 
+    #El proxy se carga una vez con el primer vídeo y se queda cargado mientras KODI esté corriendo
     if proxy_server:
         start_proxy()
 
     close_background_pbar(pbar)
 
     if page_url[0]=='*':
-        #ENLACE MULTI-BASTERD (vídeo troceado con MegaBasterd) 
+        #ENLACE MULTI-URL (vídeo troceado)
 
         logger.info(page_url)
 
@@ -879,14 +904,14 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                 with open(filename_hash, "wb") as file:
                     pickle.dump(multi_urls_ranges, file)
 
-                return [[first_multi_url_title.replace('VIDEO', 'VIDEO MULTI-BASTERD'), debrid2proxyURL(first_multi_url)]]
+                return [[first_multi_url_title.replace('VIDEO', 'VIDEO TROCEADO'), debrid2proxyURL(first_multi_url)]]
             else:
                 xbmcgui.Dialog().notification('OMEGA', "ERROR: FALLO AL GENERAR ENLACES DEBRID", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
                 return [["NEI DEBRID ERROR (revisa que haya espacio suficiente en tu cuenta de MEGA auxiliar)", ""]]
 
         else:
-            #PENDIENTE DE IMPLEMENTAR ENLACES MULTI-BASTERD CONECTANDO A MEGA DIRECTAMENTE (SIN DEBRID)
-            xbmcgui.Dialog().notification('OMEGA', "ERROR: ENLACES MULTI-BASTERD NO SOPORTADOS (DE MOMENTO)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            #PENDIENTE DE IMPLEMENTAR ENLACES DE VÍDEO TROCEADOS CONECTANDO A MEGA DIRECTAMENTE (SIN DEBRID)
+            xbmcgui.Dialog().notification('OMEGA', "ERROR: VÍDEOS TROCEADOS NO SOPORTADOS (DE MOMENTO)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
             return [["NO SOPORTADO", ""]]
 
     else:
@@ -905,6 +930,22 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             video_urls.append([scrapertools.get_filename_from_url(media_url)[-4:] + " [mega]", media_url])
 
         return video_urls
+
+
+def thread_close_pbar(pbar):
+    pbar.close()
+
+    wait=0
+
+    while not pbar.isFinished() and wait<MAX_PBAR_CLOSE_WAIT:
+        time.sleep(1)
+        wait+=1
+
+
+def close_background_pbar(pbar):
+    t = threading.Thread(target=thread_close_pbar, args=(pbar,))
+    t.setDaemon(True)
+    t.start()
 
 
 def debrid2proxyURL(url):
