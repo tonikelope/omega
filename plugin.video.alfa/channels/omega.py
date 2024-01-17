@@ -17,8 +17,10 @@
                                  
 CANAL de ALFA (KODI) PARA NOESTASINVITADO.COM
 
-Incluye librería de MEGA modificada para soportar enlaces MegaCrypter 
-y descarga multi-hilo
+Incluye: 
+
+	1) Librería de MEGA modificada para soportar enlaces MegaCrypter y descarga multi-hilo.
+	2) Conector de MEGA modificado con soporte MegaCrypter -> Real/Alldebrid y streaming de vídeos troceados.
 
 """
 
@@ -67,9 +69,9 @@ from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
 
-CHECK_STUFF_INTEGRITY = True #Sobreescribimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
+CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.37"
+OMEGA_VERSION = "5.38"
 
 config.set_setting("unify", "false")
 
@@ -2188,7 +2190,7 @@ def clean_vigilante_items(item):
             Item(
                 channel=item.channel,
                 contentSerieName=i.contentSerieName,
-                title="[B]" + i.contentSerieName + "[/B]",
+                title="[B]" + i.contentSerieName + "[/B] ("+i.uploader+")",
                 vigilante_k=k,
                 contentPlot="(CLICK PARA SACAR SERIE DEL VIGILANTE DE SERIES)",
                 action="remove_vigilante_item",
