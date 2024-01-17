@@ -71,7 +71,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.42"
+OMEGA_VERSION = "5.43"
 
 config.set_setting("unify", "false")
 
@@ -3423,11 +3423,24 @@ def findCustomTitle(scrapedtitle):
     return None
 
 
+def findLastItem(item):
+    for item_url in LAST_ITEMS:
+        i = Item().fromurl(item_url)
+
+        if item_url == item.tourl() or i.url == item.url:
+            return item_url
+
+    return None
+
+
 def updateLastItems(item):
-    if item.tourl() not in LAST_ITEMS:
+
+    item_url = findLastItem(item)
+
+    if item_url:
+        LAST_ITEMS.remove(item_url)
         LAST_ITEMS.appendleft(item.tourl())
     else:
-        LAST_ITEMS.remove(item.tourl())
         LAST_ITEMS.appendleft(item.tourl())
 
     with open(KODI_NEI_LAST_ITEMS_PATH, "w+") as file:
