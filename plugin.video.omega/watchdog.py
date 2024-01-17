@@ -75,17 +75,18 @@ elif CHECK_OMEGA_ALFA_STUFF_INTEGRITY is False:
 
 
 # MONITORS SOME OMEGA FILE IS DELETED AND RE-DOWNLOAD IT
-monitor = xbmc.Monitor()
+if CHECK_OMEGA_ALFA_STUFF_INTEGRITY:
+    monitor = xbmc.Monitor()
 
-while not monitor.abortRequested():
-    updated = False
+    while not monitor.abortRequested():
+        updated = False
 
-    for f in PROTECTED_OMEGA_FILES:
-        if not os.path.exists(ALFA_PATH + f):
-            urlretrieve(ALFA_URL + f, ALFA_PATH + f)
-            updated = True
+        for f in PROTECTED_OMEGA_FILES:
+            if not os.path.exists(ALFA_PATH + f):
+                urlretrieve(ALFA_URL + f, ALFA_PATH + f)
+                updated = True
 
-    if updated:
-        xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA reparado!',os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+        if updated:
+            xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA reparado!',os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
 
-    monitor.waitForAbort(MONITOR_TIME)
+        monitor.waitForAbort(MONITOR_TIME)

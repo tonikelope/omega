@@ -35,7 +35,7 @@ ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video
 
 ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
-FILES = ['channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json', 'resources/media/channels/banner/omega.png', 'resources/media/channels/thumb/omega.gif', 'resources/media/channels/thumb/omega.png']
+PROTECTED_OMEGA_FILES = ['channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json', 'resources/media/channels/banner/omega.png', 'resources/media/channels/thumb/omega.gif', 'resources/media/channels/thumb/omega.png']
 
 def ajustesAvanzados():
     if os.path.exists(xbmcvfs.translatePath('special://userdata/advancedsettings.xml')):
@@ -102,7 +102,7 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
     with open(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed'), 'w+') as f:
         pass
 
-    for f in FILES:
+    for f in PROTECTED_OMEGA_FILES:
         if not os.path.exists(ALFA_PATH + f):
             try:
                 urllib.request.urlretrieve(ALFA_URL + f, ALFA_PATH + f)
@@ -113,9 +113,9 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
     
     favoritos()
     
-    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), 'ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?')
+    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?")
 
     if ret:
         xbmc.executebuiltin('RestartApp')
 else:
-    xbmcgui.Dialog().ok('OMEGA', 'PARA ENTRAR EN OMEGA UTILIZA EL ICONO DE FAVORITOS (el de la estrella) O BIEN BUSCA OMEGA EN LA LISTA DE CANALES DE ALFA')
+    xbmcgui.Dialog().ok('OMEGA', 'PARA ENTRAR EN OMEGA UTILIZA EL [B]ICONO DE FAVORITOS (el de la estrella)[/B] O BIEN BUSCA OMEGA EN LA LISTA DE CANALES DE ALFA')
