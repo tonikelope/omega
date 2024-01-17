@@ -71,7 +71,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.38"
+OMEGA_VERSION = "5.39"
 
 config.set_setting("unify", "false")
 
@@ -511,7 +511,7 @@ def kodi_advancedsettings(verbose=True):
 
             ret = xbmcgui.Dialog().yesno(
                 dialog_title(),
-                "ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?",
+                "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?",
             )
 
             if ret:
@@ -1062,7 +1062,7 @@ def force_login(item):
 def about_omega(item):
     xbmcgui.Dialog().ok(
         dialog_title(),
-        "Con cariño y sin garantía ;) para mis amiguetes de NEI.\n\n(Gracias a la gente de ALFA y de KODI por su gran trabajo y por supuesto, a MEGA).\n\n[B]CARPE DIEM[/B]",
+        "Con cariño y sin garantía ;) para mis amiguetes de [B][I]NEI[/I][/B].\n\n(Gracias a la gente de ALFA y de KODI por su magnífico trabajo y por supuesto, a MEGA).\n\n[I]© tonikelope Solutions S.L.[/I]\n\n[B][I]Sed fugit interea, fugit irreparabile tempus.[/I][/B]",
     )
 
 
@@ -1071,7 +1071,7 @@ def saltar_pagina(item):
 
     d = dialog.numeric(
         0,
-        "¿A QUÉ PÁGINA DE [" + "+".join(item.generos) + "] QUIERES SALTAR?",
+        "[B]¿A QUÉ [COLOR yellow]PÁGINA[/COLOR] DE [" + "+".join(item.generos) + "] QUIERES [COLOR yellow]SALTAR[/COLOR]?[/B]",
         str(item.page),
     )
 
@@ -1604,7 +1604,7 @@ def update_favourites(item):
 
             ret = xbmcgui.Dialog().yesno(
                 dialog_title(),
-                "ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?",
+                "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?",
             )
 
             if ret:
@@ -1655,7 +1655,7 @@ def thumbnail_refresh(item):
 
             ret = xbmcgui.Dialog().yesno(
                 dialog_title(),
-                "ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?",
+                "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?",
             )
 
             if ret:
@@ -1998,7 +1998,7 @@ def restore_omega_userdata(item):
 
             ret = xbmcgui.Dialog().yesno(
                 dialog_title(),
-                "ES NECESARIO REINICIAR KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres reiniciar KODI ahora mismo?",
+                "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?",
             )
 
             if ret:
