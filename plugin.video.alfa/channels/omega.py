@@ -71,7 +71,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.39"
+OMEGA_VERSION = "5.40"
 
 config.set_setting("unify", "false")
 
@@ -1463,46 +1463,46 @@ def buscar_por_genero(item):
                         )
                     )
 
-            itemlist.append(
-                Item(
-                    channel=item.channel,
-                    title="SIGUIENTE PÁGINA",
-                    thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png",
-                    fanart=item.fanart,
-                    action="buscar_por_genero",
-                    viewcontent="movies",
-                    viewmode="poster",
-                    generos=item.generos,
-                    generosb64=item.generosb64,
-                    page=(item.page + 1),
-                )
+        itemlist.append(
+            Item(
+                channel=item.channel,
+                title="SIGUIENTE PÁGINA",
+                thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png",
+                fanart=item.fanart,
+                action="buscar_por_genero",
+                viewcontent="movies",
+                viewmode="poster",
+                generos=item.generos,
+                generosb64=item.generosb64,
+                page=(item.page + 1),
             )
+        )
 
-            tmdb.set_infoLabels_itemlist(itemlist, True)
+        tmdb.set_infoLabels_itemlist(itemlist, True)
 
-            for i in itemlist:
-                if i.infoLabels and "rating" in i.infoLabels:
+        for i in itemlist:
+            if i.infoLabels and "rating" in i.infoLabels:
 
-                    if i.infoLabels["rating"] >= 7.0:
-                        rating_text = (
-                            "[B][COLOR lightgreen]["
-                            + str(round(i.infoLabels["rating"], 1))
-                            + "][/COLOR][/B]"
-                        )
-                    elif i.infoLabels["rating"] < 5.0:
-                        rating_text = (
-                            "[B][COLOR red]["
-                            + str(round(i.infoLabels["rating"], 1))
-                            + "][/COLOR][/B]"
-                        )
-                    else:
-                        rating_text = (
-                            "[B][" + str(round(i.infoLabels["rating"], 1)) + "][/B]"
-                        )
-
-                    i.title = i.title.replace("##*NOTA*##", rating_text)
+                if i.infoLabels["rating"] >= 7.0:
+                    rating_text = (
+                        "[B][COLOR lightgreen]["
+                        + str(round(i.infoLabels["rating"], 1))
+                        + "][/COLOR][/B]"
+                    )
+                elif i.infoLabels["rating"] < 5.0:
+                    rating_text = (
+                        "[B][COLOR red]["
+                        + str(round(i.infoLabels["rating"], 1))
+                        + "][/COLOR][/B]"
+                    )
                 else:
-                    i.title = i.title.replace("##*NOTA*##", "")
+                    rating_text = (
+                        "[B][" + str(round(i.infoLabels["rating"], 1)) + "][/B]"
+                    )
+
+                i.title = i.title.replace("##*NOTA*##", rating_text)
+            else:
+                i.title = i.title.replace("##*NOTA*##", "")
 
         return itemlist
 
