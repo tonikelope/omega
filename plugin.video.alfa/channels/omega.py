@@ -71,7 +71,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.41"
+OMEGA_VERSION = "5.42"
 
 config.set_setting("unify", "false")
 
