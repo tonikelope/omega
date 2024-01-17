@@ -71,7 +71,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.40"
+OMEGA_VERSION = "5.41"
 
 config.set_setting("unify", "false")
 
@@ -2194,6 +2194,7 @@ def clean_vigilante_items(item):
                 vigilante_k=k,
                 contentPlot="(CLICK PARA SACAR SERIE DEL VIGILANTE DE SERIES)",
                 action="remove_vigilante_item",
+                uploader=i.uploader
             )
         )
 
@@ -2207,7 +2208,7 @@ def remove_vigilante_item(item):
         dialog_title(),
         "¿Estás seguro de que quieres [B]ELIMINAR[/B] [COLOR yellow][B]"
         + item.contentSerieName
-        + "[/B][/COLOR] del [B]VIGILANTE DE EPISODIOS[/B]?",
+        + "[/B][/COLOR] ("+item.uploader+") del [B]VIGILANTE DE EPISODIOS[/B]?",
     ):
 
         try:
