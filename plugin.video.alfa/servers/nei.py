@@ -23,8 +23,8 @@
 Conector de vídeo para noestasinvitado.com (OMEGA)
 
 Incluye un servidor proxy http local que permite:
-    1) Aumentar velocidad de descarga de Real/Alldebrid al utilizar conexiones paralelas.
-    2) Permite usar enlaces MegaCrypter con Real/Alldebrid.
+    1) Aumentar velocidad de descarga de Real/Alldebrid al utilizar conexiones paralelas (configurable).
+    2) Usar enlaces MegaCrypter con Real/Alldebrid.
     3) Reproducir por streaming vídeos troceados de forma transparente para el reproductor de KODI.
 
 Enlaces de vídeo que maneja este conector: 
@@ -622,18 +622,18 @@ def check_debrid_urls(itemlist):
             response = urllib.request.urlopen(request)
 
             if response.status != 200 or 'Content-Length' not in response.headers:
-                return True
+                return False
             elif 'Accept-Ranges' in response.headers and response.headers['Accept-Ranges']!='none':
                 size = int(response.headers['Content-Length'])
                 request2 = urllib.request.Request(url, headers={'Range': 'bytes='+str(size-1)+'-'+str(size-1)})
                 response2 = urllib.request.urlopen(request2)
 
                 if response2.status != 206:
-                    return True
+                    return False
     except:
-        return True
+        return False
 
-    return False
+    return True
 
 
 #Comprueba la cache de URLS convertidas MEGA/MegaCrypter -> Real/Alldebrid (devuelve True si el enlace no está cacheado)
@@ -652,11 +652,11 @@ def neiURL2DEBRIDCheckCache(page_url):
             with open(filename_hash, "rb") as file:
                 try:
                     urls = pickle.load(file)
-                    logger.info('DEBRID USANDO CACHE -> '+fid_hash)
+                    logger.info('DEBRID LEYENDO CACHE -> '+fid_hash)
                 except:
                     urls = None
 
-            return not urls or check_debrid_urls(urls)
+            return not urls or not check_debrid_urls(urls)
         else:
             return True
     else:
@@ -671,11 +671,11 @@ def neiURL2DEBRIDCheckCache(page_url):
             with open(filename_hash, "rb") as file:
                 try:
                     urls = pickle.load(file)
-                    logger.info('DEBRID USANDO CACHE -> '+fid_hash)
+                    logger.info('DEBRID LEYENDO CACHE -> '+fid_hash)
                 except:
                     urls = None
 
-            return not urls or check_debrid_urls(urls)
+            return not urls or not check_debrid_urls(urls)
         else:
             return True
 
@@ -715,16 +715,20 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
             with open(filename_hash, "rb") as file:
                 try:
                     urls = pickle.load(file)
-                    
-                    logger.info('DEBRID USANDO CACHE -> '+fid_hash)
-                    
-                    if progress_bar:
-                        pbar.update(100, 'USANDO CACHÉ...')
-
                 except:
                     urls = None
 
-            if urls==None or check_debrid_urls(urls):
+            if urls and progress_bar:
+                pbar.update(50, 'Verificando CACHÉ...')
+                
+            urls_ok=(urls and check_debrid_urls(urls))
+
+            if urls_ok:
+                logger.info('DEBRID USANDO CACHE -> '+fid_hash)
+                    
+                if progress_bar:
+                    pbar.update(100, 'USANDO CACHÉ...')
+            else:
                 os.remove(filename_hash)
 
         if not cache or not os.path.isfile(filename_hash):
@@ -765,16 +769,20 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
             with open(filename_hash, "rb") as file:
                 try:
                     urls = pickle.load(file)
-                    
-                    logger.info('DEBRID USANDO CACHE -> '+fid_hash)
-
-                    if progress_bar:
-                        pbar.update(100, 'USANDO CACHÉ...')
-
                 except:
                     urls = None
        
-            if urls==None or check_debrid_urls(urls):
+            if urls and progress_bar:
+                pbar.update(50, 'Verificando CACHÉ...')
+
+            urls_ok=(urls and check_debrid_urls(urls))
+
+            if urls_ok:
+                logger.info('DEBRID USANDO CACHE -> '+fid_hash)
+                    
+                if progress_bar:
+                    pbar.update(100, 'USANDO CACHÉ...')
+            else:
                 os.remove(filename_hash)
 
         if not cache or not os.path.isfile(filename_hash):
@@ -804,7 +812,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
 """
 Este método (común en todos los conectores de ALFA) se encarga de generar las URLS de vídeo para el reproductor de KODI.
 
-Los enlaces de MEGA/MegaCrypter sin trocear y sin Real/Alldebrid activado se dejan tal cual.
+Los enlaces de MEGA/MegaCrypter sin trocear y sin Real/Alldebrid activado se envían a la librería de MEGA (parcheada por OMEGA)
 
 Los enlaces de MEGA/Megacrypter (troceados o no) y con Real/Alldebrid activado se "proxifican" y si el vídeo
 está troceado se genera un fichero en disco con las URLS Real/Alldebrid de las diferentes partes que 
@@ -842,7 +850,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
             pbar = xbmcgui.DialogProgressBG()
 
-            pbar.create('OMEGA', 'Cocinando enlace troceado MULTI('+str(len(page_urls)-1)+') ['+getDebridServiceString()+'] (paciencia)...')
+            pbar.create('OMEGA', 'Cocinando enlace troceado M('+str(len(page_urls)-1)+') ['+getDebridServiceString()+'] (paciencia)...')
 
             pbar_increment = round(100/(len(page_urls)-1))
 
