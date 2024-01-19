@@ -718,16 +718,10 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                 except:
                     urls = None
 
-            if urls and progress_bar:
-                pbar.update(50, 'Verificando CACHÉ...')
-                
             urls_ok=(urls and check_debrid_urls(urls))
 
             if urls_ok:
                 logger.info('DEBRID USANDO CACHE -> '+fid_hash)
-                    
-                if progress_bar:
-                    pbar.update(100, 'Usando CACHÉ...')
             else:
                 os.remove(filename_hash)
 
@@ -772,16 +766,10 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                 except:
                     urls = None
        
-            if urls and progress_bar:
-                pbar.update(50, 'Verificando CACHÉ...')
-
             urls_ok=(urls and check_debrid_urls(urls))
 
             if urls_ok:
                 logger.info('DEBRID USANDO CACHE -> '+fid_hash)
-                    
-                if progress_bar:
-                    pbar.update(100, 'Usando CACHÉ...')
             else:
                 os.remove(filename_hash)
 
@@ -861,8 +849,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             i = 1
 
             #Primero comprobamos si existe en la cache MegaCrypter -> Real/Alldebrid una entrada para este vídeo concreto
-            pbar.update(pbar_counter, 'Verificando CACHÉ...')
-
             cache_error=False
 
             while i<len(page_urls) and not cache_error:
@@ -922,11 +908,8 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
                     multi_video_proxy_urls.append(debrid_url)
 
                 pbar_counter+=min(pbar_increment, 100-pbar_counter)
-                
-                if use_cache:
-                    pbar.update(pbar_counter, 'Usando CACHÉ...')
-                else:
-                    pbar.update(pbar_counter)
+
+                pbar.update(pbar_counter)
 
                 i+=1
 
