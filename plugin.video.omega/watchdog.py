@@ -25,7 +25,7 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
     xbmc.executebuiltin('RunAddon(plugin.video.omega)')
 
 def check_protected_file_integrity(remote_file_path, temp_sha1_path):
-    urlretrieve(remote_file_path+"/checksum.sha1", temp_sha1_path)
+    urlretrieve(ALFA_URL+remote_file_path+"/checksum.sha1", temp_sha1_path)
 
     sha1_checksums = {}
 
@@ -41,8 +41,8 @@ def check_protected_file_integrity(remote_file_path, temp_sha1_path):
     broken = False
 
     for filename, checksum in sha1_checksums.items():
-        if os.path.exists(remote_file_path + "/"+filename):
-            with open(remote_file_path + "/"+ filename, 'rb') as f:
+        if os.path.exists(ALFA_PATH + remote_file_path + "/" + filename):
+            with open(ALFA_PATH + remote_file_path + "/" + filename, 'rb') as f:
                 file_hash = hashlib.sha1(f.read()).hexdigest()
 
             if file_hash != checksum:
@@ -58,9 +58,9 @@ def check_protected_file_integrity(remote_file_path, temp_sha1_path):
 
 # CHECK OMEGA CHANNEL UPDATES
 
-alfa_patch_check = check_protected_file_integrity(ALFA_URL, KODI_TEMP_PATH +'alfa_patch.sha1')
+alfa_patch_check = check_protected_file_integrity('', KODI_TEMP_PATH +'alfa_patch.sha1')
 
-omega_check = check_protected_file_integrity(ALFA_URL + 'channels', KODI_TEMP_PATH +'omega_channel.sha1')
+omega_check = check_protected_file_integrity('/channels', KODI_TEMP_PATH +'omega_channel.sha1')
 
 if CHECK_OMEGA_ALFA_STUFF_INTEGRITY and (alfa_patch_check[0] or omega_check[0]):
     for f in PROTECTED_OMEGA_FILES:
