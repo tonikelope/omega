@@ -28,23 +28,6 @@ Incluye:
 import sys
 import xbmc
 import xbmcgui
-
-if "linux" in sys.platform:
-    try:
-        sys.path.insert(
-            1,
-            "/usr/lib/python"
-            + str(sys.version_info[0])
-            + "."
-            + str(sys.version_info[1])
-            + "/site-packages",
-        )
-    except Exception:
-        xbmcgui.Dialog().ok(
-            dialog_title(), "ERROR AL CORREGIR EL PATH DE PYTHON EN LINUX"
-        )
-        logger.info("channels.omega ERROR AL CORREGIR EL PATH DE PYTHON EN LINUX")
-
 import base64
 import hashlib
 import json
@@ -71,7 +54,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.44"
+OMEGA_VERSION = "5.45"
 
 config.set_setting("unify", "false")
 

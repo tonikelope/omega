@@ -23,10 +23,16 @@ import base64
 import struct
 import binascii
 import random
+
+import patch
+
+#HACK https://github.com/alfa-addon/addon/issues/1285#issuecomment-1850966175
+patch.unfix_path()
 try:
     from Cryptodome.Cipher import AES
 except:
     from Crypto.Cipher import AES
+patch.fix_path()
 
 from platformcode import logger
 
