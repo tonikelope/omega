@@ -29,7 +29,7 @@ import sys
 import xbmc
 import xbmcgui
 
-if "linux" in sys.platform and not xbmc.getCondVisibility("System.Platform.Android"):
+if "linux" in sys.platform:
     try:
         sys.path.insert(
             1,
@@ -71,7 +71,7 @@ from datetime import datetime
 
 CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.43"
+OMEGA_VERSION = "5.44"
 
 config.set_setting("unify", "false")
 
