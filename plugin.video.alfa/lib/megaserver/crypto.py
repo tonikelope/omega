@@ -24,9 +24,8 @@ import struct
 import binascii
 import random
 
-import patch
-
 #HACK https://github.com/alfa-addon/addon/issues/1285#issuecomment-1850966175
+import patch
 patch.unfix_path()
 try:
     from Cryptodome.Cipher import AES

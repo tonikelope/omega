@@ -1,4 +1,24 @@
 # -*- coding: utf-8 -*-
+
+"""
+  ___  __  __ _____ ____    _    
+ / _ \|  \/  | ____/ ___|  / \   
+| | | | |\/| |  _|| |  _  / _ \  
+| |_| | |  | | |__| |_| |/ ___ \ 
+ \___/|_|  |_|_____\____/_/   \_\
+
+ _              _ _        _                  
+| |_ ___  _ __ (_) | _____| | ___  _ __   ___ 
+| __/ _ \| '_ \| | |/ / _ \ |/ _ \| '_ \ / _ \
+| || (_) | | | | |   <  __/ | (_) | |_) |  __/
+ \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
+                                  |_|         
+   
+Servicio de KODI para verificar en el arranque la integridad de diferentes ficheros de OMEGA
+y corregirlos si han sido borrados o modificados.
+
+"""
+
 import hashlib
 import os
 import re
@@ -11,7 +31,7 @@ import xbmcvfs
 
 CHECK_OMEGA_ALFA_STUFF_INTEGRITY = True
 
-MONITOR_TIME = 15
+MONITOR_TIME = 300
 
 ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
 
@@ -21,15 +41,17 @@ ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
 PROTECTED_OMEGA_FILES = ['patch.py', 'channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json', 'resources/media/channels/banner/omega.png', 'resources/media/channels/thumb/omega.gif', 'resources/media/channels/thumb/omega.png']
 
-if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed')):
-    xbmc.executebuiltin('RunAddon(plugin.video.omega)')
 
-def check_protected_file_integrity(remote_file_path, temp_sha1_path):
-    urlretrieve(ALFA_URL+remote_file_path+"/checksum.sha1", temp_sha1_path)
+
+def check_protected_file_integrity(remote_file_path):
+    
+    temp_path = hashlib.sha1((ALFA_URL+remote_file_path+"/checksum.sha1").encode('utf-8')).hexdigest()
+
+    urlretrieve(ALFA_URL+remote_file_path+"/checksum.sha1", temp_path)
 
     sha1_checksums = {}
 
-    with open(temp_sha1_path) as f:
+    with open(temp_path) as f:
         for line in f:
             strip_line = line.strip()
             if strip_line:
@@ -52,56 +74,48 @@ def check_protected_file_integrity(remote_file_path, temp_sha1_path):
             broken = True
             break
 
-    os.remove(temp_sha1_path)
+    os.remove(temp_path)
 
     return (updated, broken)
 
-# CHECK OMEGA CHANNEL UPDATES
 
-pbar = xbmcgui.DialogProgressBG()
-            
-pbar.create('OMEGA', 'Verificando integridad...')
 
-alfa_patch_check = check_protected_file_integrity('', KODI_TEMP_PATH +'alfa_patch.sha1')
+def check_omega_integrity(progress=True, no_action_msg=True):
 
-omega_check = check_protected_file_integrity('/channels', KODI_TEMP_PATH +'omega_channel.sha1')
+    if progress:
+        pbar = xbmcgui.DialogProgressBG()    
+        pbar.create('OMEGA', 'Verificando integridad...')
 
-if CHECK_OMEGA_ALFA_STUFF_INTEGRITY and (alfa_patch_check[0] or omega_check[0]):
-    for f in PROTECTED_OMEGA_FILES:
-        urlretrieve(ALFA_URL + f, ALFA_PATH + f)
+    checks = ['', '/channels', '/servers']
 
-    xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA actualizado!',
-                                  os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+    for c in checks:
+        integrity = check_protected_file_integrity(c)
 
-elif CHECK_OMEGA_ALFA_STUFF_INTEGRITY and (alfa_patch_check[1] or omega_check[1]):
-    for f in PROTECTED_OMEGA_FILES:
-        urlretrieve(ALFA_URL + f, ALFA_PATH + f)
-
-    xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA instalado/reparado!',
-                                  os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
-    
-elif CHECK_OMEGA_ALFA_STUFF_INTEGRITY is False:
-    xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA ALTERADO PERO NO REPARADO!',
-                                  os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
-
-pbar.update(100)
-
-pbar.close()
-
-# MONITORS SOME OMEGA FILE IS DELETED AND RE-DOWNLOAD IT
-if CHECK_OMEGA_ALFA_STUFF_INTEGRITY:
-    monitor = xbmc.Monitor()
-
-    while not monitor.abortRequested():
-        updated = False
-
-        for f in PROTECTED_OMEGA_FILES:
-            if not os.path.exists(ALFA_PATH + f):
+        if CHECK_OMEGA_ALFA_STUFF_INTEGRITY and (integrity[0] or integrity[1]):
+            for f in PROTECTED_OMEGA_FILES:
                 urlretrieve(ALFA_URL + f, ALFA_PATH + f)
-                updated = True
 
-        if updated:
-            xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA reparado!',os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+            xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA actualizado!' if integrity[0] else '¡Canal OMEGA instalado/reparado!', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+            break
+        elif CHECK_OMEGA_ALFA_STUFF_INTEGRITY is False and (integrity[0] or integrity[1]) and no_action_msg:
+            xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA ALTERADO! (NO se reparará)', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+            break
 
-        monitor.waitForAbort(MONITOR_TIME)
+    if progress:
+        pbar.update(100)
+        pbar.close()
 
+
+#First run after OMEGA install
+if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed')):
+    xbmc.executebuiltin('RunAddon(plugin.video.omega)')
+
+# MONITORS OMEGA PROTECTED FILES
+monitor = xbmc.Monitor()
+
+i=0
+
+while not monitor.abortRequested():
+    check_omega_integrity((i==0), (i==0))
+    monitor.waitForAbort(MONITOR_TIME)
+    i+=1
