@@ -51,7 +51,7 @@ def restore_omega_files():
 
 
 def check_protected_file_integrity(remote_file_path):
-    temp_path = hashlib.sha1((ALFA_URL+remote_file_path+"/checksum.sha1").encode('utf-8')).hexdigest()
+    temp_path = KODI_TEMP_PATH+hashlib.sha1((ALFA_URL+remote_file_path+"/checksum.sha1").encode('utf-8')).hexdigest()
 
     urlretrieve(ALFA_URL+remote_file_path+"/checksum.sha1", temp_path)
 

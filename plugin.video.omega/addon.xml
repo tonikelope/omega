@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.omega" name="Omega" version="2.1" provider-name="tonikelope">
+<addon id="plugin.video.omega" name="Omega" version="2.2" provider-name="tonikelope">
     <requires>
         <import addon="plugin.video.alfa"/>
     </requires>
