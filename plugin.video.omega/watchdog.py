@@ -88,26 +88,29 @@ def check_protected_file_integrity(remote_file_path):
 
 def check_omega_integrity(progress=True, no_action_msg=True):
 
+    checks = ['', '/channels', '/servers']
+    
     if progress:
         pbar = xbmcgui.DialogProgressBG()    
         pbar.create('OMEGA', 'Verificando integridad...')
 
-    checks = ['', '/channels', '/servers']
-
     for c in checks:
         integrity = check_protected_file_integrity(c)
 
-        if CHECK_OMEGA_ALFA_STUFF_INTEGRITY and (integrity[0] or integrity[1]):
-            restore_omega_files()
-            xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA actualizado!' if integrity[0] else '¡Canal OMEGA instalado/reparado!', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
-            break
-        elif CHECK_OMEGA_ALFA_STUFF_INTEGRITY is False and (integrity[0] or integrity[1]) and no_action_msg:
-            xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA ALTERADO! (NO se reparará)', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+        if (integrity[0] or integrity[1]):
+            
+            if CHECK_OMEGA_ALFA_STUFF_INTEGRITY:
+                restore_omega_files()
+                xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA actualizado!' if integrity[0] else '¡Canal OMEGA instalado/reparado!', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+            elif no_action_msg:
+                xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA ALTERADO! (NO se reparará)', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+
             break
 
     if progress:
         pbar.update(100)
         pbar.close()
+
 
 
 #First run after OMEGA install
