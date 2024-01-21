@@ -58,6 +58,10 @@ def check_protected_file_integrity(remote_file_path, temp_sha1_path):
 
 # CHECK OMEGA CHANNEL UPDATES
 
+pbar = xbmcgui.DialogProgressBG()
+            
+pbar.create('OMEGA', 'Verificando integridad...')
+
 alfa_patch_check = check_protected_file_integrity('', KODI_TEMP_PATH +'alfa_patch.sha1')
 
 omega_check = check_protected_file_integrity('/channels', KODI_TEMP_PATH +'omega_channel.sha1')
@@ -80,6 +84,9 @@ elif CHECK_OMEGA_ALFA_STUFF_INTEGRITY is False:
     xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA ALTERADO PERO NO REPARADO!',
                                   os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
 
+pbar.update(100)
+
+pbar.close()
 
 # MONITORS SOME OMEGA FILE IS DELETED AND RE-DOWNLOAD IT
 if CHECK_OMEGA_ALFA_STUFF_INTEGRITY:
