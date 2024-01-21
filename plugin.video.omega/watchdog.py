@@ -42,9 +42,15 @@ ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 PROTECTED_OMEGA_FILES = ['patch.py', 'channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json', 'resources/media/channels/banner/omega.png', 'resources/media/channels/thumb/omega.gif', 'resources/media/channels/thumb/omega.png']
 
 
+def restore_omega_files():
+    for f in PROTECTED_OMEGA_FILES:
+        try:
+            urlretrieve(ALFA_URL + f, ALFA_PATH + f)
+        except:
+            pass
+
 
 def check_protected_file_integrity(remote_file_path):
-    
     temp_path = hashlib.sha1((ALFA_URL+remote_file_path+"/checksum.sha1").encode('utf-8')).hexdigest()
 
     urlretrieve(ALFA_URL+remote_file_path+"/checksum.sha1", temp_path)
@@ -92,9 +98,7 @@ def check_omega_integrity(progress=True, no_action_msg=True):
         integrity = check_protected_file_integrity(c)
 
         if CHECK_OMEGA_ALFA_STUFF_INTEGRITY and (integrity[0] or integrity[1]):
-            for f in PROTECTED_OMEGA_FILES:
-                urlretrieve(ALFA_URL + f, ALFA_PATH + f)
-
+            restore_omega_files()
             xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA actualizado!' if integrity[0] else '¡Canal OMEGA instalado/reparado!', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
             break
         elif CHECK_OMEGA_ALFA_STUFF_INTEGRITY is False and (integrity[0] or integrity[1]) and no_action_msg:

@@ -71,6 +71,14 @@ def ajustesAvanzados():
     settings_xml.write(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'))
 
 
+def restore_omega_files():
+    for f in PROTECTED_OMEGA_FILES:
+        try:
+            urlretrieve(ALFA_URL + f, ALFA_PATH + f)
+        except:
+            pass
+            
+
 def favoritos():
     try:
         if os.path.exists(xbmcvfs.translatePath('special://userdata/favourites.xml')):
@@ -102,12 +110,7 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
     with open(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed'), 'w+') as f:
         pass
 
-    for f in PROTECTED_OMEGA_FILES:
-        if not os.path.exists(ALFA_PATH + f):
-            try:
-                urllib.request.urlretrieve(ALFA_URL + f, ALFA_PATH + f)
-            except:
-                pass
+    restore_omega_files()
 
     ajustesAvanzados()
     
