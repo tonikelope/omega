@@ -115,17 +115,19 @@ i=0
 
 while not monitor.abortRequested():
     
-    if i==0:
-        pbar = xbmcgui.DialogProgressBG()    
-        pbar.create('OMEGA', 'Verificando integridad...')
+    pbar=None 
 
     try:
+        if i==0:
+            pbar = xbmcgui.DialogProgressBG()    
+            pbar.create('OMEGA', 'Verificando integridad...')
+
         check_omega_integrity((i==0))
         monitor.waitForAbort(MONITOR_TIME)
         i+=1
     except:
         monitor.waitForAbort(5)
 
-    if i==0:
+    if pbar:
         pbar.update(100)
         pbar.close()
