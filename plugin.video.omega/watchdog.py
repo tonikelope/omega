@@ -86,14 +86,10 @@ def check_protected_file_integrity(remote_file_path):
 
 
 
-def check_omega_integrity(progress=True, no_action_msg=True):
+def check_omega_integrity(no_action_msg=True):
 
     checks = ['', '/channels', '/servers']
     
-    if progress:
-        pbar = xbmcgui.DialogProgressBG()    
-        pbar.create('OMEGA', 'Verificando integridad...')
-
     for c in checks:
         integrity = check_protected_file_integrity(c)
 
@@ -107,11 +103,6 @@ def check_omega_integrity(progress=True, no_action_msg=True):
 
             break
 
-    if progress:
-        pbar.update(100)
-        pbar.close()
-
-
 
 #First run after OMEGA install
 if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed')):
@@ -123,6 +114,18 @@ monitor = xbmc.Monitor()
 i=0
 
 while not monitor.abortRequested():
-    check_omega_integrity((i==0), (i==0))
-    monitor.waitForAbort(MONITOR_TIME)
-    i+=1
+    
+    if i==0:
+        pbar = xbmcgui.DialogProgressBG()    
+        pbar.create('OMEGA', 'Verificando integridad...')
+
+    try:
+        check_omega_integrity((i==0))
+        monitor.waitForAbort(MONITOR_TIME)
+        i+=1
+    except:
+        monitor.waitForAbort(5)
+
+    if i==0:
+        pbar.update(100)
+        pbar.close()
