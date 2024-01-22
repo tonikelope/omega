@@ -52,9 +52,7 @@ from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
 
-REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
-
-OMEGA_VERSION = "5.49"
+OMEGA_VERSION = "5.50"
 
 config.set_setting("unify", "false")
 
@@ -143,7 +141,7 @@ ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/c
 
 OMEGA_NON_CRITICAL_DIRS = ['/resources']
 
-DEFAULT_HTTP_TIMEOUT = 300  # Para no pillarnos los dedos al generar enlaces Megacrypter
+DEFAULT_HTTP_TIMEOUT = 300 #Para no pillarnos los dedos al generar enlaces Megacrypter
 
 ADVANCED_SETTINGS_TIMEOUT = 300
 
@@ -945,6 +943,16 @@ def ajustes(item):
             channel=item.channel,
             title="[B]REGENERAR MINIATURAS DE KODI[/B]",
             action="thumbnail_refresh",
+            fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
+            thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
+        )
+    )
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[B]VERIFICAR INTEGRIDAD OMEGA[/B]",
+            action="verificar_integridad_omega",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
         )
@@ -5914,7 +5922,15 @@ def check_integrity(repair=True, notify=True):
     elif not integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
 
-check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=False)
+
+def verificar_integridad_omega(item):
+    pbar = xbmcgui.DialogProgressBG()    
+    pbar.create('OMEGA', 'Verificando integridad...')
+    check_integrity()
+    pbar.update(100)
+    pbar.close()
+    xbmc.executebuiltin("Container.Refresh")
+    
 
 from megaserver import (
     Mega,
