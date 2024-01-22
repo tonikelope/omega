@@ -126,7 +126,7 @@ while not monitor.abortRequested():
         
         i+=1
     except:
-        monitor.waitForAbort(5)
+        pass
 
     if pbar:
         pbar.update(100)
