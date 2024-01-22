@@ -51,7 +51,7 @@ OMEGA_NON_CRITICAL_DIRS = ['/resources']
 
 
 def omegaNotification(msg, timeout=5000):
-    xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
+    xbmcgui.Dialog().notification('OMEGA', msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
 
 
 def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
