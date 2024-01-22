@@ -50,6 +50,10 @@ ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/c
 OMEGA_NON_CRITICAL_DIRS = ['/resources']
 
 
+def omegaNotification(msg, timeout=5000):
+    xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
+
+
 def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
     
     if not sha1_checksums:
@@ -128,9 +132,9 @@ def check_integrity(repair=True, notify=True):
             integrity_error = True
             
             if repair:
-                restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, integrity[1])
+                restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, sha1_checksums=integrity[1])
             elif notify:
-                xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA ALTERADO! (NO se reparará)', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+                omegaNotification('¡Canal OMEGA ALTERADO! (NO se reparará)')
                 break
 
     if repair:
@@ -143,9 +147,9 @@ def check_integrity(repair=True, notify=True):
                 non_critical_updated = True
 
     if (integrity_error or non_critical_updated) and repair:
-        xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA actualizado/reparado!', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+        omegaNotification('¡Canal OMEGA actualizado/reparado!')
     elif not integrity_error and not non_critical_updated and notify:
-        xbmcgui.Dialog().notification('OMEGA', 'La casa está limpia y aseada', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+        omegaNotification('La casa está limpia y aseada')
 
 
 

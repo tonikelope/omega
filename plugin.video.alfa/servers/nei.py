@@ -133,7 +133,7 @@ class multiPartVideoDebridURL():
             self.size, self.accept_ranges = self.__getUrlSizeAndRanges(self.url)
 
         if not self.accept_ranges:
-            xbmcgui.Dialog().notification('OMEGA', "ESTE VÍDEO NO PERMITE AVANZAR/RETROCEDER", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            omegaNotification("ESTE VÍDEO NO PERMITE AVANZAR/RETROCEDER")
 
     def __getUrlSizeAndRanges(self, url):
         request = urllib.request.Request(url, method='HEAD')
@@ -706,7 +706,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
             if progress_bar:
                 pbar.update(100)
                 close_background_pbar(pbar)
-            xbmcgui.Dialog().notification('OMEGA', "ERROR: POSIBLE ENLACE MEGACRYPTER CADUCADO", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            omegaNotification("ERROR: POSIBLE ENLACE MEGACRYPTER CADUCADO")
             return [["NEI DEBRID ERROR (posible enlace de MegaCrypter caducado (sal y vuelve a entrar en la carpeta))", ""]]
 
         filename_hash = KODI_TEMP_PATH + 'kodi_nei_'+getDebridServiceString()+'_' + fid_hash
@@ -734,7 +734,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     if progress_bar:
                         pbar.update(100)
                         close_background_pbar(pbar)
-                    xbmcgui.Dialog().notification('OMEGA', "ERROR: REVISA TUS CUENTAS DE MEGA AUXILIARES", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+                    omegaNotification("ERROR: REVISA TUS CUENTAS DE MEGA AUXILIARES")
                     return [["NEI DEBRID ERROR (revisa que haya espacio suficiente en tus cuentas de MEGA auxiliares)", ""]]
 
                 page_url = response[0]
@@ -956,12 +956,12 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
                 return [[first_multi_proxy_url_title.replace('VIDEO', 'VIDEO TROCEADO'), first_multi_proxy_url]]
             else:
-                xbmcgui.Dialog().notification('OMEGA', "ERROR: FALLO AL GENERAR ENLACES DEBRID", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+                omegaNotification("ERROR: FALLO AL GENERAR ENLACES DEBRID")
                 return [["NEI DEBRID ERROR (revisa que haya espacio suficiente en tu cuenta de MEGA auxiliar)", ""]]
 
         else:
             #PENDIENTE DE IMPLEMENTAR ENLACES DE VÍDEO TROCEADOS CONECTANDO A MEGA DIRECTAMENTE (SIN DEBRID)
-            xbmcgui.Dialog().notification('OMEGA', "ERROR: VÍDEOS TROCEADOS NO SOPORTADOS (DE MOMENTO)", os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'media', 'channels', 'thumb', 'omega.gif'), 5000)
+            omegaNotification("ERROR: VÍDEOS TROCEADOS NO SOPORTADOS (DE MOMENTO)")
             return [["NO SOPORTADO", ""]]
 
     else:
@@ -980,6 +980,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             video_urls.append([scrapertools.get_filename_from_url(media_url)[-4:] + " [mega]", media_url])
 
         return video_urls
+
+
+def omegaNotification(msg, timeout=5000):
+    xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo("path"),"resources","media","channels","thumb","omega.gif"), timeout)
 
 
 def thread_close_pbar(pbar):
