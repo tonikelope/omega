@@ -54,7 +54,7 @@ from datetime import datetime
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.48"
+OMEGA_VERSION = "5.49"
 
 config.set_setting("unify", "false")
 
@@ -5822,7 +5822,7 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
     if not sha1_checksums:
         sha1_checksums = read_remote_checksums(remote_dir)
 
-    urlcleanup()
+    urllib.request.urlcleanup()
 
     updated = False
 
@@ -5914,12 +5914,7 @@ def check_integrity(repair=True, notify=True):
     elif not integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
 
-
-try:
-    check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=True)
-except Exception as e:
-    pass
-
+check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=False)
 
 from megaserver import (
     Mega,
