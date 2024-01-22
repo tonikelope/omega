@@ -66,7 +66,7 @@ DEBRID_PROXY_PORT = int(config.get_setting("omega_debrid_proxy_port", "omega").s
 OMEGA_REALDEBRID = config.get_setting("omega_realdebrid", "omega")
 OMEGA_ALLDEBRID = config.get_setting("omega_alldebrid", "omega")
 
-MAX_PBAR_CLOSE_WAIT = 3
+MAX_PBAR_CLOSE_WAIT = 60
 MEGACRYPTER2DEBRID_ENDPOINT = 'https://noestasinvitado.com/megacrypter2debrid.php'
 MEGACRYPTER2DEBRID_TIMEOUT = 300 #Cuando aumente la demanda habrá que implementar en el server de NEI un sistema de polling asíncrono
 MEGACRYPTER2DEBRID_MULTI_RETRY = 5
@@ -983,13 +983,16 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
 
 def thread_close_pbar(pbar):
+    monitor = xbmc.Monitor()
+
     pbar.close()
 
-    wait=0
+    conta_wait=0
 
-    while not pbar.isFinished() and wait<MAX_PBAR_CLOSE_WAIT:
-        time.sleep(1)
-        wait+=1
+    while not monitor.abortRequested() and not pbar.isFinished() and conta_wait<MAX_PBAR_CLOSE_WAIT:
+        pbar.close()
+        monitor.waitForAbort(1)
+        conta_wait+=1
 
 
 def close_background_pbar(pbar):
