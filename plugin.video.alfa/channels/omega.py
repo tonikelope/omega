@@ -52,9 +52,9 @@ from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
 
-CHECK_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
+REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.45"
+OMEGA_VERSION = "5.46"
 
 config.set_setting("unify", "false")
 
@@ -131,9 +131,17 @@ GITHUB_BASE_URL = "https://raw.githubusercontent.com/tonikelope/omega/master/"
 
 ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
 
+OMEGA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.omega/"
+
 ALFA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.alfa/")
 
 OMEGA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.omega/")
+
+PROTECTED_ALFA_DIRS = ['', '/channels', '/servers', '/lib/megaserver']
+
+ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/channels/banner']
+
+OMEGA_NON_CRITICAL_DIRS = ['/resources']
 
 DEFAULT_HTTP_TIMEOUT = 300  # Para no pillarnos los dedos al generar enlaces Megacrypter
 
@@ -6191,143 +6199,111 @@ def get_filmaffinity_data_advanced(title, year, genre):
     return fa_data
 
 
-# OMEGA uses a modified version of Alfa's MEGA LIB with support for MEGACRYPTER and multi thread
-def check_mega_lib_integrity():
-    update_url = ALFA_URL + "lib/megaserver/"
 
-    megaserver_lib_path = ALFA_PATH + "lib/megaserver/"
 
-    urllib.request.urlretrieve(
-        update_url + "checksum.sha1", megaserver_lib_path + "checksum.sha1"
-    )
+def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
+    
+    if not sha1_checksums:
+        sha1_checksums = read_remote_checksums(remote_dir)
+
+    urlcleanup()
+
+    updated = False
+
+    for filename, checksum in sha1_checksums.items():
+        if replace or not os.path.exists(local_dir + "/" + filename):
+            try:
+                urlretrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
+                updated = True        
+            except:
+                pass    
+    
+    return updated
+
+
+
+def read_remote_checksums(remote_dir):
+    temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()
+
+    urlcleanup()
+
+    urlretrieve(remote_dir+"/checksum.sha1", temp_path)
 
     sha1_checksums = {}
 
-    with open(megaserver_lib_path + "checksum.sha1") as f:
+    with open(temp_path) as f:
         for line in f:
             strip_line = line.strip()
             if strip_line:
-                parts = re.split(" +", line.strip())
+                parts = re.split(' +', line.strip())
                 sha1_checksums[parts[1]] = parts[0]
 
-    modified = False
+    os.remove(temp_path)
 
-    if not os.path.exists(megaserver_lib_path):
-        os.mkdir(megaserver_lib_path)
+    return sha1_checksums
+
+
+
+def check_files_integrity(remote_dir, local_dir):
+    sha1_checksums = read_remote_checksums(remote_dir)
+
+    integrity_error = False
 
     for filename, checksum in sha1_checksums.items():
-
-        if not os.path.exists(megaserver_lib_path + filename):
-
-            urllib.request.urlretrieve(
-                update_url + filename, megaserver_lib_path + filename
-            )
-
-            modified = True
-
-        else:
-
-            with open(megaserver_lib_path + filename, "rb") as f:
+        if os.path.exists(local_dir + "/" + filename):
+            with open(local_dir + "/" + filename, 'rb') as f:
                 file_hash = hashlib.sha1(f.read()).hexdigest()
 
             if file_hash != checksum:
-
-                os.rename(
-                    megaserver_lib_path + filename,
-                    megaserver_lib_path + filename + ".bak",
-                )
-
-                if os.path.isfile(megaserver_lib_path + filename + "o"):
-                    os.remove(megaserver_lib_path + filename + "o")
-
-                urllib.request.urlretrieve(
-                    update_url + filename, megaserver_lib_path + filename
-                )
-
-                modified = True
-
-    return modified
-
-
-# OMEGA uses a modified version of Alfa's MEGA connector with support for MEGACRYPTER and multi thread
-def check_nei_connector_integrity():
-    update_url = ALFA_URL + "servers/"
-
-    connectors_path = ALFA_PATH + "servers/"
-
-    urllib.request.urlretrieve(
-        update_url + "checksum.sha1", connectors_path + "checksum.sha1"
-    )
-
-    sha1_checksums = {}
-
-    with open(connectors_path + "checksum.sha1") as f:
-        for line in f:
-            strip_line = line.strip()
-            if strip_line:
-                parts = re.split(" +", line.strip())
-                sha1_checksums[parts[1]] = parts[0]
-
-    modified = False
-
-    for filename, checksum in sha1_checksums.items():
-
-        if not os.path.exists(connectors_path + filename):
-
-            urllib.request.urlretrieve(
-                update_url + filename, connectors_path + filename
-            )
-
-            modified = True
-
+                integrity_error = True
+                break
         else:
+            integrity_error = True
+            break
 
-            with open(connectors_path + filename, "rb") as f:
-                file_hash = hashlib.sha1(f.read()).hexdigest()
-
-            if file_hash != checksum:
-
-                if os.path.isfile(connectors_path + filename + "o"):
-                    os.remove(connectors_path + filename + "o")
-
-                urllib.request.urlretrieve(
-                    update_url + filename, connectors_path + filename
-                )
-
-                modified = True
-
-    return modified
+    return (integrity_error, sha1_checksums)
 
 
-if CHECK_STUFF_INTEGRITY and check_mega_lib_integrity():
-    xbmcgui.Dialog().notification(
-        notification_title(),
-        "Librería de MEGA/MegaCrypter reparada/actualizada",
-        os.path.join(
-            xbmcaddon.Addon().getAddonInfo("path"),
-            "resources",
-            "media",
-            "channels",
-            "thumb",
-            "omega.gif",
-        ),
-        5000,
-    )
 
-if CHECK_STUFF_INTEGRITY and check_nei_connector_integrity():
-    xbmcgui.Dialog().notification(
-        notification_title(),
-        "Conector de NEI reparado/actualizado",
-        os.path.join(
-            xbmcaddon.Addon().getAddonInfo("path"),
-            "resources",
-            "media",
-            "channels",
-            "thumb",
-            "omega.gif",
-        ),
-        5000,
-    )
+def check_integrity(repair=True, notify=True):
+
+    integrity_error = False
+
+    non_critical_updated = False
+
+    for protected_dir in PROTECTED_ALFA_DIRS:
+        integrity = check_files_integrity(ALFA_URL+protected_dir, ALFA_PATH+protected_dir)
+
+        if integrity[0]:
+
+            integrity_error = True
+            
+            if repair:
+                restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, integrity[1])
+            elif notify:
+                xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA ALTERADO! (NO se reparará)', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+                break
+
+    if repair:
+        for non_critical_dir in ALFA_NON_CRITICAL_DIRS:
+            if restore_files(ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
+                non_critical_updated = True
+
+        for non_critical_dir in OMEGA_NON_CRITICAL_DIRS:
+            if restore_files(OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
+                non_critical_updated = True
+
+    if (integrity_error or non_critical_updated) and repair:
+        xbmcgui.Dialog().notification('OMEGA', '¡Canal OMEGA actualizado/reparado!', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+    elif not integrity_error and not non_critical_updated and notify:
+        xbmcgui.Dialog().notification('OMEGA', 'La casa está limpia y aseada', os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), 5000)
+
+
+try:
+    check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=False)
+except:
+    pass
+
 
 from megaserver import (
     Mega,
