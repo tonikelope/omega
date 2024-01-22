@@ -54,7 +54,7 @@ from datetime import datetime
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True #Vigilamos y corregimos la librería de MEGA de ALFA o el conector de NEI en caso de que sean modificados/borrados por ALFA
 
-OMEGA_VERSION = "5.46"
+OMEGA_VERSION = "5.47"
 
 config.set_setting("unify", "false")
 
@@ -6213,7 +6213,7 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
     for filename, checksum in sha1_checksums.items():
         if replace or not os.path.exists(local_dir + "/" + filename):
             try:
-                urlretrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
+                urllib.request.urlretrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
                 updated = True        
             except:
                 pass    
@@ -6225,9 +6225,9 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
 def read_remote_checksums(remote_dir):
     temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()
 
-    urlcleanup()
+    urllib.request.urlcleanup()
 
-    urlretrieve(remote_dir+"/checksum.sha1", temp_path)
+    urllib.request.urlretrieve(remote_dir+"/checksum.sha1", temp_path)
 
     sha1_checksums = {}
 
