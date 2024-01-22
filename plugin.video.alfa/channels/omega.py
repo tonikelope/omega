@@ -52,7 +52,7 @@ from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
 
-OMEGA_VERSION = "5.50"
+OMEGA_VERSION = "5.51"
 
 config.set_setting("unify", "false")
 
@@ -136,6 +136,8 @@ ALFA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.alfa/")
 OMEGA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.omega/")
 
 PROTECTED_ALFA_DIRS = ['', '/channels', '/servers', '/lib/megaserver']
+
+PROTECTED_OMEGA_DIRS = ['']
 
 ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/channels/banner']
 
@@ -5908,6 +5910,19 @@ def check_integrity(repair=True, notify=True):
                 omegaNotification('¡Canal OMEGA ALTERADO! (NO se reparará)')
                 break
 
+    for protected_dir in PROTECTED_OMEGA_DIRS:
+        integrity = check_files_integrity(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir)
+
+        if integrity[0]:
+
+            integrity_error = True
+            
+            if repair:
+                restore_files(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir, sha1_checksums=integrity[1])
+            elif notify:
+                omegaNotification('¡Canal OMEGA ALTERADO! (NO se reparará)')
+                break
+    
     if repair:
         for non_critical_dir in ALFA_NON_CRITICAL_DIRS:
             if restore_files(ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
