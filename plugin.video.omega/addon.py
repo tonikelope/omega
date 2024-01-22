@@ -31,12 +31,6 @@ import xbmcvfs
 
 TIMEOUT = 300
 
-ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
-
-ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
-
-PROTECTED_OMEGA_FILES = ['patch.py', 'channels/omega.py', 'channels/omega.json', 'servers/nei.py', 'servers/nei.json', 'resources/media/channels/banner/omega.png', 'resources/media/channels/thumb/omega.gif', 'resources/media/channels/thumb/omega.png']
-
 def ajustesAvanzados():
     if os.path.exists(xbmcvfs.translatePath('special://userdata/advancedsettings.xml')):
         os.rename(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'), xbmcvfs.translatePath('special://userdata/advancedsettings.xml')+"."+str(int(time.time()))+".bak")
@@ -71,14 +65,6 @@ def ajustesAvanzados():
     settings_xml.write(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'))
 
 
-def restore_omega_files():
-    for f in PROTECTED_OMEGA_FILES:
-        try:
-            urlretrieve(ALFA_URL + f, ALFA_PATH + f)
-        except:
-            pass
-            
-
 def favoritos():
     try:
         if os.path.exists(xbmcvfs.translatePath('special://userdata/favourites.xml')):
@@ -109,8 +95,6 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
 
     with open(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed'), 'w+') as f:
         pass
-
-    restore_omega_files()
 
     ajustesAvanzados()
     
