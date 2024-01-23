@@ -130,7 +130,9 @@ def check_files_integrity(remote_dir, local_dir):
 
 def check_integrity(repair=True, notify=True):
 
-    integrity_error = False
+    alfa_integrity_error = False
+
+    omega_integrity_error = False
 
     non_critical_updated = False
 
@@ -139,7 +141,7 @@ def check_integrity(repair=True, notify=True):
 
         if integrity[0]:
 
-            integrity_error = True
+            alfa_integrity_error = True
             
             if repair:
                 restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, sha1_checksums=integrity[1])
@@ -152,7 +154,7 @@ def check_integrity(repair=True, notify=True):
 
         if integrity[0]:
 
-            integrity_error = True
+            omega_integrity_error = True
             
             if repair:
                 restore_files(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir, sha1_checksums=integrity[1])
@@ -169,12 +171,13 @@ def check_integrity(repair=True, notify=True):
             if restore_files(OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 non_critical_updated = True
 
-    if (integrity_error or non_critical_updated) and repair:
+    if (alfa_integrity_error or omega_integrity_error or non_critical_updated) and repair:
         omegaNotification('¡Canal OMEGA actualizado/reparado!')
-    elif not integrity_error and not non_critical_updated and notify:
+    elif not alfa_integrity_error and not omega_integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
 
-
+    if omega_integrity_error and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?")
+        xbmc.executebuiltin('RestartApp')
 
 #First run after OMEGA install
 if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed')):

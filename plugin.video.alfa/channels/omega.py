@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.56"
+CHANNEL_VERSION = "5.57"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -357,11 +357,11 @@ def forceView(mode):
 
 
 def notification_title():
-    return "OMEGA " + str(omega_version()) + "_" + CHANNEL_VERSION
+    return "OMEGA " + CHANNEL_VERSION
 
 
 def dialog_title():
-    return "OMEGA " + str(omega_version()) + "_" + CHANNEL_VERSION + " (by tonikelope)"
+    return "OMEGA " + CHANNEL_VERSION + " (by tonikelope)"
 
 
 def get_omega_resource_path(resource):
