@@ -4,3 +4,10 @@ OMEGA is a channel for Kodi's <a href="https://github.com/alfa-addon/addon"> Alf
 <div align="center"><h1>MEGACRYPTER -> DEBRID</h1><img src="https://raw.githubusercontent.com/tonikelope/omega/main/omega_megacrypter.jpg"></div>
 <br>
 <div align="center"><img src="https://raw.githubusercontent.com/tonikelope/omega/main/omega_proxy.jpg"></div>
+
+<p>With love and without warranty ;) for my NEI friends.
+
+(Thanks to ALFA and KODI people for their great work and of course, to MEGA).
+
+<i>© tonikelope Solutions S.L.</i>
+<i>Sed fugit interea, fugit irreparabile tempus.</i></p>
