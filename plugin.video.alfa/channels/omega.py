@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-OMEGA_VERSION = "5.53"
+OMEGA_VERSION = "5.54"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5882,7 +5882,7 @@ def check_files_integrity(remote_dir, local_dir):
 
     for filename, checksum in sha1_checksums.items():
         if os.path.exists(local_dir + "/" + filename):
-            with open(local_dir + "/" + filename, 'rb', 0) as f:
+            with open(local_dir + "/" + filename, 'rb') as f:
                 file_hash = hashlib.sha1(f.read()).hexdigest()
 
             if file_hash != checksum:
