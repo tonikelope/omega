@@ -10,4 +10,4 @@ OMEGA is a channel for Kodi's <a href="https://github.com/alfa-addon/addon"> Alf
 (Thanks to ALFA and KODI people for their great work and of course, to MEGA).
 
 <i>© tonikelope Solutions S.L.</i>
-<i>Sed fugit interea, fugit irreparabile tempus.</i></p>
+<br><i>Human knowledge belongs to the world</i></p>
