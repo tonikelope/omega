@@ -52,6 +52,10 @@ ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/c
 OMEGA_NON_CRITICAL_DIRS = ['/resources']
 
 
+def omega_version():
+    return xbmcaddon.Addon().getAddonInfo('version')
+
+
 def url_retrieve(url, file_path, cache=False):
 
     if not cache:
@@ -64,8 +68,7 @@ def url_retrieve(url, file_path, cache=False):
 
 
 def omegaNotification(msg, timeout=5000):
-    xbmcgui.Dialog().notification('OMEGA', msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
-
+    xbmcgui.Dialog().notification('OMEGA '+str(omega_version()), msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
 
 
 def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):

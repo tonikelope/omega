@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.omega" name="Omega" version="2.10" provider-name="tonikelope">
+<addon id="plugin.video.omega" name="Omega" version="2.11" provider-name="tonikelope">
     <requires>
         <import addon="plugin.video.alfa"/>
     </requires>
@@ -7,14 +7,17 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="es">NOESTASINVITADO.COM</summary>
-        <description lang="es">Navega por NOESTASINVITADO.COM con Kodi</description>
-        <disclaimer lang="es">[COLOR red]Los propietarios y distribuidores de este addon no proveen ni distribuyen ningún contenido mostrado por el addon ni tienen afiliación alguna con los proveedores del contenido.[/COLOR]</disclaimer>
+        <summary lang="es">OMEGA</summary>
+        <description lang="es">Con cariño y sin garantía ;) para mis amiguetes de [B][I]NEI[/I][/B].
+
+(Gracias a la gente de ALFA y de KODI por su magnífico trabajo y por supuesto, a MEGA).
+
+[I]© tonikelope Solutions S.L.[/I]
+[B][I]Sed fugit interea, fugit irreparabile tempus.[/I][/B]</description>
+        <disclaimer lang="es">[COLOR red]Los propietarios y distribuidores de este addon no proveen ni distribuyen ningún contenido mostrado por el addon ni tienen afiliación alguna con los proveedores del contenido[/COLOR]</disclaimer>
         <language>es</language> <!-- the language of the videos or other content the plugin provides, may be omitted in case the addon does not provide any content -->
         <platform>all</platform>
         <license>GNU GPL v3</license>
-        <forum>https://noestasinvitado.com</forum> <!-- may be omitted  -->
-        <website>https://noestasinvitado.com</website> <!-- the url of the website that contains the videos (or the official website of your plugin). May be omitted.  -->
         <email>tonikelope@gmail.com</email> <!-- may be left omitted  -->
         <source>https://github.com/tonikelope/omega</source>
         <news></news>

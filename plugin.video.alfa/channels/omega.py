@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-OMEGA_VERSION = "5.54"
+CHANNEL_VERSION = "5.56"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -268,6 +268,10 @@ if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
             os.remove(KODI_NEI_MC_CACHE_PATH)
 
 
+def omega_version():
+    return xbmcaddon.Addon('plugin.video.omega').getAddonInfo('version')
+
+
 def url_retrieve(url, file_path, cache=False):
 
     if not cache:
@@ -353,11 +357,11 @@ def forceView(mode):
 
 
 def notification_title():
-    return "OMEGA " + OMEGA_VERSION
+    return "OMEGA " + str(omega_version()) + "_" + CHANNEL_VERSION
 
 
 def dialog_title():
-    return "OMEGA " + OMEGA_VERSION + " (by tonikelope)"
+    return "OMEGA " + str(omega_version()) + "_" + CHANNEL_VERSION + " (by tonikelope)"
 
 
 def get_omega_resource_path(resource):
@@ -785,7 +789,7 @@ def mainlist(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="[B]OMEGA " + OMEGA_VERSION + "[/B]",
+                    title="[B]OMEGA " + str(omega_version()) + "_" + CHANNEL_VERSION + "[/B]",
                     action="about_omega",
                     fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
                     thumbnail="special://home/addons/plugin.video.omega/resources/icon.gif",
