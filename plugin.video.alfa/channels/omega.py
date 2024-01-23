@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.57"
+CHANNEL_VERSION = "5.58"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5902,7 +5902,9 @@ def check_files_integrity(remote_dir, local_dir):
 
 def check_integrity(repair=True, notify=True):
 
-    integrity_error = False
+    alfa_integrity_error = False
+
+    omega_integrity_error = False
 
     non_critical_updated = False
 
@@ -5911,7 +5913,7 @@ def check_integrity(repair=True, notify=True):
 
         if integrity[0]:
 
-            integrity_error = True
+            alfa_integrity_error = True
             
             if repair:
                 restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, sha1_checksums=integrity[1])
@@ -5924,14 +5926,14 @@ def check_integrity(repair=True, notify=True):
 
         if integrity[0]:
 
-            integrity_error = True
+            omega_integrity_error = True
             
             if repair:
                 restore_files(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir, sha1_checksums=integrity[1])
             elif notify:
                 omegaNotification('¡Canal OMEGA ALTERADO! (NO se reparará)')
                 break
-    
+
     if repair:
         for non_critical_dir in ALFA_NON_CRITICAL_DIRS:
             if restore_files(ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
@@ -5941,10 +5943,14 @@ def check_integrity(repair=True, notify=True):
             if restore_files(OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 non_critical_updated = True
 
-    if (integrity_error or non_critical_updated) and repair:
+    if (alfa_integrity_error or omega_integrity_error or non_critical_updated) and repair:
         omegaNotification('¡Canal OMEGA actualizado/reparado!')
-    elif not integrity_error and not non_critical_updated and notify:
+    elif not alfa_integrity_error and not omega_integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
+
+    if omega_integrity_error and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
+        xbmc.executebuiltin('RestartApp')
+
 
 
 def verificar_integridad_omega(item):
