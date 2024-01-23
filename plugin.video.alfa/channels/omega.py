@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.58"
+CHANNEL_VERSION = "5.59"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1008,7 +1008,7 @@ def force_login(item):
 def about_omega(item):
     xbmcgui.Dialog().ok(
         dialog_title(),
-        "Con cariño y sin garantía ;) para mis amiguetes de [B][I]NEI[/I][/B].\n\n(Gracias a la gente de ALFA y de KODI por su magnífico trabajo y por supuesto, a MEGA).\n\n[I]© tonikelope Solutions S.L.[/I]\n\n[B][I]Sed fugit interea, fugit irreparabile tempus.[/I][/B]",
+        "Con cariño y sin garantía ;) para mis amiguetes de [B][I]NEI[/I][/B].\n\n(Gracias a la gente de ALFA y de KODI por su magnífico trabajo y por supuesto, a MEGA).\n\n[I]© tonikelope Solutions S.L.[/I]\n\n[B][I]El conocimiento humano pertenece al mundo.[/I][/B]",
     )
 
 
