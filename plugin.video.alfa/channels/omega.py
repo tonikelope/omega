@@ -24,7 +24,6 @@ Incluye:
 
 """
 
-
 import sys
 import xbmc
 import xbmcgui
@@ -51,8 +50,11 @@ from platformcode import config, logger, platformtools, updater
 from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
+from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-OMEGA_VERSION = "5.51"
+OMEGA_VERSION = "5.52"
+
+REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
 config.set_setting("unify", "false")
 
@@ -264,6 +266,17 @@ if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
 
         if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
             os.remove(KODI_NEI_MC_CACHE_PATH)
+
+
+def url_retrieve(url, file_path, cache=False):
+
+    if not cache:
+        urllib.request.urlcleanup()
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0'), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
+        urllib.request.install_opener(opener)
+    
+    urllib.request.urlretrieve(url, file_path)
 
 
 def buscar_titulo_tmdb(item):
@@ -953,7 +966,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]VERIFICAR INTEGRIDAD OMEGA[/B]",
+            title="[B]VERIFICAR INTEGRIDAD DE ALFA/OMEGA[/B]",
             action="verificar_integridad_omega",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
@@ -5826,23 +5839,17 @@ def get_filmaffinity_data_advanced(title, year, genre):
 
 
 
-
 def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
     
     if not sha1_checksums:
         sha1_checksums = read_remote_checksums(remote_dir)
 
-    urllib.request.urlcleanup()
-
     updated = False
 
     for filename, checksum in sha1_checksums.items():
         if replace or not os.path.exists(local_dir + "/" + filename):
-            try:
-                urllib.request.urlretrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
-                updated = True        
-            except:
-                pass    
+            url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
+            updated = True          
     
     return updated
 
@@ -5851,9 +5858,7 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
 def read_remote_checksums(remote_dir):
     temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()
 
-    urllib.request.urlcleanup()
-
-    urllib.request.urlretrieve(remote_dir+"/checksum.sha1", temp_path)
+    url_retrieve(remote_dir+"/checksum.sha1", temp_path)
 
     sha1_checksums = {}
 
@@ -5941,15 +5946,8 @@ def check_integrity(repair=True, notify=True):
 def verificar_integridad_omega(item):
     pbar = xbmcgui.DialogProgressBG()    
     pbar.create('OMEGA', 'Verificando integridad...')
-    check_integrity()
+    check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
     pbar.update(100)
     pbar.close()
     xbmc.executebuiltin("Container.Refresh")
     
-
-from megaserver import (
-    Mega,
-    MegaProxyServer,
-    RequestError,
-    crypto,
-)  # AL FINAL PORQUE SI HEMOS REPARADO LA LIBRERÍA DE MEGA QUEREMOS IMPORTAR LA VERSIÓN BUENA

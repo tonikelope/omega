@@ -23,7 +23,7 @@ import hashlib
 import os
 import re
 import sys
-from urllib.request import urlretrieve, urlcleanup
+import urllib.request
 import xbmc
 import xbmcaddon
 import xbmcgui
@@ -31,7 +31,7 @@ import xbmcvfs
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
-MONITOR_TIME = 300
+MONITOR_TIME = 1800 #Al arrancar KODI y cada 30 minutos comprobamos
 
 ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
 
@@ -52,8 +52,20 @@ ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/c
 OMEGA_NON_CRITICAL_DIRS = ['/resources']
 
 
+def url_retrieve(url, file_path, cache=False):
+
+    if not cache:
+        urllib.request.urlcleanup()
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0'), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
+        urllib.request.install_opener(opener)
+    
+    urllib.request.urlretrieve(url, file_path)
+
+
 def omegaNotification(msg, timeout=5000):
     xbmcgui.Dialog().notification('OMEGA', msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
+
 
 
 def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
@@ -61,18 +73,13 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
     if not sha1_checksums:
         sha1_checksums = read_remote_checksums(remote_dir)
 
-    urlcleanup()
-
     updated = False
 
     for filename, checksum in sha1_checksums.items():
         if replace or not os.path.exists(local_dir + "/" + filename):
-            try:
-                urlretrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
-                updated = True        
-            except:
-                pass    
-    
+            url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
+            updated = True        
+  
     return updated
 
 
@@ -80,9 +87,7 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
 def read_remote_checksums(remote_dir):
     temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()
 
-    urlcleanup()
-
-    urlretrieve(remote_dir+"/checksum.sha1", temp_path)
+    url_retrieve(remote_dir+"/checksum.sha1", temp_path)
 
     sha1_checksums = {}
 
