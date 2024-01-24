@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.61"
+CHANNEL_VERSION = "5.62"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5842,9 +5842,17 @@ def get_filmaffinity_data_advanced(title, year, genre):
     return fa_data
 
 
+def wait_for_dir(local_dir):
+    monitor = xbmc.Monitor()
+
+    while not monitor.abortRequested() and not os.path.exists(local_dir):
+        monitor.waitForAbort(1)
+
 
 def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
     
+    wait_for_dir(local_dir)
+
     if not sha1_checksums:
         sha1_checksums = read_remote_checksums(remote_dir)
 
@@ -5880,6 +5888,9 @@ def read_remote_checksums(remote_dir):
 
 
 def check_files_integrity(remote_dir, local_dir):
+    
+    wait_for_dir(local_dir)
+
     sha1_checksums = read_remote_checksums(remote_dir)
 
     integrity_error = False
@@ -5948,7 +5959,7 @@ def check_integrity(repair=True, notify=True):
     elif not alfa_integrity_error and not omega_integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
 
-    if omega_integrity_error and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
+    if REPAIR_OMEGA_ALFA_STUFF_INTEGRITY and omega_integrity_error and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
         xbmc.executebuiltin('RestartApp')
 
 
