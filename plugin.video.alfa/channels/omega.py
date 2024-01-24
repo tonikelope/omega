@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.60"
+CHANNEL_VERSION = "5.61"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5860,9 +5860,9 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
 
 
 def read_remote_checksums(remote_dir):
-    temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()+"_"+str(time.time()*1000)
+    temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()+"_"+str(int(time.time()*1000))
 
-    url_retrieve(remote_dir+"/checksum.sha1", temp_path)
+    url_retrieve(remote_dir+"/checksum.sha1?token="+str(int(time.time()*1000)), temp_path)
 
     sha1_checksums = {}
 
