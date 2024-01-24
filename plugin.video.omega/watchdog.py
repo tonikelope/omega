@@ -28,6 +28,7 @@ import xbmc
 import xbmcaddon
 import xbmcgui
 import xbmcvfs
+import time
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -88,7 +89,7 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
 
 
 def read_remote_checksums(remote_dir):
-    temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()
+    temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()+"_"+str(time.time()*1000)
 
     url_retrieve(remote_dir+"/checksum.sha1", temp_path)
 
