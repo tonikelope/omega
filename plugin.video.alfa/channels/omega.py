@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.59"
+CHANNEL_VERSION = "5.60"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
