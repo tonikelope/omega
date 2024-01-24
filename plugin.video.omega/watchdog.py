@@ -232,6 +232,6 @@ while not monitor.abortRequested():
         t=0
 
     else:
-        t=(t+1)%INTEGRITY_AUTO_CHECK_TIME
+        t+=1
 
     monitor.waitForAbort(1)
