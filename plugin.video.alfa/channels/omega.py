@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.62"
+CHANNEL_VERSION = "5.63"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -2472,10 +2472,8 @@ def bibliotaku_series_temporadas(item):
                     viewmode="list",
                     id_topic=item.id_topic,
                     action="bibliotaku_series_megacrypter",
-                    title="[COLOR yellow][B]["
+                    title="[COLOR yellow][B][TEMPORADA "
                     + str(i)
-                    + "/"
-                    + str(len(item.mc_group_id))
                     + "][/B][/COLOR] "
                     + item.title,
                     url=item.url,
@@ -4614,10 +4612,8 @@ def find_video_mega_links(item, data):
                     infoLabels = item.infoLabels
 
                     title = (
-                        "[COLOR yellow][B]["
+                        "[COLOR yellow][B]["+("TEMPORADA " if not saga_pelis else "")
                         + str(i)
-                        + "/"
-                        + str(len(matches))
                         + "][/B][/COLOR] "
                         + item.title
                     )
