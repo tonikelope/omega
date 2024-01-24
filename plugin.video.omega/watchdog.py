@@ -32,7 +32,7 @@ import time
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
-INTEGRITY_AUTO_CHECK_TIME = 1800 #Al arrancar KODI y cada 30 minutos comprobamos
+INTEGRITY_AUTO_CHECK_TIME = 3600 #Al arrancar KODI y cada 60 minutos comprobamos
 
 ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
 
@@ -51,6 +51,15 @@ PROTECTED_OMEGA_DIRS = ['']
 ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/channels/banner']
 
 OMEGA_NON_CRITICAL_DIRS = ['/resources']
+
+
+
+def wait_for_dir(local_dir):
+    monitor = xbmc.Monitor()
+
+    while not monitor.abortRequested() and not os.path.exists(local_dir):
+        monitor.waitForAbort(1)
+
 
 
 def omega_version():
@@ -73,7 +82,9 @@ def omegaNotification(msg, timeout=5000):
 
 
 def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
-    
+
+    wait_for_dir(local_dir)
+
     if not sha1_checksums:
         sha1_checksums = read_remote_checksums(remote_dir)
 
@@ -89,6 +100,7 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
 
 
 def read_remote_checksums(remote_dir):
+    
     temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()+"_"+str(int(time.time()*1000))
 
     url_retrieve(remote_dir+"/checksum.sha1?token="+str(int(time.time()*1000)), temp_path)
@@ -109,6 +121,9 @@ def read_remote_checksums(remote_dir):
 
 
 def check_files_integrity(remote_dir, local_dir):
+    
+    wait_for_dir(local_dir)
+
     sha1_checksums = read_remote_checksums(remote_dir)
 
     integrity_error = False
