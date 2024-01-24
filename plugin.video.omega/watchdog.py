@@ -31,7 +31,7 @@ import xbmcvfs
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
-MONITOR_TIME = 1800 #Al arrancar KODI y cada 30 minutos comprobamos
+INTEGRITY_AUTO_CHECK_TIME = 1800 #Al arrancar KODI y cada 30 minutos comprobamos
 
 ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
 
@@ -176,7 +176,7 @@ def check_integrity(repair=True, notify=True):
     elif not alfa_integrity_error and not omega_integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
 
-    if omega_integrity_error and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
+    if REPAIR_OMEGA_ALFA_STUFF_INTEGRITY and omega_integrity_error and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
         xbmc.executebuiltin('RestartApp')
 
 #First run after OMEGA install
@@ -188,25 +188,34 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
 # MONITORS OMEGA PROTECTED FILES
 monitor = xbmc.Monitor()
 
-i=0
+auto_checked = False
+t=0
 
 while not monitor.abortRequested():
-    
-    pbar=None 
 
-    try:
-        if i==0:
-            pbar = xbmcgui.DialogProgressBG()    
-            pbar.create('OMEGA', 'Verificando integridad...')
+    verify_now = (not os.path.exists(ALFA_PATH+"/channels/omega.py") or t==INTEGRITY_AUTO_CHECK_TIME or not auto_checked)
+
+    if verify_now:
+        pbar=None
+
+        try:
+            if not auto_checked or t!=INTEGRITY_AUTO_CHECK_TIME:
+                pbar = xbmcgui.DialogProgressBG()    
+                pbar.create('OMEGA', 'Verificando integridad...')
+                
+            check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None))
             
-        check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(i==0))
-        
-        i+=1
-    except:
-        pass
+            auto_checked = True
+        except:
+            pass
 
-    if pbar:
-        pbar.update(100)
-        pbar.close()
+        if pbar:
+            pbar.update(100)
+            pbar.close()
 
-    monitor.waitForAbort(MONITOR_TIME)
+        t=0
+
+    else:
+        t=(t+1)%INTEGRITY_AUTO_CHECK_TIME
+
+    monitor.waitForAbort(1)
