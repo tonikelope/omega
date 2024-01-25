@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.65"
+CHANNEL_VERSION = "5.66"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1043,7 +1043,7 @@ def watchdog_episodios(item):
             
             pbar = xbmcgui.DialogProgressBG()
             
-            pbar.create('OMEGA', 'Activando vigilante de episodios para '+item.contentSerieName)
+            pbar.create('[B]OMEGA[/B]', '[B]Activando vigilante de episodios para '+item.contentSerieName+'[/B]')
             
             EPISODE_WATCHDOG[item.parent_item_url] = contar_episodios(
                 foro(Item().fromurl(item.parent_item_url), episode_count_call=True)
@@ -3339,7 +3339,7 @@ def foro(item, episode_count_call=False):
             if not episode_count_call and find_item_in_episode_watchdog(item):
                 pbar = xbmcgui.DialogProgressBG()
             
-                pbar.create('OMEGA', '[B]Actualizando vigilante de episodios para '+item.contentSerieName+'[/B]')
+                pbar.create('[B]OMEGA[/B]', '[B]Actualizando vigilante de episodios para '+item.contentSerieName+'[/B]')
 
                 update_watchdog_episodes(
                     find_item_in_episode_watchdog(item), contar_episodios(itemlist), item.contentSerieName
@@ -5962,7 +5962,7 @@ def check_integrity(repair=True, notify=True):
 
 def verificar_integridad_omega(item):
     pbar = xbmcgui.DialogProgressBG()    
-    pbar.create('OMEGA', '[B]VERIFICANDO INTEGRIDAD...[/B]')
+    pbar.create('[B]OMEGA[/B]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
     check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
     pbar.update(100)
     pbar.close()

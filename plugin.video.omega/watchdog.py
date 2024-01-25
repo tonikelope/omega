@@ -213,7 +213,7 @@ while not monitor.abortRequested():
         try:
             if not auto_checked or t!=INTEGRITY_AUTO_CHECK_TIME:
                 pbar = xbmcgui.DialogProgressBG()    
-                pbar.create('OMEGA', '[B]VERIFICANDO INTEGRIDAD...[/B]')
+                pbar.create('[B]OMEGA[/B]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
                 
             check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None))
             
