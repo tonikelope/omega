@@ -44,13 +44,13 @@ ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
 OMEGA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.omega/')
 
-PROTECTED_ALFA_DIRS = ['', '/channels', '/servers', '/lib/megaserver']
+CRITICAL_ALFA_DIRS = ['', '/channels', '/servers', '/lib/megaserver']
 
-PROTECTED_OMEGA_DIRS = ['']
+CRITICAL_OMEGA_DIRS = ['']
 
-ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/channels/banner']
+NON_CRITICAL_ALFA_DIRS = ['/resources/media/channels/thumb', '/resources/media/channels/banner']
 
-OMEGA_NON_CRITICAL_DIRS = ['/resources']
+NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
 
 
@@ -59,7 +59,6 @@ def wait_for_dir(local_dir):
 
     while not monitor.abortRequested() and not os.path.exists(local_dir):
         monitor.waitForAbort(1)
-
 
 
 def omega_version():
@@ -98,7 +97,6 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
     return updated
 
 
-
 def read_remote_checksums(remote_dir):
     
     temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()+"_"+str(int(time.time()*1000))
@@ -117,7 +115,6 @@ def read_remote_checksums(remote_dir):
     os.remove(temp_path)
 
     return sha1_checksums
-
 
 
 def check_files_integrity(remote_dir, local_dir):
@@ -143,7 +140,6 @@ def check_files_integrity(remote_dir, local_dir):
     return (integrity_error, sha1_checksums)
 
 
-
 def check_integrity(repair=True, notify=True):
 
     alfa_integrity_error = False
@@ -152,7 +148,7 @@ def check_integrity(repair=True, notify=True):
 
     non_critical_updated = False
 
-    for protected_dir in PROTECTED_ALFA_DIRS:
+    for protected_dir in CRITICAL_ALFA_DIRS:
         integrity = check_files_integrity(ALFA_URL+protected_dir, ALFA_PATH+protected_dir)
 
         if integrity[0]:
@@ -162,10 +158,10 @@ def check_integrity(repair=True, notify=True):
             if repair:
                 restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, sha1_checksums=integrity[1])
             elif notify:
-                omegaNotification('¡Canal OMEGA ALTERADO! (NO se reparará)')
+                omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
 
-    for protected_dir in PROTECTED_OMEGA_DIRS:
+    for protected_dir in CRITICAL_OMEGA_DIRS:
         integrity = check_files_integrity(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir)
 
         if integrity[0]:
@@ -175,20 +171,20 @@ def check_integrity(repair=True, notify=True):
             if repair:
                 restore_files(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir, sha1_checksums=integrity[1])
             elif notify:
-                omegaNotification('¡Canal OMEGA ALTERADO! (NO se reparará)')
+                omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
 
     if repair:
-        for non_critical_dir in ALFA_NON_CRITICAL_DIRS:
+        for non_critical_dir in NON_CRITICAL_ALFA_DIRS:
             if restore_files(ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 non_critical_updated = True
 
-        for non_critical_dir in OMEGA_NON_CRITICAL_DIRS:
+        for non_critical_dir in NON_CRITICAL_OMEGA_DIRS:
             if restore_files(OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 non_critical_updated = True
 
     if (alfa_integrity_error or omega_integrity_error or non_critical_updated) and repair:
-        omegaNotification('¡Canal OMEGA actualizado/reparado!')
+        omegaNotification('¡OMEGA actualizado/reparado!')
     elif not alfa_integrity_error and not omega_integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
 
@@ -201,7 +197,7 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
 
 
 
-# MONITORS OMEGA PROTECTED FILES
+# MONITORS ALFA/OMEGA
 monitor = xbmc.Monitor()
 
 auto_checked = False
@@ -217,7 +213,7 @@ while not monitor.abortRequested():
         try:
             if not auto_checked or t!=INTEGRITY_AUTO_CHECK_TIME:
                 pbar = xbmcgui.DialogProgressBG()    
-                pbar.create('OMEGA', 'Verificando integridad...')
+                pbar.create('OMEGA', '[B]VERIFICANDO INTEGRIDAD...[/B]')
                 
             check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None))
             

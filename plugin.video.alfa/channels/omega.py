@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.63"
+CHANNEL_VERSION = "5.64"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5925,7 +5925,7 @@ def check_integrity(repair=True, notify=True):
             if repair:
                 restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, sha1_checksums=integrity[1])
             elif notify:
-                omegaNotification('¡Canal OMEGA ALTERADO! (NO se reparará)')
+                omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
 
     for protected_dir in PROTECTED_OMEGA_DIRS:
@@ -5938,7 +5938,7 @@ def check_integrity(repair=True, notify=True):
             if repair:
                 restore_files(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir, sha1_checksums=integrity[1])
             elif notify:
-                omegaNotification('¡Canal OMEGA ALTERADO! (NO se reparará)')
+                omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
 
     if repair:
@@ -5951,7 +5951,7 @@ def check_integrity(repair=True, notify=True):
                 non_critical_updated = True
 
     if (alfa_integrity_error or omega_integrity_error or non_critical_updated) and repair:
-        omegaNotification('¡Canal OMEGA actualizado/reparado!')
+        omegaNotification('¡OMEGA actualizado/reparado!')
     elif not alfa_integrity_error and not omega_integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
 
@@ -5962,7 +5962,7 @@ def check_integrity(repair=True, notify=True):
 
 def verificar_integridad_omega(item):
     pbar = xbmcgui.DialogProgressBG()    
-    pbar.create('OMEGA', 'Verificando integridad...')
+    pbar.create('OMEGA', '[B]VERIFICANDO INTEGRIDAD...[/B]')
     check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
     pbar.update(100)
     pbar.close()
