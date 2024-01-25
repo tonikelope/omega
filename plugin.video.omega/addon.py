@@ -29,11 +29,17 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 
-TIMEOUT = 300
+KODI_USERDATA_PATH = xbmcvfs.translatePath("special://userdata/")
+
+ALFA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.alfa/")
+
+OMEGA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.omega/")
+
+CURL_TIMEOUT = 300
 
 def ajustesAvanzados():
-    if os.path.exists(xbmcvfs.translatePath('special://userdata/advancedsettings.xml')):
-        os.rename(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'), xbmcvfs.translatePath('special://userdata/advancedsettings.xml')+"."+str(int(time.time()))+".bak")
+    if os.path.exists(KODI_USERDATA_PATH+'/advancedsettings.xml'):
+        os.rename(KODI_USERDATA_PATH+'/advancedsettings.xml', KODI_USERDATA_PATH+'/advancedsettings.xml'+"."+str(int(time.time()))+".bak")
     
     settings_xml = ET.ElementTree(ET.Element('advancedsettings'))
 
@@ -50,25 +56,25 @@ def ajustesAvanzados():
     network = settings_xml.findall("network")
     network = ET.Element('network')
     curlclienttimeout = ET.Element('curlclienttimeout')
-    curlclienttimeout.text = str(TIMEOUT)
+    curlclienttimeout.text = str(CURL_TIMEOUT)
     network.append(curlclienttimeout)
     curllowspeedtime = ET.Element('curllowspeedtime')
-    curllowspeedtime.text = str(TIMEOUT)
+    curllowspeedtime.text = str(CURL_TIMEOUT)
     network.append(curllowspeedtime)
     settings_xml.getroot().append(network)
 
     playlisttimeout = settings_xml.findall('playlisttimeout')
     playlisttimeout = ET.Element('playlisttimeout')
-    playlisttimeout.text = str(TIMEOUT)
+    playlisttimeout.text = str(CURL_TIMEOUT)
     settings_xml.getroot().append(playlisttimeout)
 
-    settings_xml.write(xbmcvfs.translatePath('special://userdata/advancedsettings.xml'))
+    settings_xml.write(KODI_USERDATA_PATH+'/advancedsettings.xml')
 
 
 def favoritos():
     try:
-        if os.path.exists(xbmcvfs.translatePath('special://userdata/favourites.xml')):
-            favourites_xml = ET.parse(xbmcvfs.translatePath('special://userdata/favourites.xml'))
+        if os.path.exists(KODI_USERDATA_PATH+'/favourites.xml'):
+            favourites_xml = ET.parse(KODI_USERDATA_PATH+'/favourites.xml')
         else:
             favourites_xml = ET.ElementTree(ET.Element('favourites'))
 
@@ -78,31 +84,29 @@ def favoritos():
             for e in omega:
                 favourites_xml.getroot().remove(e)
 
-        with open(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/favourite.json'), 'r') as f:
+        with open(OMEGA_PATH+'/favourite.json', 'r') as f:
             favourite = json.loads(f.read())
 
-        favourite['fanart'] = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa' + favourite['fanart'])
-        favourite['thumbnail'] = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa' + favourite['thumbnail'])
-        omega = ET.Element('favourite', {'name': 'OMEGA', 'thumb': xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/resources/media/channels/thumb/omega.gif')})
+        favourite['fanart'] = ALFA_PATH + favourite['fanart']
+        favourite['thumbnail'] = ALFA_PATH + favourite['thumbnail']
+        omega = ET.Element('favourite', {'name': 'OMEGA', 'thumb': ALFA_PATH + '/resources/media/channels/thumb/omega.gif'})
         omega.text = 'ActivateWindow(10025,"plugin://plugin.video.alfa/?' + urllib.parse.quote(base64.b64encode(json.dumps(favourite).encode('utf-8')))  + '",return)'
         favourites_xml.getroot().append(omega)
-        favourites_xml.write(xbmcvfs.translatePath('special://userdata/favourites.xml'))
+        favourites_xml.write(KODI_USERDATA_PATH+'/favourites.xml')
     except:
         pass
 
 
-if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed')):
+if not os.path.exists(OMEGA_PATH+'/installed'):
 
-    with open(xbmcvfs.translatePath('special://home/addons/plugin.video.omega/installed'), 'w+') as f:
+    with open(OMEGA_PATH+'/installed', 'w+') as f:
         pass
 
     ajustesAvanzados()
     
     favoritos()
     
-    ret = xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?")
-
-    if ret:
+    if xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
         xbmc.executebuiltin('RestartApp')
 else:
-    xbmcgui.Dialog().ok('OMEGA', 'PARA ENTRAR EN OMEGA UTILIZA EL [B]ICONO DE FAVORITOS (el de la estrella)[/B] O BIEN BUSCA OMEGA EN LA LISTA DE CANALES DE ALFA')
+    xbmcgui.Dialog().ok('OMEGA', 'PARA ENTRAR EN [B]OMEGA[/B] UTILIZA EL [B]ICONO DE FAVORITOS (el de la estrella)[/B] O BIEN BUSCA OMEGA EN LA LISTA DE CANALES DE ALFA')
