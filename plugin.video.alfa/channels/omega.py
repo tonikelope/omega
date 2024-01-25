@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.64"
+CHANNEL_VERSION = "5.65"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -3339,7 +3339,7 @@ def foro(item, episode_count_call=False):
             if not episode_count_call and find_item_in_episode_watchdog(item):
                 pbar = xbmcgui.DialogProgressBG()
             
-                pbar.create('OMEGA', 'Actualizando vigilante de episodios para '+item.contentSerieName)
+                pbar.create('OMEGA', '[B]Actualizando vigilante de episodios para '+item.contentSerieName+'[/B]')
 
                 update_watchdog_episodes(
                     find_item_in_episode_watchdog(item), contar_episodios(itemlist), item.contentSerieName
