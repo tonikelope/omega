@@ -17,7 +17,7 @@
     {
       "id": "omega_user",
       "type": "text",
-      "label": "USUARIO DE NEI (OJO, el exacto):",
+      "label": "USUARIO DE NEI (OJO, EXACTO):",
       "enabled": true,
       "visible": true
     },
@@ -73,7 +73,7 @@
     {
       "id": "omega_debrid_mega_email1",
       "type": "text",
-      "label": "Email #1 de MEGA (DEBRID):",
+      "label": "Email #1 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-2,true)|eq(-1,true)",
       "visible": "eq(-2,true)|eq(-1,true)"
     },
@@ -81,14 +81,14 @@
       "id": "omega_debrid_mega_password1",
       "type": "text",
       "hidden": true,
-      "label": "Password #1 de MEGA (DEBRID):",
+      "label": "Password #1 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-3,true)|eq(-2,true)",
       "visible": "eq(-3,true)|eq(-2,true)"
     },
     {
       "id": "omega_debrid_mega_email2",
       "type": "text",
-      "label": "Email #2 de MEGA (DEBRID):",
+      "label": "Email #2 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-4,true)|eq(-3,true)",
       "visible": "eq(-4,true)|eq(-3,true)"
     },
@@ -96,14 +96,14 @@
       "id": "omega_debrid_mega_password2",
       "type": "text",
       "hidden": true,
-      "label": "Password #2 de MEGA (DEBRID):",
+      "label": "Password #2 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-5,true)|eq(-4,true)",
       "visible": "eq(-5,true)|eq(-4,true)"
     },
     {
       "id": "omega_debrid_mega_email3",
       "type": "text",
-      "label": "Email #3 de MEGA (DEBRID):",
+      "label": "Email #3 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-6,true)|eq(-5,true)",
       "visible": "eq(-6,true)|eq(-5,true)"
     },
@@ -111,14 +111,14 @@
       "id": "omega_debrid_mega_password3",
       "type": "text",
       "hidden": true,
-      "label": "Password #3 de MEGA (DEBRID):",
+      "label": "Password #3 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-7,true)|eq(-6,true)",
       "visible": "eq(-7,true)|eq(-6,true)"
     },
     {
       "id": "omega_debrid_mega_email4",
       "type": "text",
-      "label": "Email #4 de MEGA (DEBRID):",
+      "label": "Email #4 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-8,true)|eq(-7,true)",
       "visible": "eq(-8,true)|eq(-7,true)"
     },
@@ -126,14 +126,14 @@
       "id": "omega_debrid_mega_password4",
       "type": "text",
       "hidden": true,
-      "label": "Password #4 de MEGA (DEBRID):",
+      "label": "Password #4 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-9,true)|eq(-8,true)",
       "visible": "eq(-9,true)|eq(-8,true)"
     },
     {
       "id": "omega_debrid_mega_email5",
       "type": "text",
-      "label": "Email #5 de MEGA (DEBRID):",
+      "label": "Email #5 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-10,true)|eq(-9,true)",
       "visible": "eq(-10,true)|eq(-9,true)"
     },
@@ -141,14 +141,14 @@
       "id": "omega_debrid_mega_password5",
       "type": "text",
       "hidden": true,
-      "label": "Password #5 de MEGA (DEBRID):",
+      "label": "Password #5 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-11,true)|eq(-10,true)",
       "visible": "eq(-11,true)|eq(-10,true)"
     },
     {
       "id": "omega_debrid_mega_url",
       "type": "text",
-      "label": "Cuentas aux de MEGA para DEBRID (URL):",
+      "label": "Listado (json) CUENTAS MEGA AUXILIARES (DEBRID):",
       "default": "",
       "enabled": "eq(-12,true)|eq(-11,true)",
       "visible": "eq(-12,true)|eq(-11,true)"
@@ -164,7 +164,7 @@
     {
       "id": "omega_debrid_proxy_chunks",
       "type": "list",
-      "label": "Tamaño del buffer para DEBRID:",
+      "label": "Tamaño del buffer DEBRID:",
       "default": 1,
       "enabled": "eq(-14,true)|eq(-13,true)",
       "visible": "eq(-14,true)|eq(-13,true)",
@@ -173,7 +173,7 @@
     {
       "id": "omega_debrid_proxy_workers",
       "type": "list",
-      "label": "Hilos de descarga para DEBRID:",
+      "label": "Hilos de descarga DEBRID:",
       "default": 5,
       "enabled": "eq(-15,true)|eq(-14,true)",
       "visible": "eq(-15,true)|eq(-14,true)",
