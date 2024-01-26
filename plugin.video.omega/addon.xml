@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.video.omega" name="Omega" version="2.23" provider-name="tonikelope">
+<addon id="plugin.video.omega" name="Omega" version="2.24" provider-name="tonikelope">
     <requires>
         <import addon="plugin.video.alfa"/>
     </requires>
@@ -7,7 +7,6 @@
         <provides>video</provides>
     </extension>
     <extension point="xbmc.addon.metadata">
-        <summary lang="es">OMEGA</summary>
         <description lang="es">Con cariño y sin garantía ;) para mis amiguetes de [B][I]NEI[/I][/B].
 
 (Gracias a la gente de ALFA y de KODI por su magnífico trabajo y por supuesto, a MEGA).
