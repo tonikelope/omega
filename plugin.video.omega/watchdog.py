@@ -187,6 +187,9 @@ def check_integrity(repair=True, notify=True):
         omegaNotification('¡OMEGA actualizado/reparado!')
     elif not alfa_integrity_error and not omega_integrity_error and not non_critical_updated and notify:
         omegaNotification('La casa está limpia y aseada')
+
+    if REPAIR_OMEGA_ALFA_STUFF_INTEGRITY and omega_integrity_error and xbmcgui.Dialog().yesno(xbmcaddon.Addon().getAddonInfo('name'), "ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
+        xbmc.executebuiltin('RestartApp')
         
 
 #First run after OMEGA install
