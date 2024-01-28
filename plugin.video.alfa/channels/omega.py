@@ -50,9 +50,9 @@ from platformcode import config, logger, platformtools, updater
 from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
-from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
 
-CHANNEL_VERSION = "5.68"
+
+CHANNEL_VERSION = "5.69"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5967,4 +5967,10 @@ def verificar_integridad_omega(item):
     pbar.update(100)
     pbar.close()
     xbmc.executebuiltin("Container.Refresh")
-    
+
+
+try:
+    from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
+except:
+    verificar_integridad_omega(None)
+    from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
