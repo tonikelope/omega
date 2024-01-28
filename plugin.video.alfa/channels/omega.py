@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.71"
+CHANNEL_VERSION = "5.72"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5969,6 +5969,7 @@ def verificar_integridad_omega(item):
     xbmc.executebuiltin("Container.Refresh")
 
 
+
 def import_megalib():
     try:
         from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
@@ -5976,3 +5977,7 @@ def import_megalib():
         verificar_integridad_omega(None)
         time.sleep(2)
         from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
+
+
+
+import_megalib()
