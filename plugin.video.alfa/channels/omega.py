@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.73"
+CHANNEL_VERSION = "5.74"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5907,7 +5907,7 @@ def check_files_integrity(remote_dir, local_dir):
 
 
 
-def check_integrity(repair=True, notify=True):
+def check_integrity(progress_bar=None, repair=True, notify=True):
 
     alfa_integrity_error = False
 
@@ -5915,7 +5915,13 @@ def check_integrity(repair=True, notify=True):
 
     non_critical_updated = False
 
-    for protected_dir in PROTECTED_ALFA_DIRS:
+    pbar_counter = 0
+
+    total_pbar = len(CRITICAL_ALFA_DIRS) + len(CRITICAL_OMEGA_DIRS) + ((len(NON_CRITICAL_ALFA_DIRS) + len(NON_CRITICAL_OMEGA_DIRS)) if repair else 0)
+
+    pbar_increment = round(100/(total_pbar-1))
+
+    for protected_dir in CRITICAL_ALFA_DIRS:
         integrity = check_files_integrity(ALFA_URL+protected_dir, ALFA_PATH+protected_dir)
 
         if integrity[0]:
@@ -5924,11 +5930,15 @@ def check_integrity(repair=True, notify=True):
             
             if repair:
                 restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, sha1_checksums=integrity[1])
+                
+                if progress_bar:
+                    pbar_counter+=min(pbar_increment, 100-pbar_counter)
+                    pbar.update(pbar_counter)
             elif notify:
                 omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
 
-    for protected_dir in PROTECTED_OMEGA_DIRS:
+    for protected_dir in CRITICAL_OMEGA_DIRS:
         integrity = check_files_integrity(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir)
 
         if integrity[0]:
@@ -5937,17 +5947,29 @@ def check_integrity(repair=True, notify=True):
             
             if repair:
                 restore_files(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir, sha1_checksums=integrity[1])
+
+                if progress_bar:
+                    pbar_counter+=min(pbar_increment, 100-pbar_counter)
+                    pbar.update(pbar_counter)
             elif notify:
                 omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
 
     if repair:
-        for non_critical_dir in ALFA_NON_CRITICAL_DIRS:
+        for non_critical_dir in NON_CRITICAL_ALFA_DIRS:
             if restore_files(ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
+                if progress_bar:
+                    pbar_counter+=min(pbar_increment, 100-pbar_counter)
+                    pbar.update(pbar_counter)
+                
                 non_critical_updated = True
 
-        for non_critical_dir in OMEGA_NON_CRITICAL_DIRS:
+        for non_critical_dir in NON_CRITICAL_OMEGA_DIRS:
             if restore_files(OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
+                if progress_bar:
+                    pbar_counter+=min(pbar_increment, 100-pbar_counter)
+                    pbar.update(pbar_counter)
+
                 non_critical_updated = True
 
     if (alfa_integrity_error or omega_integrity_error or non_critical_updated) and repair:
@@ -5963,7 +5985,7 @@ def check_integrity(repair=True, notify=True):
 def verificar_integridad_omega(item):
     pbar = xbmcgui.DialogProgressBG()    
     pbar.create('[B]OMEGA[/B]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
-    check_integrity(repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
+    check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
     pbar.update(100)
     pbar.close()
     xbmc.executebuiltin("Container.Refresh")
