@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.74"
+CHANNEL_VERSION = "5.75"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -137,13 +137,13 @@ ALFA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.alfa/")
 
 OMEGA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.omega/")
 
-PROTECTED_ALFA_DIRS = ['', '/channels', '/servers', '/lib/megaserver']
+CRITICAL_ALFA_DIRS = ['', '/channels', '/servers', '/lib/megaserver']
 
-PROTECTED_OMEGA_DIRS = ['']
+CRITICAL_OMEGA_DIRS = ['']
 
-ALFA_NON_CRITICAL_DIRS = ['/resources/media/channels/thumb', '/resources/media/channels/banner']
+NON_CRITICAL_ALFA_DIRS = ['/resources/media/channels/thumb', '/resources/media/channels/banner']
 
-OMEGA_NON_CRITICAL_DIRS = ['/resources']
+NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
 DEFAULT_HTTP_TIMEOUT = 300 #Para no pillarnos los dedos al generar enlaces Megacrypter
 
