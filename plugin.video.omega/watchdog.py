@@ -166,7 +166,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
                 
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
-                    pbar.update(pbar_counter)
+                    progress_bar.update(pbar_counter)
             elif notify:
                 omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
@@ -183,7 +183,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
 
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
-                    pbar.update(pbar_counter)
+                    progress_bar.update(pbar_counter)
             elif notify:
                 omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
@@ -193,7 +193,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
             if restore_files(ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
-                    pbar.update(pbar_counter)
+                    progress_bar.update(pbar_counter)
                 
                 non_critical_updated = True
 
@@ -201,7 +201,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
             if restore_files(OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
-                    pbar.update(pbar_counter)
+                    progress_bar.update(pbar_counter)
 
                 non_critical_updated = True
 
