@@ -982,6 +982,10 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
         return video_urls
 
 
+def notification_title():
+    return "OMEGA NEIDEBRID"
+
+
 def omegaNotification(msg, timeout=5000):
     xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo("path"),"resources","media","channels","thumb","omega.gif"), timeout)
 
