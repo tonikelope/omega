@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.76"
+CHANNEL_VERSION = "5.77"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5919,7 +5919,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
 
     total_pbar = len(CRITICAL_ALFA_DIRS) + len(CRITICAL_OMEGA_DIRS) + ((len(NON_CRITICAL_ALFA_DIRS) + len(NON_CRITICAL_OMEGA_DIRS)) if repair else 0)
 
-    pbar_increment = round(100/(total_pbar-1))
+    pbar_increment = round(100/total_pbar)
 
     for protected_dir in CRITICAL_ALFA_DIRS:
         integrity = check_files_integrity(ALFA_URL+protected_dir, ALFA_PATH+protected_dir)
