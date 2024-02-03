@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.77"
+CHANNEL_VERSION = "5.78"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -592,6 +592,16 @@ def mainlist(item):
                 thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
             )
         )
+
+        itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[B]FORZAR RE-LOGIN EN NEI[/B]",
+                    action="force_login",
+                    fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
+                    thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
+                )
+            )
     else:
         if login():
 
@@ -1003,6 +1013,7 @@ def ajustes(item):
 
 def force_login(item):
     login(force=True)
+    xbmc.executebuiltin("Container.Refresh")
 
 
 def about_omega(item):
