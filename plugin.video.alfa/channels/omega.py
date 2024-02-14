@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.78"
+CHANNEL_VERSION = "5.79"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5996,7 +5996,12 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
 def verificar_integridad_omega(item):
     pbar = xbmcgui.DialogProgressBG()    
     pbar.create('[B]OMEGA[/B]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
-    check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
+    
+    try:
+        check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
+    except:
+        pass
+
     pbar.update(100)
     pbar.close()
     xbmc.executebuiltin("Container.Refresh")

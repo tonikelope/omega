@@ -75,7 +75,7 @@
       "type": "text",
       "label": "Email #1 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-2,true)|eq(-1,true)",
-      "visible": "eq(-2,true)|eq(-1,true)"
+      "visible": "eq(10,'')+!eq(-2,false)|!eq(-1,false)"
     },
     {
       "id": "omega_debrid_mega_password1",
@@ -83,14 +83,14 @@
       "hidden": true,
       "label": "Password #1 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-3,true)|eq(-2,true)",
-      "visible": "eq(-3,true)|eq(-2,true)"
+      "visible": "eq(9,'')+!eq(-3,false)|!eq(-2,false)"
     },
     {
       "id": "omega_debrid_mega_email2",
       "type": "text",
       "label": "Email #2 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-4,true)|eq(-3,true)",
-      "visible": "eq(-4,true)|eq(-3,true)"
+      "visible": "eq(8,'')+!eq(-4,false)|!eq(-3,false)"
     },
     {
       "id": "omega_debrid_mega_password2",
@@ -98,14 +98,14 @@
       "hidden": true,
       "label": "Password #2 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-5,true)|eq(-4,true)",
-      "visible": "eq(-5,true)|eq(-4,true)"
+      "visible": "eq(7,'')+!eq(-5,false)|!eq(-4,false)"
     },
     {
       "id": "omega_debrid_mega_email3",
       "type": "text",
       "label": "Email #3 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-6,true)|eq(-5,true)",
-      "visible": "eq(-6,true)|eq(-5,true)"
+      "visible": "eq(6,'')+!eq(-6,false)|!eq(-5,false)"
     },
     {
       "id": "omega_debrid_mega_password3",
@@ -113,14 +113,14 @@
       "hidden": true,
       "label": "Password #3 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-7,true)|eq(-6,true)",
-      "visible": "eq(-7,true)|eq(-6,true)"
+      "visible": "eq(5,'')+!eq(-7,false)|!eq(-6,false)"
     },
     {
       "id": "omega_debrid_mega_email4",
       "type": "text",
       "label": "Email #4 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-8,true)|eq(-7,true)",
-      "visible": "eq(-8,true)|eq(-7,true)"
+      "visible": "eq(4,'')+!eq(-8,false)|!eq(-7,false)"
     },
     {
       "id": "omega_debrid_mega_password4",
@@ -128,14 +128,14 @@
       "hidden": true,
       "label": "Password #4 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-9,true)|eq(-8,true)",
-      "visible": "eq(-9,true)|eq(-8,true)"
+      "visible": "eq(3,'')+!eq(-9,false)|!eq(-8,false)"
     },
     {
       "id": "omega_debrid_mega_email5",
       "type": "text",
       "label": "Email #5 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-10,true)|eq(-9,true)",
-      "visible": "eq(-10,true)|eq(-9,true)"
+      "visible": "eq(2,'')+!eq(-10,false)|!eq(-9,false)"
     },
     {
       "id": "omega_debrid_mega_password5",
@@ -143,7 +143,7 @@
       "hidden": true,
       "label": "Password #5 MEGA AUXILIAR (DEBRID):",
       "enabled": "eq(-11,true)|eq(-10,true)",
-      "visible": "eq(-11,true)|eq(-10,true)"
+      "visible": "eq(1,'')+!eq(-11,false)|!eq(-10,false)"
     },
     {
       "id": "omega_debrid_mega_url",
