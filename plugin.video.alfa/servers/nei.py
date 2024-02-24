@@ -748,7 +748,12 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
 
                 for u in urls:
                     u[0]='VIDEO NEIDEBRID'
-                    u[1]=debrid2proxyURL(u[1])
+
+                    if u[1]:
+                        u[1]=debrid2proxyURL(u[1])
+                    else:
+                        omegaNotification("ERROR: ALGO PASA CON REAL/ALLDEBRID <----> MEGA")
+                        return [["NEI DEBRID ERROR (comprueba si Real/AllDebrid tiene conexión con MEGA en este momento) Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.", ""]]
 
                 pickle.dump(urls, file)
     else:
@@ -786,8 +791,13 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                 if urls:
                     for u in urls:
                         u[0]='VIDEO NEIDEBRID'
-                        u[1]=debrid2proxyURL(u[1])
-                    
+                        
+                        if u[1]:
+                            u[1]=debrid2proxyURL(u[1])
+                        else:
+                            omegaNotification("ERROR: ALGO PASA CON REAL/ALLDEBRID <----> MEGA")
+                            return [["NEI DEBRID ERROR (comprueba si Real/AllDebrid tiene conexión con MEGA en este momento) Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.", ""]]
+
                     pickle.dump(urls, file)
 
     if progress_bar:
