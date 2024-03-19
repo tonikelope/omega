@@ -163,13 +163,15 @@ class multiPartVideoDebridURL():
 
             rangos_parciales=[]
 
-            while inicio < final:
+            while inicio < final and u < len(self.multi_urls):
                 
-                rango_absoluto = (inicio, min(final, self.multi_urls[u][1]), self.multi_urls[u][2])
+                url_trozo = self.multi_urls[u][2]
+
+                rango_absoluto = (inicio, min(final, self.multi_urls[u][1]))
 
                 inicio+=rango_absoluto[1]-rango_absoluto[0]+1
 
-                rango_parcial = (rango_absoluto[0] - self.multi_urls[u][0], rango_absoluto[1] - self.multi_urls[u][0], self.multi_urls[u][2])
+                rango_parcial = (rango_absoluto[0] - self.multi_urls[u][0], rango_absoluto[1] - self.multi_urls[u][0], url_trozo)
 
                 rangos_parciales.append(rango_parcial)
 
