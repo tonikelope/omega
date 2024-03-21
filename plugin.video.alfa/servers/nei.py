@@ -515,7 +515,7 @@ except:
 Este método convierte un enlace de MegaCrypter en un enlace temporal auxiliar de MEGA. 
 Devuelve el enlace de MEGA temporal (compatible con Real/Alldebrid) y un hash del FID de MEGA del fichero original
 """
-def megacrypter2debrid(link, clean=True, account=1):
+def megacrypter2auxmega(link, clean=True, account=1):
 
     global DEBRID_ACCOUNT_FREE_SPACE
 
@@ -567,7 +567,7 @@ def megacrypter2debrid(link, clean=True, account=1):
 Este método es como el anterior pero no genera el enlaces auxiliar de MEGA, sino 
 que nos devuelve el hash del FID original (para ver si ya lo tenemos cacheado).
 """
-def megacrypter2debridHASH(link):
+def megacrypter2auxmegaHASH(link):
     megacrypter_link = link.split('#')
 
     link_data = re.sub(r'^.*?(!.+)$', r'\1', megacrypter_link[0])
@@ -643,7 +643,7 @@ def neiURL2DEBRIDCheckCache(page_url):
 
     if 'megacrypter.noestasinvitado' in page_url:
 
-        fid_hash = megacrypter2debridHASH(page_url)
+        fid_hash = megacrypter2auxmegaHASH(page_url)
 
         if not fid_hash:
             return True
@@ -702,7 +702,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
     
     if 'megacrypter.noestasinvitado' in page_url:
 
-        fid_hash = megacrypter2debridHASH(page_url)
+        fid_hash = megacrypter2auxmegaHASH(page_url)
 
         if not fid_hash:
             if progress_bar:
@@ -730,7 +730,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
         if not cache or not os.path.isfile(filename_hash):
             with open(filename_hash, "wb") as file:
 
-                response = megacrypter2debrid(page_url, clean=clean, account=account)
+                response = megacrypter2auxmega(page_url, clean=clean, account=account)
 
                 if not response:
                     if progress_bar:
