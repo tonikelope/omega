@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.79"
+CHANNEL_VERSION = "5.80"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -846,7 +846,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[COLOR yellow][B]PREFERENCIAS DE OMEGA[/B][/COLOR]",
+            title="[COLOR yellow][B]AJUSTES DE OMEGA[/B][/COLOR]",
             action="settings_nei",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
@@ -930,7 +930,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]RESTAURAR AJUSTES de OMEGA[/B]",
+            title="[B]RESTAURAR AJUSTES DE OMEGA[/B]",
             action="restore_omega_userdata",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
@@ -940,7 +940,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]PREFERENCIAS DE ALFA[/B]",
+            title="[B]AJUSTES DE ALFA[/B]",
             action="settings_alfa",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
@@ -950,7 +950,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]COMPROBAR FIX URGENTE DE ALFA[/B]",
+            title="[B]COMPROBAR UPDATE URGENTE DE ALFA[/B]",
             action="check_alfa_update",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
@@ -1898,6 +1898,7 @@ def clean_ignored_items(item):
             Item(
                 channel=item.channel,
                 ignore_title=ignore,
+                contentPlot="(CLICK PARA QUITAR ESTE APORTE IGNORADO)",
                 title="[COLOR red][B]"
                 + ignore.replace("https://noestasinvitado.com/", "")
                 + "[/B][/COLOR]",
