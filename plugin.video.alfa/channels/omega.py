@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.80"
+CHANNEL_VERSION = "5.81"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -154,7 +154,7 @@ LAST_ITEMS_MAX = 100
 FORO_ITEMS_RETRY = 3
 
 DEFAULT_HEADERS = {
-    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0"
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0"
 }
 
 FOROS_FINALES_NEI = [
@@ -277,9 +277,12 @@ def url_retrieve(url, file_path, cache=False):
     if not cache:
         urllib.request.urlcleanup()
         opener = urllib.request.build_opener()
-        opener.addheaders = [('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0'), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
-        urllib.request.install_opener(opener)
-    
+        opener.addheaders = [('User-Agent', DEFAULT_HEADERS["User-Agent"]), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
+    else:
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-Agent', DEFAULT_HEADERS["User-Agent"])]
+        
+    urllib.request.install_opener(opener)
     urllib.request.urlretrieve(url, file_path)
 
 
@@ -357,7 +360,7 @@ def forceView(mode):
 
 
 def notification_title():
-    return "OMEGA " + CHANNEL_VERSION
+    return "OMEGA"
 
 
 def dialog_title():

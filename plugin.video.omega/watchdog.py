@@ -52,6 +52,8 @@ NON_CRITICAL_ALFA_DIRS = ['/resources/media/channels/thumb', '/resources/media/c
 
 NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
+USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0'
+
 
 
 def wait_for_dir(local_dir):
@@ -70,14 +72,17 @@ def url_retrieve(url, file_path, cache=False):
     if not cache:
         urllib.request.urlcleanup()
         opener = urllib.request.build_opener()
-        opener.addheaders = [('User-Agent', 'Mozilla/5.0 (X11; Linux x86_64; rv:120.0) Gecko/20100101 Firefox/120.0'), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
-        urllib.request.install_opener(opener)
-    
+        opener.addheaders = [('User-Agent', USER_AGENT), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
+    else:
+        opener = urllib.request.build_opener()
+        opener.addheaders = [('User-Agent', USER_AGENT)]
+        
+    urllib.request.install_opener(opener)
     urllib.request.urlretrieve(url, file_path)
 
 
 def omegaNotification(msg, timeout=5000):
-    xbmcgui.Dialog().notification('OMEGA '+str(omega_version()), msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
+    xbmcgui.Dialog().notification('OMEGA', msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
 
 
 def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
