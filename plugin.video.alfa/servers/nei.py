@@ -20,7 +20,7 @@
  \__\___/|_| |_|_|_|\_\___|_|\___/| .__/ \___|
                                   |_|         
                                   
-Conector de vídeo para noestasinvitado.com (OMEGA)
+Conector de vídeo para NEI (OMEGA)
 
 Incluye un servidor proxy http local que permite:
     1) Aumentar velocidad de descarga de Real/Alldebrid al utilizar conexiones paralelas (configurable).
@@ -706,7 +706,6 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
 
         if not fid_hash:
             if progress_bar:
-                pbar.update(100)
                 close_background_pbar(pbar)
             omegaNotification("ERROR: POSIBLE ENLACE MEGACRYPTER CADUCADO")
             return [["NEI DEBRID ERROR (posible enlace de MegaCrypter caducado (sal y vuelve a entrar en la carpeta))", ""]]
@@ -734,7 +733,6 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
 
                 if not response:
                     if progress_bar:
-                        pbar.update(100)
                         close_background_pbar(pbar)
                     omegaNotification("ERROR: REVISA TUS CUENTAS DE MEGA AUXILIARES")
                     return [["NEI DEBRID ERROR (revisa que haya espacio suficiente en tus cuentas de MEGA auxiliares)", ""]]
@@ -754,7 +752,9 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     if u[1]:
                         u[1]=debrid2proxyURL(u[1])
                     else:
-                        omegaNotification("ERROR: ALGO PASA CON REAL/ALLDEBRID <----> MEGA")
+                        if progress_bar:
+                            close_background_pbar(pbar)
+                        omegaNotification("ERROR: ALGO PASA ENTRE REAL/ALLDEBRID <----> MEGA")
                         return [["NEI DEBRID ERROR (comprueba si Real/AllDebrid tiene conexión con MEGA en este momento) Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.", ""]]
 
                 pickle.dump(urls, file)
@@ -797,13 +797,14 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                         if u[1]:
                             u[1]=debrid2proxyURL(u[1])
                         else:
-                            omegaNotification("ERROR: ALGO PASA CON REAL/ALLDEBRID <----> MEGA")
+                            if progress_bar:
+                                close_background_pbar(pbar)
+                            omegaNotification("ERROR: ALGO PASA ENTRE REAL/ALLDEBRID <----> MEGA")
                             return [["NEI DEBRID ERROR (comprueba si Real/AllDebrid tiene conexión con MEGA en este momento) Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.", ""]]
 
                     pickle.dump(urls, file)
 
     if progress_bar:
-        pbar.update(100)
         close_background_pbar(pbar)
     
     return urls
@@ -1016,6 +1017,7 @@ def thread_close_pbar(pbar):
 
 
 def close_background_pbar(pbar):
+    pbar.update(100)
     t = threading.Thread(target=thread_close_pbar, args=(pbar,))
     t.setDaemon(True)
     t.start()
