@@ -245,7 +245,7 @@ class neiDebridVideoProxyChunkWriter():
 
             next_offset = self.next_offset_required
 
-            self.next_offset_required = self.next_offset_required + CHUNK_SIZE if self.next_offset_required + CHUNK_SIZE < self.end_offset else -1;
+            self.next_offset_required = self.next_offset_required + CHUNK_SIZE if self.next_offset_required + CHUNK_SIZE < self.end_offset else -1
 
         return next_offset
 
