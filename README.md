@@ -9,5 +9,7 @@ OMEGA is a channel for Kodi's <a href="https://github.com/alfa-addon/addon"> Alf
 
 (Thanks to ALFA and KODI people for their great work and of course, to MEGA).
 
+TO-DO (someday) -> PEP8
+
 <i>© tonikelope Solutions S.L.</i>
 <br><i>Human knowledge belongs to the world</i></p>
