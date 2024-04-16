@@ -54,6 +54,8 @@ NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
 USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0'
 
+MAX_URL_RETRIEVE_ERROR = 5
+
 
 
 def wait_for_dir(local_dir):
@@ -68,17 +70,30 @@ def omega_version():
 
 
 def url_retrieve(url, file_path, cache=False):
+    ok = False
 
-    if not cache:
-        urllib.request.urlcleanup()
-        opener = urllib.request.build_opener()
-        opener.addheaders = [('User-Agent', USER_AGENT), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
-    else:
-        opener = urllib.request.build_opener()
-        opener.addheaders = [('User-Agent', USER_AGENT)]
+    i = 0
+
+    while not ok and i < MAX_URL_RETRIEVE_ERROR:
+        try:
+            if not cache:
+                urllib.request.urlcleanup()
+                opener = urllib.request.build_opener()
+                opener.addheaders = [('User-Agent', USER_AGENT), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
+            else:
+                opener = urllib.request.build_opener()
+                opener.addheaders = [('User-Agent', USER_AGENT)]
         
-    urllib.request.install_opener(opener)
-    urllib.request.urlretrieve(url, file_path)
+            urllib.request.install_opener(opener)
+            
+            urllib.request.urlretrieve(url, file_path)
+            
+            ok = True
+        except Exception as ex:
+            i+=1
+            
+            if i==MAX_URL_RETRIEVE_ERROR:
+                raise ex
 
 
 def omegaNotification(msg, timeout=5000):
