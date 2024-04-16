@@ -19,8 +19,8 @@ CANAL de ALFA (KODI) PARA NOESTASINVITADO.COM
 
 Incluye: 
 
-	1) Librería de MEGA modificada para soportar enlaces MegaCrypter y descarga multi-hilo.
-	2) Conector de MEGA modificado con soporte MegaCrypter -> Real/Alldebrid y streaming de vídeos troceados.
+    1) Librería de MEGA modificada para soportar enlaces MegaCrypter y descarga multi-hilo.
+    2) Conector de MEGA modificado con soporte MegaCrypter -> Real/Alldebrid y streaming de vídeos troceados.
 
 """
 
@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.84"
+CHANNEL_VERSION = "5.85"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -284,10 +284,10 @@ def url_retrieve(url, file_path, cache=False):
             if not cache:
                 urllib.request.urlcleanup()
                 opener = urllib.request.build_opener()
-                opener.addheaders = [('User-Agent', USER_AGENT), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
+                opener.addheaders = [('User-Agent', DEFAULT_HEADERS["User-Agent"]), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
             else:
                 opener = urllib.request.build_opener()
-                opener.addheaders = [('User-Agent', USER_AGENT)]
+                opener.addheaders = [('User-Agent', DEFAULT_HEADERS["User-Agent"])]
         
             urllib.request.install_opener(opener)
             
@@ -6018,7 +6018,8 @@ def verificar_integridad_omega(item):
     
     try:
         check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
-    except:
+    except Exception as ex:
+        omegaNotification('ERROR -> '+str(ex))
         pass
 
     pbar.update(100)
