@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.82"
+CHANNEL_VERSION = "5.83"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -152,6 +152,8 @@ ADVANCED_SETTINGS_TIMEOUT = 300
 LAST_ITEMS_MAX = 100
 
 FORO_ITEMS_RETRY = 3
+
+MAX_URL_RETRIEVE_ERROR = 5
 
 DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0"
@@ -273,17 +275,30 @@ def omega_version():
 
 
 def url_retrieve(url, file_path, cache=False):
+    ok = False
 
-    if not cache:
-        urllib.request.urlcleanup()
-        opener = urllib.request.build_opener()
-        opener.addheaders = [('User-Agent', DEFAULT_HEADERS["User-Agent"]), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
-    else:
-        opener = urllib.request.build_opener()
-        opener.addheaders = [('User-Agent', DEFAULT_HEADERS["User-Agent"])]
+    i = 0
+
+    while not ok and i < MAX_URL_RETRIEVE_ERROR:
+        try:
+            if not cache:
+                urllib.request.urlcleanup()
+                opener = urllib.request.build_opener()
+                opener.addheaders = [('User-Agent', USER_AGENT), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
+            else:
+                opener = urllib.request.build_opener()
+                opener.addheaders = [('User-Agent', USER_AGENT)]
         
-    urllib.request.install_opener(opener)
-    urllib.request.urlretrieve(url, file_path)
+            urllib.request.install_opener(opener)
+            
+            urllib.request.urlretrieve(url, file_path)
+            
+            ok = True
+        except Exception as ex:
+            i+=1
+            
+            if i==MAX_URL_RETRIEVE_ERROR:
+                raise ex
 
 
 def buscar_titulo_tmdb(item):
