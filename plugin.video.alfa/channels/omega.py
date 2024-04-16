@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.81"
+CHANNEL_VERSION = "5.82"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1050,7 +1050,7 @@ def watchdog_episodios(item):
 
         if xbmcgui.Dialog().yesno(
             dialog_title(),
-            "¿[B]METER[/B] [COLOR yellow][B]"
+            "¿[B]Meter[/B] [COLOR yellow][B]"
             + item.contentSerieName
             + "[/B][/COLOR] en el [B]vigilante de episodios[/B]?",
         ):
@@ -1071,7 +1071,7 @@ def watchdog_episodios(item):
 
     elif xbmcgui.Dialog().yesno(
         dialog_title(),
-        "¿[B]QUITAR[/B] [COLOR yellow][B]"
+        "¿[B]Sacar[/B] [COLOR yellow][B]"
         + item.contentSerieName
         + "[/B][/COLOR] del [B]vigilante de episodios[/B]?",
     ):
@@ -1133,7 +1133,7 @@ def lista_series_con_nuevos_episodios(item):
 
         pDialog.create(
             dialog_title(),
-            "Comprobando series del [B]vigilante de episodios[/B] ([COLOR yellow][B]"
+            "Lanzando [B]vigilante de episodios[/B] ([COLOR yellow][B]"
             + str(tot_series)
             + "[/B][/COLOR])...",
         )
@@ -1881,13 +1881,13 @@ def clean_history(item):
 def clean_vigilante(item):
     if xbmcgui.Dialog().yesno(
         dialog_title(),
-        "¿Estás seguro de que quieres borrar todas las series del VIGILANTE de EPISODIOS?",
+        "¿Estás seguro de que quieres SACAR TODAS LAS SERIES del VIGILANTE de EPISODIOS?",
     ):
 
         try:
             os.remove(KODI_NEI_EPISODE_WATCHDOG_PATH)
             EPISODE_WATCHDOG.clear()
-            omegaNotification("VIGILANTE DE EPISODIOS PURGADO")
+            omegaNotification("VIGILANTE DE EPISODIOS VACIADO")
         except:
             pass
 
@@ -1949,7 +1949,7 @@ def clean_vigilante_items(item):
                 contentSerieName=i.contentSerieName,
                 title="[B]" + i.contentSerieName + "[/B] ("+i.uploader+")",
                 vigilante_k=k,
-                contentPlot="(CLICK PARA SACAR SERIE DEL VIGILANTE DE SERIES)",
+                contentPlot="(CLICK PARA SACAR LA SERIE DEL VIGILANTE DE EPISODIOS)",
                 action="remove_vigilante_item",
                 uploader=i.uploader
             )
@@ -1963,7 +1963,7 @@ def clean_vigilante_items(item):
 def remove_vigilante_item(item):
     if xbmcgui.Dialog().yesno(
         dialog_title(),
-        "¿Estás seguro de que quieres [B]ELIMINAR[/B] [COLOR yellow][B]"
+        "¿Estás seguro de que quieres [B]SACAR[/B] [COLOR yellow][B]"
         + item.contentSerieName
         + "[/B][/COLOR] ("+item.uploader+") del [B]VIGILANTE DE EPISODIOS[/B]?",
     ):
@@ -1983,7 +1983,7 @@ def remove_vigilante_item(item):
                         + "\n"
                     )
 
-            omegaNotification(item.contentSerieName + " ELIMINADO DEL VIGILANTE DE EPISODIOS")
+            omegaNotification(item.contentSerieName + " SACADA DEL VIGILANTE DE EPISODIOS")
         except:
             pass
 
@@ -3340,7 +3340,7 @@ def foro(item, episode_count_call=False):
 
             if not find_item_in_episode_watchdog(item):
                 watchdog_item.title = (
-                    "[COLOR yellow][B]ACTIVAR VIGILANTE DE EPISODIOS[/B][/COLOR]"
+                    "[COLOR yellow][B]METER EN EL VIGILANTE DE EPISODIOS[/B][/COLOR]"
                 )
 
                 watchdog_item.contentPlot = ""
@@ -3354,7 +3354,7 @@ def foro(item, episode_count_call=False):
             if not episode_count_call and find_item_in_episode_watchdog(item):
                 pbar = xbmcgui.DialogProgressBG()
             
-                pbar.create('[B]OMEGA[/B]', '[B]Actualizando vigilante de episodios para '+item.contentSerieName+'[/B]')
+                pbar.create('[B]OMEGA[/B]', '[B]Actualizando [COLOR yellow]vigilante de episodios[/COLOR] para '+item.contentSerieName+'[/B]')
 
                 update_watchdog_episodes(
                     find_item_in_episode_watchdog(item), contar_episodios(itemlist), item.contentSerieName
@@ -3381,7 +3381,7 @@ def foro(item, episode_count_call=False):
         custom_title_item = item.clone()
 
         custom_title_item.title = (
-            "[COLOR lightgrey][B]ARREGLAR TÍTULO (CARÁTULA)[/B][/COLOR]"
+            "[COLOR lightgrey][B]ARREGLAR TÍTULO[/B][/COLOR]"
         )
 
         custom_title_item.contentPlot = "Corrige el título en caso de que la carátula/sinopsis no cargue correctamente (normalmente suele ser que el año de lanzamiento no es correcto)"
