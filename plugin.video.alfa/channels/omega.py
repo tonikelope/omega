@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.87"
+CHANNEL_VERSION = "5.88"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -917,7 +917,7 @@ def ajustes(item):
         Item(
             channel=item.channel,
             title="[COLOR red][B]BORRAR MARCAS DE VÍDEOS VISTOS[/B][/COLOR]",
-            action="clean_history",
+            action="clean_marcas_visto",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
         )
@@ -1879,11 +1879,8 @@ def clean_last(item):
             pass
 
 
-def clean_history(item):
-    if xbmcgui.Dialog().yesno(
-        dialog_title(),
-        "¿Estás seguro de que quieres borrar las marcas de las películas y capítulos de series que has visto?",
-    ):
+def clean_marcas_visto(item):
+    if xbmcgui.Dialog().yesno(dialog_title(), "¿Estás seguro de que quieres borrar las marcas de las películas y capítulos de series que has visto?") and xbmcgui.Dialog().yesno(dialog_title(),"¿[B]SEGURO[/B]?"):
 
         try:
             os.remove(KODI_NEI_HISTORY_PATH)
@@ -1896,7 +1893,7 @@ def clean_history(item):
 def clean_vigilante(item):
     if xbmcgui.Dialog().yesno(
         dialog_title(),
-        "¿Estás seguro de que quieres SACAR TODAS LAS SERIES del VIGILANTE de EPISODIOS?",
+        "¿Estás seguro de que quieres [B]SACAR TODAS LAS SERIES[/B] del [COLOR yellow]VIGILANTE DE EPISODIOS[/COLOR]?",
     ):
 
         try:
@@ -1965,6 +1962,7 @@ def clean_vigilante_items(item):
                 title="[B]" + i.contentSerieName + "[/B] ("+i.uploader+")",
                 vigilante_k=k,
                 contentPlot="(CLICK PARA SACAR LA SERIE DEL VIGILANTE DE EPISODIOS)",
+                thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_news.png",
                 action="remove_vigilante_item",
                 uploader=i.uploader
             )
