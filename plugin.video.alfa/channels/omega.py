@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.86"
+CHANNEL_VERSION = "5.87"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -2537,7 +2537,7 @@ def bibliotaku_series_temporadas(item):
                         if item.mode == "tvshow"
                         else item.contentTitle
                     ),
-                    thumbnail="https://www.filmaffinity.com/images/logo4.png",
+                    thumbnail="special://home/addons/plugin.video.omega/resources/fa_logo.png",
                 )
             )
 
@@ -2561,7 +2561,7 @@ def bibliotaku_series_temporadas(item):
                         )
                         + "[/I]",
                         action="leerMensajesHiloForo",
-                        thumbnail="https://noestasinvitado.com/logonegro2.png",
+                        thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
                     )
                 )
 
@@ -2582,7 +2582,7 @@ def bibliotaku_series_temporadas(item):
 
     search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
 
-    search_item.contentPlot = "Busca en NEI otros aportes con el mismo título"
+    search_item.contentPlot = "Buscar en NEI otros aportes con el mismo título"
 
     search_item.action = "search_similares"
 
@@ -2609,11 +2609,11 @@ def bibliotaku_series_temporadas(item):
     custom_title_item = item.clone()
 
     custom_title_item.title = (
-        "[COLOR lightgrey][B]ARREGLAR TÍTULO (CARÁTULA)[/B][/COLOR]"
+        "[COLOR lightgrey][B]ARREGLAR TÍTULO[/B][/COLOR]"
     )
 
     custom_title_item.contentPlot = (
-        "Corrige el título en caso de que la carátula/sinopsis no cargue correctamente"
+        "Permite corregir el título en caso de que la carátula/sinopsis no cargue correctamente"
     )
 
     custom_title_item.action = "customize_title"
@@ -2628,13 +2628,13 @@ def bibliotaku_series_temporadas(item):
 
     tmdb_item.title = "[COLOR lightgray][B]BUSCAR INFORMACIÓN EN TMDB[/B][/COLOR]"
 
-    tmdb_item.contentPlot = "Busca información en TMDB"
+    tmdb_item.contentPlot = "Buscar información en TMDB"
 
     tmdb_item.action = "buscar_titulo_tmdb"
 
     tmdb_item.url = ""
 
-    tmdb_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+    tmdb_item.thumbnail = "special://home/addons/plugin.video.omega/resources/tmdb_logo.png"
 
     itemlist.append(tmdb_item)
 
@@ -2883,7 +2883,7 @@ def bibliotaku_pelis_megacrypter(item):
     )
 
     custom_title_item.contentPlot = (
-        "Corrige el título en caso de que la carátula/sinopsis no cargue correctamente"
+        "Permite corregir el título en caso de que la carátula/sinopsis no cargue correctamente"
     )
 
     custom_title_item.action = "customize_title"
@@ -2898,13 +2898,13 @@ def bibliotaku_pelis_megacrypter(item):
 
     tmdb_item.title = "[COLOR lightgray][B]BUSCAR INFORMACIÓN EN TMDB[/B][/COLOR]"
 
-    tmdb_item.contentPlot = "Busca información en TMDB"
+    tmdb_item.contentPlot = "Buscar información en TMDB"
 
     tmdb_item.action = "buscar_titulo_tmdb"
 
     tmdb_item.url = ""
 
-    tmdb_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+    tmdb_item.thumbnail = "special://home/addons/plugin.video.omega/resources/tmdb_logo.png"
 
     itemlist.append(tmdb_item)
 
@@ -3028,10 +3028,10 @@ def leerMensajesHiloForo(item):
             channel=item.channel,
             url_orig=(item.url_orig if "url_orig" in item else None),
             id_topic=item.id_topic,
-            fanart="https://noestasinvitado.com/logonegro2.png",
+            fanart="special://home/addons/plugin.video.omega/resources/nei_logo.png",
             contentPlot=item.contentPlot,
             url=item.url,
-            thumbnail="https://noestasinvitado.com/logonegro2.png",
+            thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
             action="QRMensajeForo",
             title="[COLOR yellow][B]MOSTRAR ENLACE QR[/B][/COLOR]",
         )
@@ -3055,8 +3055,8 @@ def leerMensajesHiloForo(item):
                     if (OMEGA_LOGIN != msg["nick"] and not msg["thanks"])
                     else None,
                     contentPlot=item.contentPlot,
-                    fanart="https://noestasinvitado.com/logonegro2.png",
-                    thumbnail="https://noestasinvitado.com/logonegro2.png",
+                    fanart="special://home/addons/plugin.video.omega/resources/nei_logo.png",
+                    thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
                     action="cargarMensajeForo",
                     msg=msg,
                     title="[B][COLOR "
@@ -3075,10 +3075,10 @@ def leerMensajesHiloForo(item):
             channel=item.channel,
             url_orig=(item.url_orig if "url_orig" in item else None),
             id_topic=item.id_topic,
-            fanart="https://noestasinvitado.com/logonegro2.png",
+            fanart="special://home/addons/plugin.video.omega/resources/nei_logo.png",
             contentPlot=item.contentPlot,
             url=item.url,
-            thumbnail="https://noestasinvitado.com/logonegro2.png",
+            thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
             action="escribirMensajeHiloForo",
             title="[B]ESCRIBIR UN MENSAJE[/B]",
         )
@@ -3089,10 +3089,10 @@ def leerMensajesHiloForo(item):
             channel=item.channel,
             url_orig=(item.url_orig if "url_orig" in item else None),
             id_topic=item.id_topic,
-            fanart="https://noestasinvitado.com/logonegro2.png",
+            fanart="special://home/addons/plugin.video.omega/resources/nei_logo.png",
             contentPlot=item.contentPlot,
             url=item.url,
-            thumbnail="https://noestasinvitado.com/logonegro2.png",
+            thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
             action="avisarEnlacesRotos",
             title="[COLOR red][B]AVISAR DE ENLACES ROTOS[/B][/COLOR]",
         )
@@ -3103,10 +3103,10 @@ def leerMensajesHiloForo(item):
             channel=item.channel,
             url_orig=(item.url_orig if "url_orig" in item else None),
             id_topic=item.id_topic,
-            fanart="https://noestasinvitado.com/logonegro2.png",
+            fanart="special://home/addons/plugin.video.omega/resources/nei_logo.png",
             contentPlot=item.contentPlot,
             url=item.url,
-            thumbnail="https://noestasinvitado.com/logonegro2.png",
+            thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
             action="pedirEnlacesSinComprimir",
             title="[COLOR lightgray][B]PEDIR ENLACES SIN COMPRIMIR[/B][/COLOR]",
         )
@@ -3285,7 +3285,7 @@ def foro(item, episode_count_call=False):
                     )
                     + "[/I]",
                     action="leerMensajesHiloForo",
-                    thumbnail="https://noestasinvitado.com/logonegro2.png",
+                    thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
                 )
             )
 
@@ -3399,7 +3399,7 @@ def foro(item, episode_count_call=False):
             "[COLOR lightgrey][B]ARREGLAR TÍTULO[/B][/COLOR]"
         )
 
-        custom_title_item.contentPlot = "Corrige el título en caso de que la carátula/sinopsis no cargue correctamente (normalmente suele ser que el año de lanzamiento no es correcto)"
+        custom_title_item.contentPlot = "Permite corregir el título en caso de que la carátula/sinopsis no cargue correctamente (normalmente suele ser que el año de lanzamiento no es correcto)"
 
         custom_title_item.action = "customize_title"
 
@@ -3413,13 +3413,13 @@ def foro(item, episode_count_call=False):
 
         tmdb_item.title = "[COLOR lightgray][B]BUSCAR INFORMACIÓN EN TMDB[/B][/COLOR]"
 
-        tmdb_item.contentPlot = "Busca información en TMDB (útil para averiguar y corregir el año del título si la carátula no carga)"
+        tmdb_item.contentPlot = "Buscar información en TMDB (útil para averiguar y corregir el año del título si la carátula no carga)"
 
         tmdb_item.action = "buscar_titulo_tmdb"
 
         tmdb_item.url = ""
 
-        tmdb_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+        tmdb_item.thumbnail = "special://home/addons/plugin.video.omega/resources/tmdb_logo.png"
 
         itemlist.append(tmdb_item)
 
@@ -4472,7 +4472,7 @@ def find_video_gvideo_links(item, data, fa=False):
                         if item.mode == "tvshow"
                         else item.contentTitle
                     ),
-                    thumbnail="https://www.filmaffinity.com/images/logo4.png",
+                    thumbnail="special://home/addons/plugin.video.omega/resources/fa_logo.png",
                 )
             )
 
@@ -4494,7 +4494,7 @@ def find_video_gvideo_links(item, data, fa=False):
                     )
                     + "[/I]",
                     action="leerMensajesHiloForo",
-                    thumbnail="https://noestasinvitado.com/logonegro2.png",
+                    thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
                 )
             )
 
@@ -4780,7 +4780,7 @@ def find_video_mega_links(item, data):
                                     if item.mode == "tvshow"
                                     else item.contentTitle
                                 ),
-                                thumbnail="https://www.filmaffinity.com/images/logo4.png",
+                                thumbnail="special://home/addons/plugin.video.omega/resources/fa_logo.png",
                             )
                         )
 
@@ -4802,7 +4802,7 @@ def find_video_mega_links(item, data):
                                 )
                                 + "[/I]",
                                 action="leerMensajesHiloForo",
-                                thumbnail="https://noestasinvitado.com/logonegro2.png",
+                                thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
                             )
                         )
             else:
@@ -4896,7 +4896,7 @@ def find_video_mega_links(item, data):
                                         if item.mode == "tvshow"
                                         else item.contentTitle
                                     ),
-                                    thumbnail="https://www.filmaffinity.com/images/logo4.png",
+                                    thumbnail="special://home/addons/plugin.video.omega/resources/fa_logo.png",
                                 )
                             )
 
@@ -4918,7 +4918,7 @@ def find_video_mega_links(item, data):
                                     )
                                     + "[/I]",
                                     action="leerMensajesHiloForo",
-                                    thumbnail="https://noestasinvitado.com/logonegro2.png",
+                                    thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
                                 )
                             )
 
@@ -5209,7 +5209,7 @@ def get_video_mega_links_group(item):
                     if item.mode == "tvshow"
                     else item.contentTitle
                 ),
-                thumbnail="https://www.filmaffinity.com/images/logo4.png",
+                thumbnail="special://home/addons/plugin.video.omega/resources/fa_logo.png",
             )
         )
 
@@ -5231,7 +5231,7 @@ def get_video_mega_links_group(item):
                     )
                     + "[/I]",
                     action="leerMensajesHiloForo",
-                    thumbnail="https://noestasinvitado.com/logonegro2.png",
+                    thumbnail="special://home/addons/plugin.video.omega/resources/nei_logo.png",
                 )
             )
 
