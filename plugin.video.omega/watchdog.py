@@ -75,6 +75,8 @@ def url_retrieve(url, file_path, cache=False):
     i = 0
 
     while not ok and i < MAX_URL_RETRIEVE_ERROR:
+        i+=1
+
         try:
             if not cache:
                 urllib.request.urlcleanup()
@@ -90,8 +92,6 @@ def url_retrieve(url, file_path, cache=False):
             
             ok = True
         except Exception as ex:
-            i+=1
-            
             if i==MAX_URL_RETRIEVE_ERROR:
                 raise ex
 
