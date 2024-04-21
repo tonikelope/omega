@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.89"
+CHANNEL_VERSION = "5.90"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5425,7 +5425,7 @@ def cargar_critica(item):
         if res_spoiler:
             respuesta = (
                 respuesta
-                + "\n\n**********************************************************\n[B](CLICK DERECHO PARA ACTIVAR LOS SPOILERS A PARTIR DE AQUÍ)[/B]\n**********************************************************\n\n"
+                + "\n\n[B]**********************************************************\n(CLICK DERECHO PARA ACTIVAR LOS SPOILERS A PARTIR DE AQUÍ)\n**********************************************************[/B]\n\n"
             )
 
         xbmcgui.Dialog().textviewer(
@@ -5461,7 +5461,7 @@ def cargar_critica_con_spoiler(item):
         if res_spoiler:
             respuesta = (
                 respuesta
-                + "\n\n[COLOR red]*********************************\n[B]CUIDADO: SPOILER A PARTIR DE AQUÍ[/B]\n*********************************[/COLOR]\n\n"
+                + "\n\n[COLOR red][B]*********************************\nCUIDADO: SPOILER A PARTIR DE AQUÍ\n*********************************[/B][/COLOR]\n\n"
                 + res_spoiler.group(1)
             )
 
