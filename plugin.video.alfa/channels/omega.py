@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.91"
+CHANNEL_VERSION = "5.92"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1533,7 +1533,7 @@ def update_favourites(item):
 
             omegaNotification("Icono de favoritos regenerado")
 
-            if xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?")
+            if xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
                 xbmc.executebuiltin("RestartApp")
 
         except Exception as e:
@@ -1555,7 +1555,7 @@ def thumbnail_refresh(item):
 
             omegaNotification("Miniaturas regeneradas")
 
-            if xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?")
+            if xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
                 xbmc.executebuiltin("RestartApp")
 
         except Exception as e:
@@ -1619,7 +1619,7 @@ def settings_nei(item):
         (int(config.get_setting("omega_items_per_page", "omega")) + 1) * 50
     )
 
-    if is_reboot_required(old_reboot_settings) and xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?")
+    if is_reboot_required(old_reboot_settings) and xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
         xbmc.executebuiltin("RestartApp")
 
     xbmc.executebuiltin("Container.Refresh")
@@ -1837,7 +1837,7 @@ def restore_omega_userdata(item):
 
             omegaNotification("BACKUP RESTAURADO")
 
-            if xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?")
+            if xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
                 xbmc.executebuiltin("RestartApp")
     except:
         omegaNotification("ERROR AL RESTAURAR EL BACKUP")
