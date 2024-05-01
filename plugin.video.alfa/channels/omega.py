@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.94"
+CHANNEL_VERSION = "5.95"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1582,9 +1582,13 @@ def is_reboot_required(old_settings):
 
 
 def settings_nei(item):
-    old_kodi_memorysize = config.get_setting("omega_kodi_buffer", "omega")
+    old_kodi_memorysize = str(
+        (int(config.get_setting("omega_kodi_buffer", "omega")) + 1) * 52428800
+    )
 
-    old_kodi_readfactor = config.get_setting("omega_kodi_readfactor", "omega")
+    old_kodi_readfactor = str(
+        (int(config.get_setting("omega_kodi_readfactor", "omega")) + 1) * 4
+    )
 
     old_reboot_settings = get_reboot_items_old_values()
 
