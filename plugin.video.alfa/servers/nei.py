@@ -258,6 +258,7 @@ class neiDebridVideoProxyChunkDownloader():
         self.url = VIDEO_MULTI_DEBRID_URL
         self.exit = False
         self.chunk_writer = chunk_writer
+        self.chunk_error_notify = False
 
     def run(self):
 
@@ -280,13 +281,13 @@ class neiDebridVideoProxyChunkDownloader():
                         self.chunk_writer.cv_queue_full.wait(1)
 
                 if not self.chunk_writer.exit and not self.exit:
-                    full_chunk = bytearray()
+                    chunk = bytearray()
 
-                    required_full_chunk_size = final-inicio+1
+                    required_chunk_size = final-inicio+1
 
-                    full_chunk_error = True
+                    chunk_error = True
 
-                    while not self.exit and full_chunk_error and not self.chunk_writer.exit:
+                    while not self.exit and chunk_error and not self.chunk_writer.exit:
 
                         for partial_range in partial_ranges:
 
@@ -307,36 +308,42 @@ class neiDebridVideoProxyChunkDownloader():
 
                                     with urllib.request.urlopen(request) as response:
 
-                                        required_chunk_size = p_final-p_inicio+1
+                                        required_partial_chunk_size = p_final-p_inicio+1
 
-                                        chunk=response.read(required_chunk_size)
+                                        partial_chunk=response.read(required_partial_chunk_size)
 
-                                        if len(chunk) == required_chunk_size:
-                                            full_chunk+=chunk
+                                        if len(partial_chunk) == required_partial_chunk_size:
+                                            chunk+=partial_chunk
                                             error = False
                                         else:
-                                            logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(p_inicio)+'-'+str(p_final)+' ('+str(len(chunk))+' bytes) PARTIAL CHUNK SIZE ERROR!')
+                                            logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(p_inicio)+'-'+str(p_final)+' ('+str(len(partial_chunk))+' bytes) PARTIAL CHUNK SIZE ERROR!')
                                             time.sleep(CHUNK_ERROR_SLEEP)
 
                                 except Exception as ex:
                                     logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' HTTP ERROR!')
+                                    logger.debug(ex)
                                     time.sleep(CHUNK_ERROR_SLEEP)
 
                         if not self.exit and not self.chunk_writer.exit:
 
-                            if len(full_chunk) == required_full_chunk_size:
+                            if len(chunk) == required_chunk_size:
 
                                 with self.chunk_writer.chunk_queue_lock:
                                 
                                     if not self.exit and not self.chunk_writer.exit:
-                                        self.chunk_writer.queue[inicio]=full_chunk
+                                        self.chunk_writer.queue[inicio]=chunk
 
                                 with self.chunk_writer.cv_new_element:
                                     self.chunk_writer.cv_new_element.notify_all()
 
-                                full_chunk_error = False
+                                chunk_error = False
                             else:
-                                logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' ('+str(len(full_chunk))+' bytes) CHUNK SIZE ERROR!')
+                                logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' ('+str(len(chunk))+' bytes) CHUNK SIZE ERROR!')
+
+                                if not self.chunk_error_notify:
+                                    self.chunk_error_notify = True
+                                    omegaNotification('CHUNK ERROR: ¿Demasiados HILOS en ajustes?')
+
                                 time.sleep(CHUNK_ERROR_SLEEP)
 
             else:
