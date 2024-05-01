@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.92"
+CHANNEL_VERSION = "5.93"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1567,15 +1567,15 @@ def get_reboot_items_old_values():
 
     old_settings={}
 
-    for reboot_item in reboot_items:
-        old_settings[reboot_items]=config.get_setting(reboot_item, "omega")
+    for k in reboot_items:
+        old_settings[k]=config.get_setting(k, "omega")
 
     return old_settings
 
 
 def is_reboot_required(old_settings):
-    for reboot_item in old_settings:
-        if config.get_setting(reboot_item, "omega") != old_settings[reboot_item]:
+    for k in old_settings:
+        if config.get_setting(k, "omega") != old_settings[k]:
             return True
 
     return False
