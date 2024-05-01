@@ -148,7 +148,7 @@
     {
       "id": "omega_debrid_mega_url",
       "type": "text",
-      "label": "Listado (json) CUENTAS MEGA AUXILIARES (DEBRID):",
+      "label": "Listado JSON CUENTAS MEGA AUXILIARES (DEBRID):",
       "default": "",
       "enabled": "eq(-12,true)|eq(-11,true)",
       "visible": "eq(-12,true)|eq(-11,true)"
@@ -255,7 +255,7 @@
     {
       "id": "omega_kodi_buffer",
       "type": "list",
-      "label": "Tamaño del buffer de KODI (requiere reiniciar):",
+      "label": "Tamaño del buffer de KODI:",
       "default": 0,
       "enabled": true,
       "visible": true,
@@ -264,7 +264,7 @@
     {
       "id": "omega_kodi_readfactor",
       "type": "list",
-      "label": "Velocidad de llenado del buffer de KODI (requiere reiniciar):",
+      "label": "Velocidad de llenado del buffer de KODI:",
       "default": 1,
       "enabled": true,
       "visible": true,

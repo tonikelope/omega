@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.96"
+CHANNEL_VERSION = "5.97"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1548,7 +1548,7 @@ def thumbnail_refresh(item):
 
 
 def get_reboot_items_old_values():
-    reboot_items=["omega_kodi_buffer", "omega_kodi_readfactor", "omega_realdebrid", "omega_alldebrid", "omega_debrid_proxy_port", "omega_debrid_proxy_workers", "omega_debrid_proxy_chunks", "omega_debrid_mega_url"]
+    reboot_items=["omega_kodi_buffer", "omega_kodi_readfactor", "omega_realdebrid", "omega_alldebrid", "omega_debrid_proxy_port", "omega_debrid_proxy_workers", "omega_debrid_proxy_chunks", "omega_debrid_mega_url", "omega_megalib_workers", "omega_megalib_chunks", "omega_debrid_mega_email1", "omega_debrid_mega_email2", "omega_debrid_mega_email3", "omega_debrid_mega_email4", "omega_debrid_mega_email5", "omega_debrid_mega_password1", "omega_debrid_mega_password2","omega_debrid_mega_password3", "omega_debrid_mega_password4", "omega_debrid_mega_password5"]
 
     old_settings={}
 
@@ -5238,7 +5238,7 @@ def leer_criticas_fa(item):
                     viewmode="list",
                     contentTitle=item_fa_data["fa_title"],
                     contentPlot="[I]Críticas de: " + item_fa_data["fa_title"] + "[/I]",
-                    title=item_fa_data["fa_title"],
+                    title="[B]"+item_fa_data["fa_title"]+"[/B]",
                     action="leer_criticas_fa",
                     thumbnail=item.thumbnail,
                 )
