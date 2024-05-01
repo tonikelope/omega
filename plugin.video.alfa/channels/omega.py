@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.95"
+CHANNEL_VERSION = "5.96"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -445,59 +445,44 @@ def kodi_advancedsettings(verbose=True):
         (int(config.get_setting("omega_kodi_readfactor", "omega")) + 1) * 4
     )
 
-    if verbose:
-        ret = xbmcgui.Dialog().yesno(
-            dialog_title(),
-            "Nuevo tamaño de búffer de video de KODI: "
-            + new_memorysize
-            + " bytes\nNueva velocidad de llenado del búffer: "
-            + new_readfactor_mul
-            + "x\n\n¿APLICAR NUEVOS VALORES?",
-        )
+    os.rename(
+        xbmcvfs.translatePath("special://userdata/advancedsettings.xml"),
+        xbmcvfs.translatePath("special://userdata/advancedsettings.xml")
+        + "."
+        + str(int(time.time()))
+        + ".bak",
+    )
 
-    if not verbose or ret:
+    settings_xml = ET.ElementTree(ET.Element("advancedsettings"))
 
-        os.rename(
-            xbmcvfs.translatePath("special://userdata/advancedsettings.xml"),
-            xbmcvfs.translatePath("special://userdata/advancedsettings.xml")
-            + "."
-            + str(int(time.time()))
-            + ".bak",
-        )
+    cache = settings_xml.findall("cache")
+    cache = ET.Element("cache")
+    memorysize = ET.Element("memorysize")
+    memorysize.text = new_memorysize
+    readfactor = ET.Element("readfactor")
+    readfactor.text = new_readfactor
+    cache.append(memorysize)
+    cache.append(readfactor)
+    settings_xml.getroot().append(cache)
 
-        settings_xml = ET.ElementTree(ET.Element("advancedsettings"))
+    network = settings_xml.findall("network")
+    network = ET.Element("network")
+    curlclienttimeout = ET.Element("curlclienttimeout")
+    curlclienttimeout.text = str(ADVANCED_SETTINGS_TIMEOUT)
+    network.append(curlclienttimeout)
+    curllowspeedtime = ET.Element("curllowspeedtime")
+    curllowspeedtime.text = str(ADVANCED_SETTINGS_TIMEOUT)
+    network.append(curllowspeedtime)
+    settings_xml.getroot().append(network)
 
-        cache = settings_xml.findall("cache")
-        cache = ET.Element("cache")
-        memorysize = ET.Element("memorysize")
-        memorysize.text = new_memorysize
-        readfactor = ET.Element("readfactor")
-        readfactor.text = new_readfactor
-        cache.append(memorysize)
-        cache.append(readfactor)
-        settings_xml.getroot().append(cache)
+    playlisttimeout = settings_xml.findall("playlisttimeout")
+    playlisttimeout = ET.Element("playlisttimeout")
+    playlisttimeout.text = str(ADVANCED_SETTINGS_TIMEOUT)
+    settings_xml.getroot().append(playlisttimeout)
 
-        network = settings_xml.findall("network")
-        network = ET.Element("network")
-        curlclienttimeout = ET.Element("curlclienttimeout")
-        curlclienttimeout.text = str(ADVANCED_SETTINGS_TIMEOUT)
-        network.append(curlclienttimeout)
-        curllowspeedtime = ET.Element("curllowspeedtime")
-        curllowspeedtime.text = str(ADVANCED_SETTINGS_TIMEOUT)
-        network.append(curllowspeedtime)
-        settings_xml.getroot().append(network)
-
-        playlisttimeout = settings_xml.findall("playlisttimeout")
-        playlisttimeout = ET.Element("playlisttimeout")
-        playlisttimeout.text = str(ADVANCED_SETTINGS_TIMEOUT)
-        settings_xml.getroot().append(playlisttimeout)
-
-        settings_xml.write(
-            xbmcvfs.translatePath("special://userdata/advancedsettings.xml")
-        )
-
-        if verbose:
-            omegaNotification("Ajustes avanzados regenerados")
+    settings_xml.write(
+        xbmcvfs.translatePath("special://userdata/advancedsettings.xml")
+    )
 
 
 def mega_login(verbose):
@@ -1582,14 +1567,6 @@ def is_reboot_required(old_settings):
 
 
 def settings_nei(item):
-    old_kodi_memorysize = str(
-        (int(config.get_setting("omega_kodi_buffer", "omega")) + 1) * 52428800
-    )
-
-    old_kodi_readfactor = str(
-        (int(config.get_setting("omega_kodi_readfactor", "omega")) + 1) * 4
-    )
-
     old_reboot_settings = get_reboot_items_old_values()
 
     platformtools.show_channel_settings()
@@ -1616,12 +1593,7 @@ def settings_nei(item):
         (int(config.get_setting("omega_kodi_readfactor", "omega")) + 1) * 4
     )
 
-    kodi_advancedsettings(
-        (
-            old_kodi_memorysize != new_kodi_memorysize
-            or old_kodi_readfactor != new_kodi_readfactor
-        )
-    )
+    kodi_advancedsettings()
 
     setNEITopicsPerPage(
         (int(config.get_setting("omega_items_per_page", "omega")) + 1) * 50
