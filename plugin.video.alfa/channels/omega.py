@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.97"
+CHANNEL_VERSION = "5.98"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1548,7 +1548,7 @@ def thumbnail_refresh(item):
 
 
 def get_reboot_items_old_values():
-    reboot_items=["omega_kodi_buffer", "omega_kodi_readfactor", "omega_realdebrid", "omega_alldebrid", "omega_debrid_proxy_port", "omega_debrid_proxy_workers", "omega_debrid_proxy_chunks", "omega_debrid_mega_url", "omega_megalib_workers", "omega_megalib_chunks", "omega_debrid_mega_email1", "omega_debrid_mega_email2", "omega_debrid_mega_email3", "omega_debrid_mega_email4", "omega_debrid_mega_email5", "omega_debrid_mega_password1", "omega_debrid_mega_password2","omega_debrid_mega_password3", "omega_debrid_mega_password4", "omega_debrid_mega_password5"]
+    reboot_items=["omega_kodi_buffer", "omega_kodi_readfactor", "omega_megalib_workers", "omega_megalib_chunks"]
 
     old_settings={}
 
@@ -1558,7 +1558,18 @@ def get_reboot_items_old_values():
     return old_settings
 
 
-def is_reboot_required(old_settings):
+def get_debrid_items_old_values():
+    debrid_items=["omega_realdebrid", "omega_alldebrid", "omega_debrid_proxy_port", "omega_debrid_proxy_workers", "omega_debrid_proxy_chunks", "omega_debrid_mega_url", "omega_debrid_mega_email1", "omega_debrid_mega_email2", "omega_debrid_mega_email3", "omega_debrid_mega_email4", "omega_debrid_mega_email5", "omega_debrid_mega_password1", "omega_debrid_mega_password2","omega_debrid_mega_password3", "omega_debrid_mega_password4", "omega_debrid_mega_password5"]
+
+    old_settings={}
+
+    for k in debrid_items:
+        old_settings[k]=config.get_setting(k, "omega")
+
+    return old_settings
+
+
+def check_items_updated(old_settings):
     for k in old_settings:
         if config.get_setting(k, "omega") != old_settings[k]:
             return True
@@ -1568,6 +1579,8 @@ def is_reboot_required(old_settings):
 
 def settings_nei(item):
     old_reboot_settings = get_reboot_items_old_values()
+
+    old_debrid_settings = get_debrid_items_old_values()
 
     platformtools.show_channel_settings()
 
@@ -1599,8 +1612,10 @@ def settings_nei(item):
         (int(config.get_setting("omega_items_per_page", "omega")) + 1) * 50
     )
 
-    if is_reboot_required(old_reboot_settings) and xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
+    if check_items_updated(old_reboot_settings) and xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
         xbmc.executebuiltin("RestartApp")
+    elif check_items_updated(old_debrid_settings):
+        httptools.downloadpage('http://localhost:'+config.get_setting("omega_debrid_proxy_port", "omega").strip()+"/shutdown")
 
     xbmc.executebuiltin("Container.Refresh")
 
@@ -2609,6 +2624,20 @@ def bibliotaku_series_temporadas(item):
 
     itemlist.append(tmdb_item)
 
+    ajustes_item = item.clone()
+
+    ajustes_item.title = "[COLOR yellow][B]AJUSTES DE OMEGA[/B][/COLOR]"
+
+    ajustes_item.contentPlot = "Ajustes de OMEGA"
+
+    ajustes_item.action = "settings_nei"
+
+    ajustes_item.url = ""
+
+    ajustes_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"
+
+    itemlist.append(ajustes_item)
+
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
     return itemlist
@@ -2878,6 +2907,20 @@ def bibliotaku_pelis_megacrypter(item):
     tmdb_item.thumbnail = "special://home/addons/plugin.video.omega/resources/tmdb_logo.png"
 
     itemlist.append(tmdb_item)
+
+    ajustes_item = item.clone()
+
+    ajustes_item.title = "[COLOR yellow][B]AJUSTES DE OMEGA[/B][/COLOR]"
+
+    ajustes_item.contentPlot = "Ajustes de OMEGA"
+
+    ajustes_item.action = "settings_nei"
+
+    ajustes_item.url = ""
+
+    ajustes_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"
+
+    itemlist.append(ajustes_item)
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
 
@@ -3418,6 +3461,20 @@ def foro(item, episode_count_call=False):
             generos_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search.png"
 
             itemlist.append(generos_item)
+
+        ajustes_item = item.clone()
+
+        ajustes_item.title = "[COLOR yellow][B]AJUSTES DE OMEGA[/B][/COLOR]"
+
+        ajustes_item.contentPlot = "Ajustes de OMEGA"
+
+        ajustes_item.action = "settings_nei"
+
+        ajustes_item.url = ""
+
+        ajustes_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png"
+
+        itemlist.append(ajustes_item)
 
     if not video_links:
 
@@ -4494,8 +4551,8 @@ def ignore_uploader(item):
         xbmc.executebuiltin("Container.Refresh")
 
 
-def omegaNotification(msg, timeout=5000):
-    xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo("path"),"resources","media","channels","thumb","omega.gif"), timeout)
+def omegaNotification(msg, timeout=5000, sound=True):
+    xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo("path"),"resources","media","channels","thumb","omega.gif"), timeout, sound)
 
 
 def getMegacrypterFilename(url):

@@ -88,6 +88,13 @@ except:
     DEBRID_AUX_MEGA_ACCOUNTS = []
 
 
+def notification_title():
+    return "OMEGA NEIDEBRID"
+
+
+def omegaNotification(msg, timeout=5000, sound=True):
+    xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo("path"),"resources","media","channels","thumb","omega.gif"), timeout, sound)
+
 """
 Esta clase convierte una URL de Real/Alldebrid normal en una múltiple para reproducir por streaming vídeos 
 troceados (al estilo MegaBasterd o el comando de Unix split)
@@ -383,13 +390,20 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
     
     def do_GET(self):
-            
-        if self.path.startswith('/isalive'):
+          
+        if self.path.startswith('/shutdown'):
             
             self.send_response(200)
 
             self.end_headers()
 
+            self.server.shutdown()
+
+        elif self.path.startswith('/isalive'):
+            
+            self.send_response(200)
+
+            self.end_headers()
         else:
 
             self.__updateURL()
@@ -533,6 +547,11 @@ class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
 
 try:
     proxy_server = ThreadingSimpleServer((DEBRID_PROXY_HOST, DEBRID_PROXY_PORT), neiDebridVideoProxy)
+    
+    if DEBRID_WORKERS > 1:
+        omegaNotification('PROXY ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
+    else:
+        omegaNotification('PROXY ON (un hilo directo)', sound=False)
 except:
     proxy_server = None 
 
@@ -1019,14 +1038,6 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
             video_urls.append([scrapertools.get_filename_from_url(media_url)[-4:] + " [mega]", media_url])
 
         return video_urls
-
-
-def notification_title():
-    return "OMEGA NEIDEBRID"
-
-
-def omegaNotification(msg, timeout=5000):
-    xbmcgui.Dialog().notification(notification_title(), msg, os.path.join(xbmcaddon.Addon().getAddonInfo("path"),"resources","media","channels","thumb","omega.gif"), timeout)
 
 
 def thread_close_pbar(pbar):
