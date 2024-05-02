@@ -544,16 +544,16 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
     pass
 
-
-try:
-    proxy_server = ThreadingSimpleServer((DEBRID_PROXY_HOST, DEBRID_PROXY_PORT), neiDebridVideoProxy)
-    
-    if DEBRID_WORKERS > 1:
-        omegaNotification('PROXY ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
-    else:
-        omegaNotification('PROXY ON (un hilo directo)', sound=False)
-except:
-    proxy_server = None 
+if OMEGA_REALDEBRID or OMEGA_ALLDEBRID:
+    try:
+        proxy_server = ThreadingSimpleServer((DEBRID_PROXY_HOST, DEBRID_PROXY_PORT), neiDebridVideoProxy)
+        
+        if DEBRID_WORKERS > 1:
+            omegaNotification('PROXY ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
+        else:
+            omegaNotification('PROXY ON (un hilo directo)', sound=False)
+    except:
+        proxy_server = None 
 
 
 """
@@ -876,7 +876,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
     pbar.create('[B]OMEGA[/B]', '[B]Cargando conector NEI...[/B]')
 
     #El proxy se carga una vez con el primer vídeo y se queda cargado mientras KODI esté corriendo
-    if proxy_server:
+    if (OMEGA_REALDEBRID or OMEGA_ALLDEBRID) and proxy_server:
         start_proxy()
 
     close_background_pbar(pbar)

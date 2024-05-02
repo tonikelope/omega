@@ -20,6 +20,7 @@ Basado en la librería de MEGA que programó divadr y modificado por tonikelope 
 
 import time
 import os
+import shutil
 import urllib.request, urllib.error, urllib.parse
 from platformcode import platformtools,logger,config
 import threading
@@ -36,6 +37,7 @@ except:
 
 CHUNK_WORKERS = int(config.get_setting("omega_megalib_workers", "omega"))+1
 TURBO_CHUNK_WORKERS = 20
+SOCKET_TIMEOUT = 15
 
 class Cursor(object):
     def __init__(self, file):
@@ -49,11 +51,12 @@ class Cursor(object):
         self.k = file.k
         self.proxy_manager = MegaProxyManager.MegaProxyManager()
         self.turbo_mode = False
+        self.response = None
         self.turbo_lock = threading.Lock()
 
 
     def turbo(self):
-        if not self.turbo_mode:
+        if not self.turbo_mode and CHUNK_WORKERS>1:
             with self.turbo_lock:
                 if not self.turbo_mode:
                     self.turbo_mode = True
@@ -80,69 +83,82 @@ class Cursor(object):
 
     def __start_multi_download(self, offset):
 
-        self.pipe_r,self.pipe_w=os.pipe()
+        if CHUNK_WORKERS > 1:
+            self.pipe_r,self.pipe_w=os.pipe()
+            self.chunk_writer = ChunkWriter.ChunkWriter(self, self.pipe_w, offset, self._file.size - 1)
 
-        self.chunk_writer = ChunkWriter.ChunkWriter(self, self.pipe_w, offset, self._file.size - 1)
+            t = threading.Thread(target=self.chunk_writer.run)
+            t.daemon = True
+            t.start()
 
-        t = threading.Thread(target=self.chunk_writer.run)
-        t.daemon = True
-        t.start()
+            self.chunk_downloaders = []
 
-        self.chunk_downloaders = []
-
-        if len(self.chunk_downloaders) < CHUNK_WORKERS:
-
-            for c in range(0,CHUNK_WORKERS):
-                chunk_downloader = ChunkDownloader.ChunkDownloader(c+1, self)
-                self.chunk_downloaders.append(chunk_downloader)
-                t = threading.Thread(target=chunk_downloader.run)
-                t.daemon = True
-                t.start()
+            if len(self.chunk_downloaders) < CHUNK_WORKERS:
+                for c in range(0,CHUNK_WORKERS):
+                    chunk_downloader = ChunkDownloader.ChunkDownloader(c+1, self)
+                    self.chunk_downloaders.append(chunk_downloader)
+                    t = threading.Thread(target=chunk_downloader.run)
+                    t.daemon = True
+                    t.start()
+        else:
+            req = urllib.request.Request(self._file.url+('/%d-%d' % (offset, self._file.size - 1)))
+            self.response = urllib.request.urlopen(req, timeout=SOCKET_TIMEOUT)
 
 
     def stop_multi_download(self):
 
         logger.info("Cursor stopping multi download!")
 
-        if self.pipe_r:
-            try:
-                os.close(self.pipe_r)
-            except Exception as e:
-                logger.info(str(e))
+        if self.response:
+            self.response.close()
+        else:
 
-        if self.pipe_w:
-            try:
-                os.close(self.pipe_w)
-            except Exception as e:
-                logger.info(str(e))
-        try:
-            if self.chunk_writer:
-                self.chunk_writer.exit = True
-
-                with self.chunk_writer.cv_new_element:
-                    self.chunk_writer.cv_new_element.notify()
-
-        except Exception as e:
-            logger.info(str(e))
-
-        if self.chunk_downloaders is not None:
-            for c in self.chunk_downloaders:
+            if self.pipe_r:
                 try:
-                    c.exit = True
+                    os.close(self.pipe_r)
                 except Exception as e:
                     logger.info(str(e))
 
-        self.chunk_downloaders = None
+            if self.pipe_w:
+                try:
+                    os.close(self.pipe_w)
+                except Exception as e:
+                    logger.info(str(e))
+            
+            try:
+                if self.chunk_writer:
+                    self.chunk_writer.exit = True
+
+                    with self.chunk_writer.cv_new_element:
+                        self.chunk_writer.cv_new_element.notify()
+
+            except Exception as e:
+                logger.info(str(e))
+
+            if self.chunk_downloaders is not None:
+                for c in self.chunk_downloaders:
+                    try:
+                        c.exit = True
+                    except Exception as e:
+                        logger.info(str(e))
+
+            self.chunk_downloaders = None
 
 
     def read(self, n=None):
-        if not self.pipe_r:
-            return
+        if self.response:
+            try:    
+                res = self.response.read(n)
+            except Exception:
+                res = None
+        else:
+            if not self.pipe_r:
+                return
 
-        try:    
-            res = os.read(self.pipe_r, n)
-        except Exception:
-            res = None
+            try:    
+                res = os.read(self.pipe_r, n)
+            except Exception:
+                res = None
 
         if res:
             res = self.decode(res)
