@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "5.99"
+CHANNEL_VERSION = "6.0"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -836,7 +836,7 @@ def mainlist(item):
 
 
 def help_settings_nei(item):
-    xbmcgui.Dialog().textviewer("AYUDA", "[B]¿Qué valor se recomienda poner en [COLOR yellow]hilos[/COLOR] de descarga DEBRID/MEGA?[/B]\nPor norma general, este valor debe dejarse a 1 a no ser que por algún motivo el vídeo que estemos reproduciendo vaya más lento de lo habitual, en cuyo caso podemos empezar a probar con 4 hilos e ir subiendo poco a poco.\n\n[B]¿Qué se debe poner en [COLOR yellow]tamaño de buffer DEBRID/MEGA[/COLOR]?[/B]\nEn caso de utilizar más de un hilo de descarga, se recomienda dejar este buffer en el valor por defecto (50MB para MEGA y 100MB para DEBRID) o como mucho aumentarlo hasta el doble (si sólo se usa un hilo de descarga, este valor se ignorará).\n\n[B]¿Qué valor se debe usar para el [COLOR yellow]buffer de KODI[/COLOR]?[/B]\nEste ajustes es importante. Si la reproducción funciona sin cortes, no hace falta tocarlo. En caso de experimentar cortes se recomienda irlo subiendo poco a poco (ojo con subirlo mucho porque podemos quedarnos sin memoria RAM en el dispositivo)\n\n[B]¿Y la [COLOR yellow]velocidad[/COLOR] de lectura del buffer de KODI?[/B]\nSe recomienda nuevamente dejarlo por defecto o aumentarlo como hasta 8x")
+    xbmcgui.Dialog().textviewer("AYUDA", "[B]¿Qué valor se recomienda poner en [COLOR yellow]hilos[/COLOR] de descarga DEBRID/MEGA?[/B]\nPor norma general, este valor debe dejarse a 1 a no ser que por algún motivo el vídeo que estemos reproduciendo vaya más lento de lo habitual (o nuestro ISP limite las descargas), en cuyo caso podemos empezar a probar con 4 hilos e ir subiendo poco a poco.\n\n[B]¿Qué se debe poner en [COLOR yellow]tamaño de buffer DEBRID/MEGA[/COLOR]?[/B]\nEn caso de utilizar más de un hilo de descarga, se recomienda dejar este buffer en el valor por defecto (50MB para MEGA y 100MB para DEBRID) o como mucho aumentarlo hasta el doble (si sólo se usa un hilo de descarga, este valor se ignorará).\n\n[B]¿Qué valor se debe usar para el [COLOR yellow]buffer de KODI[/COLOR]?[/B]\nEste ajuste es importante. Si la reproducción funciona sin cortes, no hace falta tocarlo. En caso de experimentar cortes (o para videos MUY grandes como 4K REMUX) se recomienda subirlo hasta 150/200 MB (ojo con subirlo mucho porque podemos quedarnos sin memoria RAM en el dispositivo)\n\n[B]¿Y la [COLOR yellow]velocidad[/COLOR] de lectura del buffer de KODI?[/B]\nSe recomienda nuevamente dejarlo por defecto o aumentarlo hasta 8x")
 
 
 def ajustes(item):
