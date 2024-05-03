@@ -73,9 +73,9 @@ MEGACRYPTER2DEBRID_MULTI_RETRY = 5
 VIDEO_MULTI_DEBRID_URL = None
 VIDEO_MULTI_DEBRID_URL_LOCK = threading.Lock()
 
-CHUNK_SIZE = 10*1024*1024 #COMPROMISO
+CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 DEBRID_WORKERS = int(config.get_setting("omega_debrid_proxy_workers", "omega"))+1
-MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "omega"))+1)*5) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
+MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "omega"))+1)*10) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
 CHUNK_ERROR_SLEEP = 2 #segundos
 
 DEBRID_ACCOUNT_FREE_SPACE = None
@@ -369,7 +369,15 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
 
-        if self.path.startswith('/isalive'):
+        if self.path.startswith('/shutdown'):
+            
+            self.send_response(200)
+
+            self.end_headers()
+
+            self.server.shutdown()
+
+        elif self.path.startswith('/isalive'):
             
             self.send_response(200)
 
