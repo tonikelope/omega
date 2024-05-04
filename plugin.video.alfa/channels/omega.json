@@ -17,7 +17,7 @@
     {
       "id": "omega_user",
       "type": "text",
-      "label": "USUARIO DE NEI (OJO, EXACTO):",
+      "label": "USUARIO DE NEI (OJO a las mayúsculas):",
       "enabled": true,
       "visible": true
     },
@@ -49,7 +49,7 @@
     {
       "id": "omega_blacklist_titles",
       "type": "text",
-      "label": "IGNORAR TÍTULOS que contengan (separar por comas):",
+      "label": "IGNORAR TÍTULOS que contengan las palabras (separar por comas):",
       "default": "",
       "enabled": true,
       "visible": true
@@ -148,7 +148,7 @@
     {
       "id": "omega_debrid_mega_url",
       "type": "text",
-      "label": "Listado JSON CUENTAS MEGA AUXILIARES (DEBRID):",
+      "label": "Listado (json) de CUENTAS de MEGA AUXILIARES (DEBRID):",
       "default": "",
       "enabled": "eq(-12,true)|eq(-11,true)",
       "visible": "eq(-12,true)|eq(-11,true)"
@@ -245,14 +245,6 @@
       "visible": "eq(-23,false)+eq(-22,false)"
     },
     {
-      "id": "include_in_global_search",
-      "type": "bool",
-      "label": "Incluir OMEGA en la búsqueda global",
-      "default": true,
-      "enabled": true,
-      "visible": true
-    },
-    {
       "id": "omega_kodi_buffer",
       "type": "list",
       "label": "Buffer de KODI:",
@@ -269,6 +261,14 @@
       "enabled": true,
       "visible": true,
       "lvalues": [ "1x", "2x", "3x", "4x", "5x", "6x", "7x", "8x", "9x", "10x", "11x", "12x", "13x", "14x", "15x", "16x"]
+    },
+    {
+      "id": "include_in_global_search",
+      "type": "bool",
+      "label": "Incluir OMEGA en la búsqueda global",
+      "default": true,
+      "enabled": true,
+      "visible": true
     }
   ]
 }
