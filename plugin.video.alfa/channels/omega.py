@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.6"
+CHANNEL_VERSION = "6.7"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1593,7 +1593,7 @@ def check_items_updated(old_settings):
 
 def shutdown_debrid_proxy():
     try:
-        urllib.request.urlopen('http://localhost:'+config.get_setting("omega_debrid_proxy_port", "omega").strip()+'/shutdown')
+        urllib.request.urlopen('http://localhost:'+config.get_setting("omega_debrid_proxy_port", "omega").strip()+'/shutdown', method='HEAD')
     except:
         pass
 

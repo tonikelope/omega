@@ -162,40 +162,40 @@
       "visible": "eq(-13,true)|eq(-12,true)"
     },
     {
-      "id": "omega_debrid_proxy_chunks",
+      "id": "omega_debrid_proxy_workers",
       "type": "list",
-      "label": "Tamaño del buffer DEBRID:",
+      "label": "Hilos para proxy DEBRID:",
       "default": 0,
       "enabled": "eq(-14,true)|eq(-13,true)",
       "visible": "eq(-14,true)|eq(-13,true)",
-      "lvalues": [ "50 MB", "100 MB", "150 MB", "200 MB", "250 MB", "300 MB", "350 MB", "400 MB", "450 MB", "500 MB"]
-    },
-    {
-      "id": "omega_debrid_proxy_workers",
-      "type": "list",
-      "label": "Hilos de descarga DEBRID:",
-      "default": 0,
-      "enabled": "eq(-15,true)|eq(-14,true)",
-      "visible": "eq(-15,true)|eq(-14,true)",
       "lvalues": [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "15", "16"]
     },
     {
-      "id": "omega_megalib_chunks",
+      "id": "omega_debrid_proxy_chunks",
       "type": "list",
-      "label": "Tamaño del buffer para MEGA:",
-      "default": 1,
-      "enabled": "eq(-16,false)+eq(-15,false)",
-      "visible": "eq(-16,false)+eq(-15,false)",
+      "label": "Buffer para el proxy DEBRID (si hilos>1):",
+      "default": 0,
+      "enabled": "eq(-15,true)|eq(-14,true)",
+      "visible": "eq(-15,true)|eq(-14,true)",
       "lvalues": [ "50 MB", "100 MB", "150 MB", "200 MB", "250 MB", "300 MB", "350 MB", "400 MB", "450 MB", "500 MB"]
     },
     {
       "id": "omega_megalib_workers",
       "type": "list",
-      "label": "Hilos de descarga para MEGA:",
+      "label": "Hilos para MEGA directo:",
       "default": 0,
+      "enabled": "eq(-16,false)+eq(-15,false)",
+      "visible": "eq(-16,false)+eq(-15,false)",
+      "lvalues": [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+    },
+    {
+      "id": "omega_megalib_chunks",
+      "type": "list",
+      "label": "Buffer para MEGA directo (si hilos>1):",
+      "default": 1,
       "enabled": "eq(-17,false)+eq(-16,false)",
       "visible": "eq(-17,false)+eq(-16,false)",
-      "lvalues": [ "1", "2", "3", "4", "5", "6", "7", "8", "9", "10"]
+      "lvalues": [ "50 MB", "100 MB", "150 MB", "200 MB", "250 MB", "300 MB", "350 MB", "400 MB", "450 MB", "500 MB"]
     },
     {
       "id": "omega_mega_proxy_list",
@@ -233,16 +233,16 @@
       "type": "bool",
       "label": "Usar MEGACRYPTER REVERSE MODE (requiere abrir puerto)",
       "default": false,
-      "enabled": true,
-      "visible": true
+      "enabled": "eq(-22,false)+eq(-21,false)",
+      "visible": "eq(-22,false)+eq(-21,false)"
     },
     {
       "id": "omega_mc_reverse_port",
       "type": "text",
       "label": "Puerto para MEGACRYPTER REVERSE MODE:",
       "default": "9998",
-      "enabled": "eq(-1,true)",
-      "visible": "eq(-1,true)"
+      "enabled": "eq(-23,false)+eq(-22,false)",
+      "visible": "eq(-23,false)+eq(-22,false)"
     },
     {
       "id": "include_in_global_search",
@@ -255,7 +255,7 @@
     {
       "id": "omega_kodi_buffer",
       "type": "list",
-      "label": "Tamaño del buffer de KODI:",
+      "label": "Buffer de KODI:",
       "default": 0,
       "enabled": true,
       "visible": true,
@@ -264,7 +264,7 @@
     {
       "id": "omega_kodi_readfactor",
       "type": "list",
-      "label": "Velocidad de llenado del buffer de KODI:",
+      "label": "Velocidad de carga del buffer de KODI:",
       "default": 1,
       "enabled": true,
       "visible": true,
