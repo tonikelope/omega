@@ -406,57 +406,62 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                 self.end_headers()
 
             else:
+                try:
 
-                range_request = self.__sendResponseHeaders()
-                
-                if range_request:
+                    range_request = self.__sendResponseHeaders()
                     
-                    if DEBRID_WORKERS > 1:
-                        chunk_writer = neiDebridVideoProxyChunkWriter(self.wfile, int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
+                    if range_request:
+                        
+                        if DEBRID_WORKERS > 1:
+                            chunk_writer = neiDebridVideoProxyChunkWriter(self.wfile, int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
 
-                        chunk_downloaders=[]
+                            chunk_downloaders=[]
 
-                        for c in range(0, DEBRID_WORKERS):
-                            chunk_downloader = neiDebridVideoProxyChunkDownloader(c+1, chunk_writer)
-                            chunk_downloaders.append(chunk_downloader)
-                            t = threading.Thread(target=chunk_downloader.run)
-                            t.daemon = True
+                            for c in range(0, DEBRID_WORKERS):
+                                chunk_downloader = neiDebridVideoProxyChunkDownloader(c+1, chunk_writer)
+                                chunk_downloaders.append(chunk_downloader)
+                                t = threading.Thread(target=chunk_downloader.run)
+                                t.daemon = True
+                                t.start()
+
+                            t = threading.Thread(target=chunk_writer.run)
                             t.start()
+                            t.join()
 
-                        t = threading.Thread(target=chunk_writer.run)
-                        t.start()
-                        t.join()
+                            for downloader in chunk_downloaders:
+                                downloader.exit = True
+                        else:
+                            
+                                partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
 
-                        for downloader in chunk_downloaders:
-                            downloader.exit = True
+                                for partial_range in partial_ranges:
+
+                                    p_inicio = partial_range[0]
+
+                                    p_final = partial_range[1]
+
+                                    url = partial_range[2]
+
+                                    request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final)}
+
+                                    request = urllib.request.Request(url, headers=request_headers)
+
+                                    with urllib.request.urlopen(request) as response:
+                                        shutil.copyfileobj(response, self.wfile)                     
                     else:
-                        partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
 
-                        for partial_range in partial_ranges:
-
-                            p_inicio = partial_range[0]
-
-                            p_final = partial_range[1]
-
-                            url = partial_range[2]
-
-                            request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
-
-                            request = urllib.request.Request(url, headers=request_headers)
-
-                            with urllib.request.urlopen(request) as response:
-                                shutil.copyfileobj(response, self.wfile)                        
-                else:
-
-                    if VIDEO_MULTI_DEBRID_URL.multi_urls:
-                        for murl in VIDEO_MULTI_DEBRID_URL.multi_urls:
-                            request = urllib.request.Request(murl[2])
+                        if VIDEO_MULTI_DEBRID_URL.multi_urls:
+                            for murl in VIDEO_MULTI_DEBRID_URL.multi_urls:
+                                request = urllib.request.Request(murl[2])
+                                with urllib.request.urlopen(request) as response:
+                                    shutil.copyfileobj(response, self.wfile)
+                        else:
+                            request = urllib.request.Request(VIDEO_MULTI_DEBRID_URL.url)
                             with urllib.request.urlopen(request) as response:
                                 shutil.copyfileobj(response, self.wfile)
-                    else:
-                        request = urllib.request.Request(VIDEO_MULTI_DEBRID_URL.url)
-                        with urllib.request.urlopen(request) as response:
-                            shutil.copyfileobj(response, self.wfile)
+
+                except Exception as ex:
+                            logger.info(ex) 
 
     
     def __updateURL(self):
