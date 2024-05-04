@@ -442,12 +442,19 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
                                     url = partial_range[2]
 
-                                    request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final)}
+                                    p_length = p_final-p_inicio+1
+
+                                    request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
 
                                     request = urllib.request.Request(url, headers=request_headers)
 
                                     with urllib.request.urlopen(request) as response:
-                                        shutil.copyfileobj(response, self.wfile)                     
+                                        p_chunk_read = 0
+                                        while p_chunk_read < p_length:
+                                            p_chunk = response.read(min(8*1024, p_length-p_chunk_read))
+                                            p_chunk_read+=len(p_chunk)
+                                            self.wfile.write(p_chunk)
+                                                        
                     else:
 
                         if VIDEO_MULTI_DEBRID_URL.multi_urls:
