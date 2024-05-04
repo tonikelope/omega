@@ -559,7 +559,7 @@ if OMEGA_REALDEBRID or OMEGA_ALLDEBRID:
         if DEBRID_WORKERS > 1:
             omegaNotification('PROXY ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
         else:
-            omegaNotification('PROXY ON (un hilo directo)', sound=False)
+            omegaNotification('PROXY ON (un hilo sin buffer)', sound=False)
     except:
         proxy_server = None 
 
