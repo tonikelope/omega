@@ -369,32 +369,16 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
     def do_HEAD(self):
 
-        if self.path.startswith('/shutdown'):
+        self.__updateURL()
+
+        if VIDEO_MULTI_DEBRID_URL.size < 0:
             
-            self.send_response(200)
-
-            self.end_headers()
-
-            self.server.shutdown()
-
-        elif self.path.startswith('/isalive'):
-            
-            self.send_response(200)
-
+            self.send_response(503)
             self.end_headers()
 
         else:
 
-            self.__updateURL()
-
-            if VIDEO_MULTI_DEBRID_URL.size < 0:
-                
-                self.send_response(503)
-                self.end_headers()
-
-            else:
-
-                self.__sendResponseHeaders()
+            self.__sendResponseHeaders()
 
     
     def do_GET(self):
