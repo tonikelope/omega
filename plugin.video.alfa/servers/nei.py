@@ -205,6 +205,7 @@ class neiDebridVideoProxyChunkWriter():
         self.next_offset_required = start_offset
         self.chunk_offset_lock = threading.Lock()
         self.chunk_queue_lock = threading.Lock()
+        self.chunk_error_notify = False
 
 
     def run(self):
@@ -265,7 +266,7 @@ class neiDebridVideoProxyChunkDownloader():
         self.url = VIDEO_MULTI_DEBRID_URL
         self.exit = False
         self.chunk_writer = chunk_writer
-        self.chunk_error_notify = False
+        
 
     def run(self):
 
@@ -347,8 +348,8 @@ class neiDebridVideoProxyChunkDownloader():
                             else:
                                 logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' ('+str(len(chunk))+' bytes) CHUNK SIZE ERROR!')
 
-                                if not self.chunk_error_notify:
-                                    self.chunk_error_notify = True
+                                if not self.chunk_writer.chunk_error_notify:
+                                    self.chunk_writer.chunk_error_notify = True
                                     omegaNotification('CHUNK ERROR: ¿Demasiados HILOS en ajustes?')
 
                                 time.sleep(CHUNK_ERROR_SLEEP)
@@ -431,29 +432,28 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                             for downloader in chunk_downloaders:
                                 downloader.exit = True
                         else:
-                            
-                                partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
+                            partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
 
-                                for partial_range in partial_ranges:
+                            for partial_range in partial_ranges:
 
-                                    p_inicio = partial_range[0]
+                                p_inicio = partial_range[0]
 
-                                    p_final = partial_range[1]
+                                p_final = partial_range[1]
 
-                                    url = partial_range[2]
+                                url = partial_range[2]
 
-                                    p_length = p_final-p_inicio+1
+                                p_length = p_final-p_inicio+1
 
-                                    request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
+                                request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
 
-                                    request = urllib.request.Request(url, headers=request_headers)
+                                request = urllib.request.Request(url, headers=request_headers)
 
-                                    with urllib.request.urlopen(request) as response:
-                                        p_chunk_read = 0
-                                        while p_chunk_read < p_length:
-                                            p_chunk = response.read(min(8*1024, p_length-p_chunk_read))
-                                            p_chunk_read+=len(p_chunk)
-                                            self.wfile.write(p_chunk)
+                                with urllib.request.urlopen(request) as response:
+                                    p_chunk_read = 0
+                                    while p_chunk_read < p_length:
+                                        p_chunk = response.read(min(8*1024, p_length-p_chunk_read))
+                                        p_chunk_read+=len(p_chunk)
+                                        self.wfile.write(p_chunk)
                                                         
                     else:
 
