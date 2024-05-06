@@ -192,7 +192,7 @@
       "id": "omega_megalib_chunks",
       "type": "list",
       "label": "Buffer para MEGA directo (si hilos>1):",
-      "default": 1,
+      "default": 0,
       "enabled": "eq(-17,false)+eq(-16,false)",
       "visible": "eq(-17,false)+eq(-16,false)",
       "lvalues": [ "50 MB", "100 MB", "150 MB", "200 MB", "250 MB", "300 MB", "350 MB", "400 MB", "450 MB", "500 MB"]
