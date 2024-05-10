@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.10"
+CHANNEL_VERSION = "6.11"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -2651,7 +2651,7 @@ def bibliotaku_series_temporadas(item):
 
     ajustes_item.contentPlot = "Ajustes de OMEGA"
 
-    ajustes_item.action = "settings_nei"
+    ajustes_item.action = "ajustes"
 
     ajustes_item.url = ""
 
@@ -2935,7 +2935,7 @@ def bibliotaku_pelis_megacrypter(item):
 
     ajustes_item.contentPlot = "Ajustes de OMEGA"
 
-    ajustes_item.action = "settings_nei"
+    ajustes_item.action = "ajustes"
 
     ajustes_item.url = ""
 
@@ -3489,7 +3489,7 @@ def foro(item, episode_count_call=False):
 
         ajustes_item.contentPlot = "Ajustes de OMEGA"
 
-        ajustes_item.action = "settings_nei"
+        ajustes_item.action = "ajustes"
 
         ajustes_item.url = ""
 
