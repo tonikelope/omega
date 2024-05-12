@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.14"
+CHANNEL_VERSION = "6.15"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -167,6 +167,10 @@ FOROS_FINALES_NEI = [
     "alta-definicion-(hd)-52",
     "definicion-estandar-(sd)-51",
 ]
+
+KODI_BUFFER_SIZES = [16, 20, 32, 64, 96, 128, 192, 256, 384, 512, 768, 1024]
+
+KODI_READ_FACTORS = [2, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 32, 50]
 
 try:
     lines = [line.rstrip("\n") for line in open(KODI_NEI_EPISODE_WATCHDOG_PATH)]
@@ -435,15 +439,9 @@ def login(force=False):
 
 def kodi_advancedsettings(verbose=True):
 
-    new_memorysize = str(
-        (int(config.get_setting("omega_kodi_buffer", "omega")) + 1) * 52428800
-    )
-    new_readfactor_mul = str(
-        int(config.get_setting("omega_kodi_readfactor", "omega")) + 1
-    )
-    new_readfactor = str(
-        (int(config.get_setting("omega_kodi_readfactor", "omega")) + 1) * 4
-    )
+    new_memorysize = str(KODI_BUFFER_SIZES[int(config.get_setting("omega_kodi_buffer", "omega"))]*1024*1024)
+    
+    new_readfactor = str(KODI_READ_FACTORS[int(config.get_setting("omega_kodi_readfactor", "omega"))])
 
     os.rename(
         xbmcvfs.translatePath("special://userdata/advancedsettings.xml"),
@@ -836,7 +834,7 @@ def mainlist(item):
 
 
 def help_settings_nei(item):
-    xbmcgui.Dialog().textviewer("AYUDA", "[B]¿Qué valor se recomienda poner en [COLOR yellow]hilos[/COLOR] de descarga DEBRID/MEGA?[/B]\nPor norma general, este valor debe dejarse a 1 a no ser que por algún motivo el vídeo que estemos reproduciendo vaya más lento de lo habitual, nuestro ISP nos limite de alguna manera o se trate de un vídeo de bitrate muy elevado (por ejemplo 4K REMUX). En ese caso, podemos empezar con 4 hilos e ir subiendo poco a poco.\n\n[B]¿Qué se debe poner en [COLOR yellow]tamaño de buffer DEBRID/MEGA[/COLOR]?[/B]\nEn caso de utilizar más de un hilo de descarga, se recomienda dejar este buffer en 50MB (si sólo se usa un hilo de descarga, este valor se ignorará).\n\n[B]¿Qué valor se debe usar para el [COLOR yellow]buffer de KODI[/COLOR]?[/B]\nEste ajuste es importante. Si la reproducción funciona sin saltos, no hace falta tocarlo. En caso contrario o para soportar vídeos de bitrate muy elevado como 4K REMUX se recomienda subirlo hasta 150/200 MB (ojo con subirlo mucho porque podemos quedarnos sin memoria RAM en el dispositivo).\n\n[B]¿Y la [COLOR yellow]velocidad[/COLOR] de carga del buffer de KODI?[/B]\nSe recomienda dejarlo a 2x/4x y aumentarlo hasta 8x si pensamos reproducir vídeos de bitrate muy elevado como 4K REMUX\n\n[B]Nota:[/B] los hilos ayudan a exprimir la velocidad de descarga al máximo y los buffers a suavizar bajadas puntuales en la velocidad de descarga, pero la limitación real es el ancho de banda de tu conexión a Internet y el bitrate del vídeo en cuestión. (Por ejemplo, para reproducir por streaming de forma fluida una película de 2 horas 4K REMUX (80 GB aprox) se requiere como mínimo una conexión REAL de 200Mbps (ojo al WIFI), siendo recomendable 300Mbps o más).\n\n[B]Al entrar a OMEGA han desaparecido casi todos los iconos[/B]\nA veces tras una actualización de ALFA, OMEGA puede des-sincronizarse. El 99% de las veces se soluciona pulsando en [B]FORZAR RE-LOGIN[/B], cerrando KODI y volviendo a entrar.")
+    xbmcgui.Dialog().textviewer("AYUDA", "[B]¿Qué valor se recomienda poner en [COLOR yellow]hilos[/COLOR] de descarga DEBRID/MEGA?[/B]\nPor norma general, este valor debe dejarse a 1 a no ser que por algún motivo el vídeo que estemos reproduciendo vaya más lento de lo habitual, nuestro ISP nos limite de alguna manera o se trate de un vídeo de bitrate muy elevado (por ejemplo 4K REMUX). En ese caso, podemos empezar con 4 hilos e ir subiendo poco a poco.\n\n[B]¿Qué se debe poner en [COLOR yellow]tamaño de buffer DEBRID/MEGA[/COLOR]?[/B]\nEn caso de utilizar más de un hilo de descarga, se recomienda dejar este buffer en 50MB (si sólo se usa un hilo de descarga, este valor se ignorará).\n\n[B]¿Qué valor se debe usar para el [COLOR yellow]buffer de KODI[/COLOR]?[/B]\nEste ajuste es importante. Si la reproducción funciona sin saltos, no hace falta tocarlo. En caso contrario o para soportar vídeos de bitrate muy elevado como 4K REMUX se recomienda subirlo hasta 128/256MB (ojo con subirlo mucho porque podemos quedarnos sin memoria RAM en el dispositivo).\n\n[B]¿Y la [COLOR yellow]velocidad[/COLOR] de carga del buffer de KODI?[/B]\nSe recomienda dejarlo a 6x y aumentarlo hasta 12x/16x si pensamos reproducir vídeos de bitrate muy elevado como 4K REMUX\n\n[B]Nota1:[/B] los hilos ayudan a exprimir la velocidad de descarga al máximo y los buffers a suavizar bajadas puntuales en la velocidad de descarga, pero la limitación real es el ancho de banda de tu conexión a Internet y el bitrate del vídeo en cuestión. (Por ejemplo, para reproducir por streaming de forma fluida una película de 2 horas 4K REMUX (80 GB aprox) se requiere como mínimo una conexión REAL de 200Mbps (ojo al WIFI), siendo recomendable 300Mbps o más).\n[I][B]Nota2:[/B] a aprtir de la versión 21 de KODI, el tamaño del buffer de KODI y la velocidad de carga se ajustan desde los ajustes de KODI generales en modo avanzado/experto (SERVICIOS -> ALMACENAMIENTO)[/I] (Lo que se ponga en estos dos valores en ajustes OMEGA será ignorado por KODI a partir de la versión 21).\n\n[B]Al entrar a OMEGA han desaparecido casi todos los iconos[/B]\nA veces tras una actualización de ALFA, OMEGA puede des-sincronizarse. El 99% de las veces se soluciona pulsando en [B]FORZAR RE-LOGIN[/B], cerrando KODI y volviendo a entrar.")
 
 
 def ajustes(item):
@@ -1618,14 +1616,6 @@ def settings_nei(item):
             bool(config.get_setting("omega_alldebrid", "omega")),
             server="alldebrid",
         )
-
-    new_kodi_memorysize = str(
-        (int(config.get_setting("omega_kodi_buffer", "omega")) + 1) * 52428800
-    )
-
-    new_kodi_readfactor = str(
-        (int(config.get_setting("omega_kodi_readfactor", "omega")) + 1) * 4
-    )
 
     kodi_advancedsettings()
 
