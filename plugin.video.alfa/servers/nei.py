@@ -73,13 +73,15 @@ MEGACRYPTER2DEBRID_MULTI_RETRY = 5
 VIDEO_MULTI_DEBRID_URL = None
 VIDEO_MULTI_DEBRID_URL_LOCK = threading.Lock()
 
-CHUNK_SIZE = 5*1024*1024 #COMPROMISO
+WORKER_CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 DEBRID_WORKERS = int(config.get_setting("omega_debrid_proxy_workers", "omega"))+1
 MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "omega"))+1)*10) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
 CHUNK_ERROR_SLEEP = 2 #segundos
 
 DEBRID_ACCOUNT_FREE_SPACE = None
 DEBRID_AUX_MEGA_ACCOUNTS = []
+
+RESPONSE_READ_CHUNK_SIZE = 8*1024
 
 try:
     if config.get_setting("omega_debrid_mega_url", "omega"):
@@ -253,7 +255,7 @@ class neiDebridVideoProxyChunkWriter():
 
             next_offset = self.next_offset_required
 
-            self.next_offset_required = self.next_offset_required + CHUNK_SIZE if self.next_offset_required + CHUNK_SIZE < self.end_offset else -1
+            self.next_offset_required = self.next_offset_required + WORKER_CHUNK_SIZE if self.next_offset_required + WORKER_CHUNK_SIZE < self.end_offset else -1
 
         return next_offset
 
@@ -280,7 +282,7 @@ class neiDebridVideoProxyChunkDownloader():
 
                 inicio = offset
 
-                final = min(inicio + CHUNK_SIZE - 1, self.chunk_writer.end_offset)
+                final = min(inicio + WORKER_CHUNK_SIZE - 1, self.chunk_writer.end_offset)
 
                 partial_ranges = self.url.absolute2PartialRanges(inicio, final) #Si el vídeo está troceado, es posible que el chunk pedido por el reproductor de KODI tenga bytes de diferentes trozos (URLs)
 
@@ -451,7 +453,7 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                                 with urllib.request.urlopen(request) as response:
                                     p_chunk_read = 0
                                     while p_chunk_read < p_length:
-                                        p_chunk = response.read(min(8*1024, p_length-p_chunk_read))
+                                        p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
                                         p_chunk_read+=len(p_chunk)
                                         self.wfile.write(p_chunk)
                                                         
@@ -553,7 +555,7 @@ if OMEGA_REALDEBRID or OMEGA_ALLDEBRID:
         proxy_server = ThreadingSimpleServer((DEBRID_PROXY_HOST, DEBRID_PROXY_PORT), neiDebridVideoProxy)
         
         if DEBRID_WORKERS > 1:
-            omegaNotification('PROXY ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
+            omegaNotification('PROXY ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((WORKER_CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
         else:
             omegaNotification('PROXY ON (un hilo sin buffer)', sound=False)
     except:
