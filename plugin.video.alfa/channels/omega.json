@@ -247,7 +247,7 @@
     {
       "id": "omega_kodi_buffer",
       "type": "list",
-      "label": "Buffer de KODI (KODI < v21!):",
+      "label": "Buffer de KODI (ignorado en v21 o posterior):",
       "default": 4,
       "enabled": true,
       "visible": true,
@@ -256,7 +256,7 @@
     {
       "id": "omega_kodi_readfactor",
       "type": "list",
-      "label": "Velocidad de carga del buffer de KODI (KODI < v21!):",
+      "label": "Velocidad de carga del buffer de KODI (ignorado en v21 o posterior):",
       "default": 3,
       "enabled": true,
       "visible": true,
