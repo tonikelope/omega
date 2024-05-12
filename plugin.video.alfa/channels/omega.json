@@ -173,7 +173,7 @@
     {
       "id": "omega_debrid_proxy_chunks",
       "type": "list",
-      "label": "Buffer para el proxy DEBRID (si hilos>1):",
+      "label": "Buffer para el proxy DEBRID (ignorado si sólo se usa un hilo):",
       "default": 0,
       "enabled": "eq(-15,true)|eq(-14,true)",
       "visible": "eq(-15,true)|eq(-14,true)",
@@ -191,7 +191,7 @@
     {
       "id": "omega_megalib_chunks",
       "type": "list",
-      "label": "Buffer para MEGA directo (si hilos>1):",
+      "label": "Buffer para MEGA directo (ignorado si sólo se usa un hilo):",
       "default": 0,
       "enabled": "eq(-17,false)+eq(-16,false)",
       "visible": "eq(-17,false)+eq(-16,false)",
@@ -247,7 +247,7 @@
     {
       "id": "omega_kodi_buffer",
       "type": "list",
-      "label": "Buffer de KODI (ignorado en v21 o posterior):",
+      "label": "Buffer de KODI (ignorado en KODI v21+):",
       "default": 4,
       "enabled": true,
       "visible": true,
@@ -256,7 +256,7 @@
     {
       "id": "omega_kodi_readfactor",
       "type": "list",
-      "label": "Velocidad de carga del buffer de KODI (ignorado en v21 o posterior):",
+      "label": "Velocidad de carga del buffer de KODI (ignorado en KODI v21+):",
       "default": 3,
       "enabled": true,
       "visible": true,
