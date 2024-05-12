@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.16"
+CHANNEL_VERSION = "6.17"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -168,9 +168,9 @@ FOROS_FINALES_NEI = [
     "definicion-estandar-(sd)-51",
 ]
 
-KODI_BUFFER_SIZES = [16, 20, 32, 64, 96, 128, 192, 256, 384, 512, 768, 1024]
+KODI_BUFFER_SIZES = [16, 20, 24, 32, 48, 64, 96, 128, 192, 256, 384, 512, 768, 1024]
 
-KODI_READ_FACTORS = [2, 4, 5, 6, 7, 8, 9, 10, 12, 14, 16, 18, 20, 24, 32, 50]
+KODI_READ_FACTORS = [2, 4, 6, 8, 12, 16, 24, 32, 50]
 
 try:
     lines = [line.rstrip("\n") for line in open(KODI_NEI_EPISODE_WATCHDOG_PATH)]

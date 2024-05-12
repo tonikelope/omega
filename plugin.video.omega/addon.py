@@ -46,9 +46,9 @@ def ajustesAvanzados():
     cache = settings_xml.findall("cache")
     cache = ET.Element('cache')
     memorysize = ET.Element('memorysize')
-    memorysize.text = '67108864'
+    memorysize.text = '50331648'
     readfactor = ET.Element('readfactor')
-    readfactor.text = '6'
+    readfactor.text = '8'
     cache.append(memorysize)
     cache.append(readfactor)
     settings_xml.getroot().append(cache)

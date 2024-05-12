@@ -247,20 +247,20 @@
     {
       "id": "omega_kodi_buffer",
       "type": "list",
-      "label": "Buffer de KODI (KODI < v21):",
-      "default": 3,
+      "label": "Buffer de KODI (KODI < v21!):",
+      "default": 4,
       "enabled": true,
       "visible": true,
-      "lvalues": [ "16 MB", "20 MB", "32 MB", "64 MB", "96 MB", "128 MB", "192 MB", "256 MB", "384 MB", "512 MB", "768 MB", "1024 MB"]
+      "lvalues": ["16 MB", "20 MB", "24 MB", "32 MB", "48 MB", "64 MB", "96 MB", "128 MB", "192 MB", "256 MB", "384 MB", "512 MB", "768 MB", "1024 MB"]
     },
     {
       "id": "omega_kodi_readfactor",
       "type": "list",
-      "label": "Velocidad de carga del buffer de KODI (KODI < v21):",
+      "label": "Velocidad de carga del buffer de KODI (KODI < v21!):",
       "default": 3,
       "enabled": true,
       "visible": true,
-      "lvalues": ["2x", "4x", "5x", "6x", "7x", "8x", "9x", "10x", "12x", "14x", "16x", "18x", "20x", "24x", "32x", "50x"]
+      "lvalues": ["2x", "4x", "6x", "8x", "12x", "16x", "24x", "32x", "50x"]
     },
     {
       "id": "include_in_global_search",
