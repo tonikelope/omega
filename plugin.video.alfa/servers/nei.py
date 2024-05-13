@@ -321,34 +321,33 @@ class neiDebridVideoProxyChunkDownloader():
 
                 if offset >=0:
 
-                    inicio = offset
+                    final = min(offset + WORKER_CHUNK_SIZE - 1, self.chunk_writer.end_offset)
 
-                    final = min(inicio + WORKER_CHUNK_SIZE - 1, self.chunk_writer.end_offset)
+                    required_chunk_size = final-offset+1
 
-                    partial_ranges = self.url.absolute2PartialRanges(inicio, final) #Si el vídeo está troceado, es posible que el chunk pedido por el reproductor de KODI tenga bytes de diferentes trozos (URLs)
+                    partial_ranges = self.url.absolute2PartialRanges(offset, final) #Si el vídeo está troceado, es posible que el chunk pedido por el reproductor de KODI tenga bytes de diferentes trozos (URLs)
 
                     while not self.exit and not self.chunk_writer.exit and len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE and offset!=self.chunk_writer.bytes_written:
                         with self.chunk_writer.cv_queue_full:
                             self.chunk_writer.cv_queue_full.wait(1)
 
                     if not self.chunk_writer.exit and not self.exit:
-                        chunk = bytearray()
-
-                        required_chunk_size = final-inicio+1
-
+                        
                         chunk_error = True
 
                         while not self.exit and not self.chunk_writer.exit and chunk_error:
 
+                        	chunk = bytearray()
+
                             for partial_range in partial_ranges:
 
-                                p_inicio = partial_range[0]
+                                p_offset = partial_range[0]
 
                                 p_final = partial_range[1]
 
                                 url = partial_range[2]
 
-                                request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
+                                request_headers = {'Range': 'bytes='+str(p_offset)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
 
                                 partial_chunk_error = True
 
@@ -358,7 +357,7 @@ class neiDebridVideoProxyChunkDownloader():
 
                                     with urllib.request.urlopen(request) as response:
 
-                                        required_partial_chunk_size = p_final-p_inicio+1
+                                        required_partial_chunk_size = p_final-p_offset+1
 
                                         partial_chunk=response.read(required_partial_chunk_size)
 
@@ -368,7 +367,7 @@ class neiDebridVideoProxyChunkDownloader():
                                             chunk+=partial_chunk
                                             partial_chunk_error = False
                                         else:
-                                            logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(p_inicio)+'-'+str(p_final)+' ('+str(len(partial_chunk))+' bytes) PARTIAL CHUNK SIZE ERROR! (¿posible bug del DEBRIDER?)')
+                                            logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(p_offset)+'-'+str(p_final)+' ('+str(len(partial_chunk))+' bytes) PARTIAL CHUNK SIZE ERROR! (¿posible bug del DEBRIDER?)')
 
                             if not self.exit and not self.chunk_writer.exit:
 
@@ -377,14 +376,14 @@ class neiDebridVideoProxyChunkDownloader():
                                     with self.chunk_writer.chunk_queue_lock:
                                     
                                         if not self.exit and not self.chunk_writer.exit:
-                                            self.chunk_writer.queue[inicio]=chunk
+                                            self.chunk_writer.queue[offset]=chunk
 
                                     with self.chunk_writer.cv_new_element:
                                         self.chunk_writer.cv_new_element.notify_all()
 
                                     chunk_error = False
                                 else:
-                                    logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' ('+str(len(chunk))+' bytes) CHUNK SIZE ERROR! (¿posible bug del DEBRIDER?)')
+                                    logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(offset)+'-'+str(final)+' ('+str(len(chunk))+' bytes) CHUNK SIZE ERROR! (¿posible bug del DEBRIDER?)')
 
                 else:
                     with self.chunk_writer.chunk_offset_lock:
