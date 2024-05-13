@@ -337,7 +337,7 @@ class neiDebridVideoProxyChunkDownloader():
 
                         while not self.exit and not self.chunk_writer.exit and chunk_error:
 
-                        	chunk = bytearray()
+                            chunk = bytearray()
 
                             for partial_range in partial_ranges:
 
