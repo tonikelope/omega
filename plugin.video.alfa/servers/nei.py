@@ -311,6 +311,8 @@ class neiDebridVideoProxyChunkDownloader():
 
         logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' HELLO')
 
+        bytes_downloaded = 0
+
         while not self.exit and not self.chunk_writer.exit:
 
             offset = self.chunk_writer.nextOffsetRequired()
@@ -325,7 +327,7 @@ class neiDebridVideoProxyChunkDownloader():
 
                     partial_ranges = self.url.absolute2PartialRanges(inicio, final) #Si el vídeo está troceado, es posible que el chunk pedido por el reproductor de KODI tenga bytes de diferentes trozos (URLs)
 
-                    while not self.chunk_writer.exit and not self.exit and len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE and offset!=self.chunk_writer.bytes_written:
+                    while not self.exit and not self.chunk_writer.exit and len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE and offset!=self.chunk_writer.bytes_written:
                         with self.chunk_writer.cv_queue_full:
                             self.chunk_writer.cv_queue_full.wait(1)
 
@@ -359,6 +361,8 @@ class neiDebridVideoProxyChunkDownloader():
                                         required_partial_chunk_size = p_final-p_inicio+1
 
                                         partial_chunk=response.read(required_partial_chunk_size)
+
+                                        bytes_downloaded+=len(partial_chunk)
 
                                         if len(partial_chunk) == required_partial_chunk_size:
                                             chunk+=partial_chunk
@@ -394,7 +398,7 @@ class neiDebridVideoProxyChunkDownloader():
 
         self.exit = True
 
-        logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' BYE')
+        logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' BYE ('+str(bytes_downloaded)+' bytes downloaded)')
 
 
 """
