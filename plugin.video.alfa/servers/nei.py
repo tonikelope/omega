@@ -330,7 +330,7 @@ class neiDebridVideoProxyChunkDownloader():
                                             time.sleep(CHUNK_ERROR_SLEEP)
 
                                 except Exception as ex:
-                                    logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' HTTP ERROR!')
+                                    logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(p_inicio)+'-'+str(p_final)+' HTTP ERROR!')
                                     
                                     logger.debug(ex)
 
