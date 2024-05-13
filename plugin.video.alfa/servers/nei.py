@@ -76,7 +76,6 @@ VIDEO_MULTI_DEBRID_URL_LOCK = threading.Lock()
 WORKER_CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 DEBRID_WORKERS = int(config.get_setting("omega_debrid_proxy_workers", "omega"))+1
 MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "omega"))+1)*10) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
-CHUNK_ERROR_SLEEP = 2 #segundos
 
 DEBRID_ACCOUNT_FREE_SPACE = None
 DEBRID_AUX_MEGA_ACCOUNTS = []
