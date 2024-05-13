@@ -215,46 +215,71 @@ class neiDebridVideoProxyChunkWriter():
 
         logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] HELLO')
 
-        for c in range(0, DEBRID_WORKERS):
-            chunk_downloader = neiDebridVideoProxyChunkDownloader(c+1, self)
-            self.chunk_downloaders.append(chunk_downloader)
-            t = threading.Thread(target=chunk_downloader.run)
-            t.daemon = True
-            t.start()
+        if DEBRID_WORKERS > 1:
 
-        try:
+            for c in range(0, DEBRID_WORKERS):
+                chunk_downloader = neiDebridVideoProxyChunkDownloader(c+1, self)
+                self.chunk_downloaders.append(chunk_downloader)
+                t = threading.Thread(target=chunk_downloader.run)
+                t.daemon = True
+                t.start()
 
-            while not self.exit and self.bytes_written < self.end_offset:
-                
-                while not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
+            try:
 
-                    with self.chunk_queue_lock:
-
-                        current_chunk = self.queue.pop(self.bytes_written)
-
-                    with self.cv_queue_full:
-
-                        self.cv_queue_full.notify_all()
-
-                    self.output.write(current_chunk)
-
-                    self.bytes_written+=len(current_chunk)
+                while not self.exit and self.bytes_written < self.end_offset:
                     
-                if not self.exit and self.bytes_written < self.end_offset:
-                    
-                    with self.cv_new_element:
-                        self.cv_new_element.wait(1)
+                    while not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
 
-        except Exception as ex:
-            logger.info(ex)
+                        with self.chunk_queue_lock:
 
-        self.exit = True
+                            current_chunk = self.queue.pop(self.bytes_written)
 
-        for downloader in self.chunk_downloaders:
-            downloader.exit = True
+                        with self.cv_queue_full:
 
-        with self.chunk_queue_lock:
-            self.queue.clear()
+                            self.cv_queue_full.notify_all()
+
+                        self.output.write(current_chunk)
+
+                        self.bytes_written+=len(current_chunk)
+                        
+                    if not self.exit and self.bytes_written < self.end_offset:
+                        
+                        with self.cv_new_element:
+                            self.cv_new_element.wait(1)
+
+            except Exception as ex:
+                logger.info(ex)
+
+            self.exit = True
+
+            for downloader in self.chunk_downloaders:
+                downloader.exit = True
+
+            with self.chunk_queue_lock:
+                self.queue.clear()
+        else:
+            partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(self.start_offset, self.end_offset)
+
+            for partial_range in partial_ranges:
+
+                p_inicio = partial_range[0]
+
+                p_final = partial_range[1]
+
+                url = partial_range[2]
+
+                p_length = p_final-p_inicio+1
+
+                request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
+
+                request = urllib.request.Request(url, headers=request_headers)
+
+                with urllib.request.urlopen(request) as response:
+                    p_chunk_read = 0
+                    while p_chunk_read < p_length:
+                        p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
+                        p_chunk_read+=len(p_chunk)
+                        self.output.write(p_chunk)
 
         logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] BYE')
 
@@ -449,36 +474,12 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                     range_request = self.__sendResponseHeaders()
                     
                     if range_request:
-                        
-                        if DEBRID_WORKERS > 1:
-                            chunk_writer = neiDebridVideoProxyChunkWriter(self.wfile, int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
-                            t = threading.Thread(target=chunk_writer.run)
-                            t.start()
-                            t.join()
-                        else:
-                            partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
 
-                            for partial_range in partial_ranges:
-
-                                p_inicio = partial_range[0]
-
-                                p_final = partial_range[1]
-
-                                url = partial_range[2]
-
-                                p_length = p_final-p_inicio+1
-
-                                request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
-
-                                request = urllib.request.Request(url, headers=request_headers)
-
-                                with urllib.request.urlopen(request) as response:
-                                    p_chunk_read = 0
-                                    while p_chunk_read < p_length:
-                                        p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
-                                        p_chunk_read+=len(p_chunk)
-                                        self.wfile.write(p_chunk)
-                                                        
+                        chunk_writer = neiDebridVideoProxyChunkWriter(self.wfile, int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size-1))
+                        t = threading.Thread(target=chunk_writer.run)
+                        t.start()
+                        t.join()
+                                          
                     else:
 
                         if VIDEO_MULTI_DEBRID_URL.multi_urls:
@@ -492,7 +493,7 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                                 shutil.copyfileobj(response, self.wfile)
 
                 except Exception as ex:
-                            logger.info(ex) 
+                    logger.info(ex)
 
     
     def __updateURL(self):
