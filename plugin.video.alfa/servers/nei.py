@@ -331,7 +331,13 @@ class neiDebridVideoProxyChunkDownloader():
 
                                 except Exception as ex:
                                     logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' HTTP ERROR!')
+                                    
                                     logger.debug(ex)
+
+                                    if not self.chunk_writer.chunk_error_notify:
+                                        self.chunk_writer.chunk_error_notify = True
+                                        omegaNotification('CHUNK ERROR: ¿Demasiados HILOS en ajustes?')
+
                                     time.sleep(CHUNK_ERROR_SLEEP)
 
                         if not self.exit and not self.chunk_writer.exit:
@@ -348,13 +354,7 @@ class neiDebridVideoProxyChunkDownloader():
 
                                 chunk_error = False
                             else:
-                                logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' ('+str(len(chunk))+' bytes) CHUNK SIZE ERROR!')
-
-                                if not self.chunk_writer.chunk_error_notify:
-                                    self.chunk_writer.chunk_error_notify = True
-                                    omegaNotification('CHUNK ERROR: ¿Demasiados HILOS en ajustes?')
-
-                                time.sleep(CHUNK_ERROR_SLEEP)
+                                logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' ('+str(len(chunk))+' bytes) CHUNK SIZE ERROR! (posible bug)')
 
             else:
                 self.exit = True
