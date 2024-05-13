@@ -270,7 +270,7 @@ class neiDebridVideoProxyChunkWriter():
 
             self.next_offset_required = self.next_offset_required + WORKER_CHUNK_SIZE if self.next_offset_required + WORKER_CHUNK_SIZE < self.end_offset else -1
 
-        return next_offset
+            return next_offset
 
 
     def getRunningWorkers(self):
@@ -293,7 +293,7 @@ class neiDebridVideoProxyChunkWriter():
 
                 if not self.chunk_error_notify:
                     self.chunk_error_notify = True
-                    omegaNotification('CHUNK ERROR: ¿Demasiados HILOS en ajustes?')
+                    omegaNotification('CUIDADO: ¿Demasiados HILOS en ajustes?')
 
 
     
@@ -336,7 +336,7 @@ class neiDebridVideoProxyChunkDownloader():
 
                         chunk_error = True
 
-                        while not self.exit and chunk_error and not self.chunk_writer.exit:
+                        while not self.exit and not self.chunk_writer.exit and chunk_error:
 
                             for partial_range in partial_ranges:
 
@@ -348,9 +348,9 @@ class neiDebridVideoProxyChunkDownloader():
 
                                 request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
 
-                                error = True
+                                partial_chunk_error = True
 
-                                while not self.exit and error and not self.chunk_writer.exit:
+                                while not self.exit and not self.chunk_writer.exit and partial_chunk_error:
                                     
                                     request = urllib.request.Request(url, headers=request_headers)
 
@@ -362,7 +362,7 @@ class neiDebridVideoProxyChunkDownloader():
 
                                         if len(partial_chunk) == required_partial_chunk_size:
                                             chunk+=partial_chunk
-                                            error = False
+                                            partial_chunk_error = False
                                         else:
                                             logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(p_inicio)+'-'+str(p_final)+' ('+str(len(partial_chunk))+' bytes) PARTIAL CHUNK SIZE ERROR! (¿posible bug del DEBRIDER?)')
 
@@ -388,7 +388,7 @@ class neiDebridVideoProxyChunkDownloader():
                             self.exit = True
 
             except Exception as ex:
-                logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(inicio)+'-'+str(final)+' HTTP ERROR!')
+                logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> OFFSET '+str(offset)+' HTTP ERROR! (¿muchos hilos?)')
                 logger.debug(ex)
                 self.chunk_writer.rejectThisOffset(self, offset)
 
@@ -450,11 +450,9 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                         
                         if DEBRID_WORKERS > 1:
                             chunk_writer = neiDebridVideoProxyChunkWriter(self.wfile, int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
-
                             t = threading.Thread(target=chunk_writer.run)
                             t.start()
                             t.join()
-
                         else:
                             partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size -1))
 
