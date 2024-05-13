@@ -217,7 +217,7 @@ class neiDebridVideoProxyChunkWriter():
         logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] HELLO')
 
         for c in range(0, DEBRID_WORKERS):
-            chunk_downloader = neiDebridVideoProxyChunkDownloader(c+1, chunk_writer)
+            chunk_downloader = neiDebridVideoProxyChunkDownloader(c+1, self)
             self.chunk_downloaders.append(chunk_downloader)
             t = threading.Thread(target=chunk_downloader.run)
             t.daemon = True
