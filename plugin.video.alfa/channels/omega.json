@@ -257,7 +257,7 @@
       "id": "omega_kodi_readfactor",
       "type": "list",
       "label": "Velocidad de carga del buffer de KODI (ignorado en KODI v21+):",
-      "default": 3,
+      "default": 2,
       "enabled": true,
       "visible": true,
       "lvalues": ["2x", "4x", "6x", "8x", "12x", "16x", "24x", "32x", "50x"]
