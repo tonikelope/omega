@@ -34,9 +34,9 @@ REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
 INTEGRITY_AUTO_CHECK_TIME = 3600 #Al arrancar KODI y cada 60 minutos comprobamos
 
-ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
+ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/refs/heads/main/plugin.video.alfa/"
 
-OMEGA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.omega/"
+OMEGA_URL = "https://raw.githubusercontent.com/tonikelope/omega/refs/heads/main/plugin.video.omega/"
 
 KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
 
@@ -121,7 +121,7 @@ def read_remote_checksums(remote_dir):
     
     temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()+"_"+str(int(time.time()*1000))
 
-    url_retrieve(remote_dir+"/checksum.sha1?token="+str(int(time.time()*1000)), temp_path)
+    url_retrieve(remote_dir+"/checksum.sha1?"+str(int(time.time()*1000)), temp_path)
 
     sha1_checksums = {}
 
@@ -256,12 +256,13 @@ while not monitor.abortRequested():
         try:
             if not auto_checked or t!=INTEGRITY_AUTO_CHECK_TIME:
                 pbar = xbmcgui.DialogProgressBG()    
-                pbar.create('[B]OMEGA[/B]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
-                
+                pbar.create('[B]OMEGA WATCHDOG[/B]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
+                auto_checked = True
+               
             check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None))
             
-            auto_checked = True
-        except:
+        except Exception as ex:
+            omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
             pass
 
         if pbar:

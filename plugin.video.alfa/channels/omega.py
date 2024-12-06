@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.20"
+CHANNEL_VERSION = "6.21"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -127,11 +127,9 @@ OMEGA_RESOURCES_URL = "https://noestasinvitado.com/omega_resources/"
 
 OMEGA_MENSAJES_FORO_URL = "https://noestasinvitado.com/omega_foro.php?idtopic="
 
-GITHUB_BASE_URL = "https://raw.githubusercontent.com/tonikelope/omega/master/"
+ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/refs/heads/main/plugin.video.alfa/"
 
-ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.alfa/"
-
-OMEGA_URL = "https://raw.githubusercontent.com/tonikelope/omega/main/plugin.video.omega/"
+OMEGA_URL = "https://raw.githubusercontent.com/tonikelope/omega/refs/heads/main/plugin.video.omega/"
 
 ALFA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.alfa/")
 
@@ -153,7 +151,7 @@ LAST_ITEMS_MAX = 100
 
 FORO_ITEMS_RETRY = 3
 
-MAX_URL_RETRIEVE_ERROR = 5
+MAX_URL_RETRIEVE_ERROR = 2
 
 DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0"
@@ -302,6 +300,7 @@ def url_retrieve(url, file_path, cache=False):
             ok = True
         except Exception as ex:
             if i==MAX_URL_RETRIEVE_ERROR:
+                logger.info("OMEGA INTEGRITY URL ERROR "+url)
                 raise ex
 
 
@@ -1349,10 +1348,10 @@ def buscar_por_genero(item):
 
                 if content_type == "tvshow":
                     extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
-                elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+                elif re.search(r"Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
                     extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
                     parsed_title["title"] = re.sub(
-                        "Saga|Duolog.a|Trilog.a",
+                        r"Saga|Duolog.a|Trilog.a",
                         "",
                         parsed_title["title"],
                         flags=re.IGNORECASE,
@@ -2307,13 +2306,13 @@ def bibliotaku_series(item):
 
         data += json_response["body"]
 
-    data = re.sub("[–—]", "-", html.unescape(data))
+    data = re.sub(r"[–—]", "-", html.unescape(data))
 
-    data = re.sub("[- ]*?(T|S) *?[0-9U]+[- ]*", " ", data)
+    data = re.sub(r"[- ]*?(T|S) *?[0-9U]+[- ]*", " ", data)
 
-    data = re.sub(" *?-+ *?[Tt]emporadas?[^-]+-+ *?", " ", data)
+    data = re.sub(r" *?-+ *?[Tt]emporadas?[^-]+-+ *?", " ", data)
 
-    data = re.sub(" AC3", " ", data)
+    data = re.sub(r" AC3", " ", data)
 
     patron = r"\[b\](.*?)\[\/b\].*?LINKS\[.*?\[url_mc\]([0-9]+)"
 
@@ -2324,7 +2323,7 @@ def bibliotaku_series(item):
     series = {}
 
     letter_pattern = (
-        re.compile("^[" + item.letter + "]") if item.letter != "TODO" else None
+        re.compile(r"^[" + item.letter + "]") if item.letter != "TODO" else None
     )
 
     for rawscrapedtitle, mc_id in matches:
@@ -2373,11 +2372,11 @@ def bibliotaku_series(item):
                 if content_type == "tvshow":
                     extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
                 elif re.search(
-                    "Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE
+                    r"Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE
                 ):
                     extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
                     parsed_title["title"] = re.sub(
-                        "Saga|Duolog.a|Trilog.a",
+                        r"Saga|Duolog.a|Trilog.a",
                         "",
                         parsed_title["title"],
                         flags=re.IGNORECASE,
@@ -2703,7 +2702,7 @@ def bibliotaku_pelis(item):
     matches = re.compile(patron, re.DOTALL | re.IGNORECASE).findall(data)
 
     letter_pattern = (
-        re.compile("^[" + item.letter + "]") if item.letter != "TODO" else None
+        re.compile(r"^[" + item.letter + "]") if item.letter != "TODO" else None
     )
 
     for rawscrapedtitle, mc_id in matches:
@@ -2744,10 +2743,10 @@ def bibliotaku_pelis(item):
 
             if content_type == "tvshow":
                 extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
-            elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+            elif re.search(r"Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
                 extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
                 parsed_title["title"] = re.sub(
-                    "Saga|Duolog.a|Trilog.a",
+                    r"Saga|Duolog.a|Trilog.a",
                     "",
                     parsed_title["title"],
                     flags=re.IGNORECASE,
@@ -3560,11 +3559,11 @@ def foro(item, episode_count_call=False):
                     if content_type == "tvshow":
                         extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
                     elif re.search(
-                        "Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE
+                        r"Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE
                     ):
                         extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
                         parsed_title["title"] = re.sub(
-                            "Saga|Duolog.a|Trilog.a",
+                            r"Saga|Duolog.a|Trilog.a",
                             "",
                             parsed_title["title"],
                             flags=re.IGNORECASE,
@@ -3736,7 +3735,7 @@ def foro(item, episode_count_call=False):
 
                     logger.info("URL_FORO " + item.url)
 
-                    id_foro = re.search("([^/]+)/*(?:\?[^/]+)?$", item.url).group(1)
+                    id_foro = re.search(r"([^/]+)/*(?:\?[^/]+)?$", item.url).group(1)
 
                     logger.info("ID_FORO " + id_foro)
 
@@ -4018,7 +4017,7 @@ def search_parse(data, item):
 
             if content_type == "tvshow":
                 extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
-            elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+            elif re.search(r"Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
                 extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
                 parsed_title["title"] = re.sub(
                     "Saga|Duolog.a|Trilog.a", "", parsed_title["title"], flags=re.IGNORECASE
@@ -4967,7 +4966,7 @@ def find_video_mega_links(item, data):
 
 
 def clean_title(title):
-    return re.sub(" +", " ", title)
+    return re.sub(r" +", " ", title)
 
 
 def get_video_mega_links_group(item):
@@ -5322,7 +5321,7 @@ def leer_criticas_fa(item):
                 fa_data = fa_data[0]
             else:
 
-                if re.search("\d+", item.contentTitle.lower()):
+                if re.search(r"\d+", item.contentTitle.lower()):
                     item.contentTitle = replaceIntegersToRomans(item.contentTitle)
                     return leer_criticas_fa(item)
 
@@ -5434,7 +5433,7 @@ def clean_html_tags(data):
     tag_re = re.compile(r"(<!--.*?-->|<[^>]*>)")
 
     # Remove well-formed tags, fixing mistakes by legitimate users
-    no_tags = tag_re.sub("", data)
+    no_tags = tag_re.sub(r"", data)
 
     return no_tags
 
@@ -5548,7 +5547,7 @@ def indice_links(item):
             parsed_title["year"] = parsed_custom_title["year"]
 
         content_title = re.sub(
-            "^(Saga|Trilog.a|Duolog*a) ",
+            r"^(Saga|Trilog.a|Duolog*a) ",
             "",
             parsed_title["title"] if not custom_title else custom_title,
         )
@@ -5572,10 +5571,10 @@ def indice_links(item):
 
         if content_type == "tvshow":
             extra = "[COLOR magenta][B][SERIE][/B][/COLOR] "
-        elif re.search("Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
+        elif re.search(r"Saga|Duolog.a|Trilog.a", rawscrapedtitle, re.IGNORECASE):
             extra = "[COLOR magenta][B][SAGA][/B][/COLOR] "
             parsed_title["title"] = re.sub(
-                "Saga|Duolog.a|Trilog.a", "", parsed_title["title"], flags=re.IGNORECASE
+                r"Saga|Duolog.a|Trilog.a", "", parsed_title["title"], flags=re.IGNORECASE
             )
 
         title = (
@@ -5700,7 +5699,7 @@ def format_bytes(bytes, precision=2):
 
 def extract_title(title):
 
-    title = re.sub("\( *?\d{4} *?\)", "", title)
+    title = re.sub(r"\( *?\d{4} *?\)", "", title)
 
     pattern = re.compile(r"^[^\[\]]+", re.IGNORECASE)
 
@@ -5853,7 +5852,7 @@ def parse_title(title):
 
 def get_filmaffinity_data_advanced(title, year, genre):
 
-    title = re.sub("^Saga ", "", title)
+    title = re.sub(r"^Saga ", "", title)
 
     fa_data_filename = (
         KODI_TEMP_PATH
@@ -5935,7 +5934,7 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
 def read_remote_checksums(remote_dir):
     temp_path = KODI_TEMP_PATH+hashlib.sha1((remote_dir+"/checksum.sha1").encode('utf-8')).hexdigest()+"_"+str(int(time.time()*1000))
 
-    url_retrieve(remote_dir+"/checksum.sha1?token="+str(int(time.time()*1000)), temp_path)
+    url_retrieve(remote_dir+"/checksum.sha1?"+str(int(time.time()*1000)), temp_path)
 
     sha1_checksums = {}
 
@@ -5943,7 +5942,7 @@ def read_remote_checksums(remote_dir):
         for line in f:
             strip_line = line.strip()
             if strip_line:
-                parts = re.split(' +', line.strip())
+                parts = re.split(r' +', line.strip())
                 sha1_checksums[parts[1]] = parts[0]
 
     os.remove(temp_path)
@@ -6058,7 +6057,7 @@ def verificar_integridad_omega(item):
     try:
         check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
     except Exception as ex:
-        omegaNotification('ERROR -> '+str(ex))
+        omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
         pass
 
     pbar.update(100)
