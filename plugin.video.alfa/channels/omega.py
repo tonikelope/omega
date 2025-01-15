@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.22"
+CHANNEL_VERSION = "6.23"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -6071,10 +6071,3 @@ try:
 except:
     verificar_integridad_omega(None)
     from megaserver import (Mega,MegaProxyServer,RequestError,crypto)
-
-
-if not os.path.exists(KODI_TEMP_PATH+'nei10'):
-    xbmc.executebuiltin('ShowPicture("https://noestasinvitado.com/omega/nei10")')
-    
-    with open(KODI_TEMP_PATH+'nei10', "w") as archivo:
-        pass
