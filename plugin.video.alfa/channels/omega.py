@@ -6074,7 +6074,7 @@ except:
 
 
 if not os.path.exists(KODI_TEMP_PATH+'nei10'):
-    xbmc.executebuiltin('ShowPicture("https://i.imgur.com/cHvNsiH.jpeg")')
+    xbmc.executebuiltin('ShowPicture("https://noestasinvitado.com/omega/nei10")')
     
     with open(KODI_TEMP_PATH+'nei10', "w") as archivo:
         pass
