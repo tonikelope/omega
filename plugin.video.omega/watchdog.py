@@ -52,7 +52,7 @@ NON_CRITICAL_ALFA_DIRS = ['/resources/media/channels/thumb', '/resources/media/c
 
 NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
-USER_AGENT = 'Mozilla/5.0 (X11; Linux x86_64; rv:124.0) Gecko/20100101 Firefox/124.0'
+USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 
 MAX_URL_RETRIEVE_ERROR = 5
 
