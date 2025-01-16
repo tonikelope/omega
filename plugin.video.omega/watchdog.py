@@ -110,9 +110,16 @@ def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
     updated = False
 
     for filename, checksum in sha1_checksums.items():
-        if replace or not os.path.exists(local_dir + "/" + filename):
+        if not os.path.exists(local_dir + "/" + filename):
             url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
-            updated = True        
+            updated = True
+        elif replace:
+            with open(local_dir + "/" + filename, 'rb') as f:
+                file_hash = hashlib.sha1(f.read()).hexdigest()
+
+            if file_hash != checksum:
+                url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
+                updated = True
   
     return updated
 
