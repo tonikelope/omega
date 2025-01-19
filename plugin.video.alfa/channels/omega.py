@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.24"
+CHANNEL_VERSION = "6.25"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -2526,6 +2526,7 @@ def bibliotaku_series_temporadas(item):
                     )
                     + "[/I]",
                     action="leer_criticas_fa",
+                    originalTitle=item.infoLabels["originaltitle"],
                     year=item.infoLabels["year"],
                     mode=item.mode,
                     contentTitle=(
@@ -4503,6 +4504,7 @@ def find_video_gvideo_links(item, data, fa=False):
                     )
                     + "[/I]",
                     action="leer_criticas_fa",
+                    originalTitle=item.infoLabels["originaltitle"],
                     year=item.infoLabels["year"],
                     mode=item.mode,
                     contentTitle=(
@@ -4811,6 +4813,7 @@ def find_video_mega_links(item, data):
                                 )
                                 + "[/I]",
                                 action="leer_criticas_fa",
+                                originalTitle=item.infoLabels["originaltitle"],
                                 year=item.infoLabels["year"],
                                 mode=item.mode,
                                 contentTitle=(
@@ -4927,6 +4930,7 @@ def find_video_mega_links(item, data):
                                     )
                                     + "[/I]",
                                     action="leer_criticas_fa",
+                                    originalTitle=item.infoLabels["originaltitle"],
                                     year=item.infoLabels["year"],
                                     mode=item.mode,
                                     contentTitle=(
@@ -5240,6 +5244,7 @@ def get_video_mega_links_group(item):
                 )
                 + "[/I]",
                 action="leer_criticas_fa",
+                originalTitle=item.infoLabels["originaltitle"],
                 year=item.infoLabels["year"],
                 mode=item.mode,
                 contentTitle=(
@@ -5288,6 +5293,11 @@ def leer_criticas_fa(item):
     if not fa_data:
         fa_data = get_filmaffinity_data_advanced(
             item.contentTitle, str(item.year), "TV_SE" if item.mode == "tvshow" else ""
+        )
+
+        if not fa_data:
+            fa_data = get_filmaffinity_data_advanced(
+            item.originalTitle, str(item.year), "TV_SE" if item.mode == "tvshow" else ""
         )
 
     logger.info(fa_data)
