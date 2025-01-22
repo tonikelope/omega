@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # https://github.com/tonikelope/omega
 
-"""
+r"""
   ___  __  __ _____ ____    _    
  / _ \|  \/  | ____/ ___|  / \   
 | | | | |\/| |  _|| |  _  / _ \  
@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.25"
+CHANNEL_VERSION = "6.26"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -4399,8 +4399,8 @@ def replaceIntegersToRomans(s):
 def cleanContentTitle(s):
     s = re.sub(r"  *", " ", s)
     s = s.replace("-", " ")
-    s = re.sub(r"[\[][^\]]+[\]]", "", s)
-    s = re.sub(r"\( *?\d{4} *?\)", "", s)
+    s = re.sub(r"\( *?\d{4} *?\).*", "", s)
+    s = re.sub(r"\[[^\]]+\]", "", s)
     s = re.sub(r"\.[^.]+(?:\.part.*?)?$", "", s)
     s = cleanEpisodeNumber(s)
     s = re.sub("^(Saga|Trilog.a|Duolog*a) ", "", s)
