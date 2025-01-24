@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.26"
+CHANNEL_VERSION = "6.27"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5923,16 +5923,18 @@ def wait_for_dir(local_dir):
         monitor.waitForAbort(1)
 
 
-def restore_files(remote_dir, local_dir, sha1_checksums=None, replace=True):
+def restore_files(pbar, remote_dir, local_dir, sha1_checksums=None, replace=True):
 
     wait_for_dir(local_dir)
 
     if not sha1_checksums:
+        pbar.update(message="Downloading checksums...")
         sha1_checksums = read_remote_checksums(remote_dir)
 
     updated = False
 
     for filename, checksum in sha1_checksums.items():
+        pbar.update(message="Checking "+filename+"...")
         if not os.path.exists(local_dir + "/" + filename):
             url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
             updated = True
@@ -5968,15 +5970,17 @@ def read_remote_checksums(remote_dir):
 
 
 
-def check_files_integrity(remote_dir, local_dir):
+def check_files_integrity(pbar, remote_dir, local_dir):
     
     wait_for_dir(local_dir)
 
+    pbar.update(message="Downloading checksums...")
     sha1_checksums = read_remote_checksums(remote_dir)
 
     integrity_error = False
 
     for filename, checksum in sha1_checksums.items():
+        pbar.update(message="Checking "+filename+"...")
         if os.path.exists(local_dir + "/" + filename):
             with open(local_dir + "/" + filename, 'rb') as f:
                 file_hash = hashlib.sha1(f.read()).hexdigest()
@@ -6007,14 +6011,14 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
     pbar_increment = round(100/total_pbar)
 
     for protected_dir in CRITICAL_ALFA_DIRS:
-        integrity = check_files_integrity(ALFA_URL+protected_dir, ALFA_PATH+protected_dir)
+        integrity = check_files_integrity(progress_bar, ALFA_URL+protected_dir, ALFA_PATH+protected_dir)
 
         if integrity[0]:
 
             alfa_integrity_error = True
             
             if repair:
-                restore_files(ALFA_URL+protected_dir, ALFA_PATH+protected_dir, sha1_checksums=integrity[1])
+                restore_files(progress_bar, ALFA_URL+protected_dir, ALFA_PATH+protected_dir, sha1_checksums=integrity[1])
                 
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
@@ -6024,14 +6028,14 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
                 break
 
     for protected_dir in CRITICAL_OMEGA_DIRS:
-        integrity = check_files_integrity(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir)
+        integrity = check_files_integrity(progress_bar, OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir)
 
         if integrity[0]:
 
             omega_integrity_error = True
             
             if repair:
-                restore_files(OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir, sha1_checksums=integrity[1])
+                restore_files(progress_bar, OMEGA_URL+protected_dir, OMEGA_PATH+protected_dir, sha1_checksums=integrity[1])
 
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
@@ -6042,7 +6046,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
 
     if repair:
         for non_critical_dir in NON_CRITICAL_ALFA_DIRS:
-            if restore_files(ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
+            if restore_files(progress_bar, ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
                     progress_bar.update(pbar_counter)
@@ -6050,7 +6054,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
                 non_critical_updated = True
 
         for non_critical_dir in NON_CRITICAL_OMEGA_DIRS:
-            if restore_files(OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
+            if restore_files(progress_bar, OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
                     progress_bar.update(pbar_counter)
