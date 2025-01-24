@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.28"
+CHANNEL_VERSION = "6.30"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5928,13 +5928,13 @@ def restore_files(pbar, remote_dir, local_dir, sha1_checksums=None, replace=True
     wait_for_dir(local_dir)
 
     if not sha1_checksums:
-        pbar.update(message="Downloading checksums...")
+        pbar.update(message="Descargando checksums...")
         sha1_checksums = read_remote_checksums(remote_dir)
 
     updated = False
 
     for filename, checksum in sha1_checksums.items():
-        pbar.update(message="Checking "+filename+"...")
+        pbar.update(message="Comprobando "+filename+"...")
         if not os.path.exists(local_dir + "/" + filename):
             url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
             updated = True
