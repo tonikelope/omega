@@ -150,13 +150,13 @@ def check_files_integrity(pbar, remote_dir, local_dir):
     
     wait_for_dir(local_dir)
 
-    pbar.update(message="Downloading checksums...")
+    pbar.update(message="Descargando checksums...")
     sha1_checksums = read_remote_checksums(remote_dir)
 
     integrity_error = False
 
     for filename, checksum in sha1_checksums.items():
-        pbar.update(message="Checking "+filename+"...")
+        pbar.update(message="Comprobando "+filename+"...")
         if os.path.exists(local_dir + "/" + filename):
             with open(local_dir + "/" + filename, 'rb') as f:
                 file_hash = hashlib.sha1(f.read()).hexdigest()
