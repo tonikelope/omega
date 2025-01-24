@@ -69,7 +69,7 @@ def omega_version():
     return xbmcaddon.Addon().getAddonInfo('version')
 
 
-def url_retrieve(url, file_path, cache=False):
+def url_retrieve(url, file_path):
     ok = False
 
     i = 0
@@ -78,13 +78,9 @@ def url_retrieve(url, file_path, cache=False):
         i+=1
 
         try:
-            if not cache:
-                urllib.request.urlcleanup()
-                opener = urllib.request.build_opener()
-                opener.addheaders = [('User-Agent', USER_AGENT), ('Cache-Control', 'no-cache, no-store, must-revalidate'), ('Pragma', 'no-cache'), ('Expires', '0')]
-            else:
-                opener = urllib.request.build_opener()
-                opener.addheaders = [('User-Agent', USER_AGENT)]
+            opener = urllib.request.build_opener()
+            
+            opener.addheaders = [('User-Agent', USER_AGENT)]
         
             urllib.request.install_opener(opener)
             

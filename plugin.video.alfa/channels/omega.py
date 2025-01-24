@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.30"
+CHANNEL_VERSION = "6.31"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -276,7 +276,7 @@ def omega_version():
     return xbmcaddon.Addon('plugin.video.omega').getAddonInfo('version')
 
 
-def url_retrieve(url, file_path, cache=False):
+def url_retrieve2(url, file_path, cache=False):
     ok = False
 
     i = 0
@@ -301,6 +301,29 @@ def url_retrieve(url, file_path, cache=False):
         except Exception as ex:
             if i==MAX_URL_RETRIEVE_ERROR:
                 logger.info("OMEGA INTEGRITY URL ERROR "+url)
+                raise ex
+
+
+def url_retrieve(url, file_path):
+    ok = False
+
+    i = 0
+
+    while not ok and i < MAX_URL_RETRIEVE_ERROR:
+        i+=1
+
+        try:
+            opener = urllib.request.build_opener()
+            
+            opener.addheaders = [('User-Agent', USER_AGENT)]
+        
+            urllib.request.install_opener(opener)
+            
+            urllib.request.urlretrieve(url, file_path)
+            
+            ok = True
+        except Exception as ex:
+            if i==MAX_URL_RETRIEVE_ERROR:
                 raise ex
 
 
