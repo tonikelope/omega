@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.32"
+CHANNEL_VERSION = "6.33"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -151,7 +151,7 @@ LAST_ITEMS_MAX = 100
 
 FORO_ITEMS_RETRY = 3
 
-MAX_URL_RETRIEVE_ERROR = 2
+MAX_URL_RETRIEVE_ERROR = 5
 
 DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
