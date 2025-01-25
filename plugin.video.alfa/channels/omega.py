@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.33"
+CHANNEL_VERSION = "6.34"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -287,7 +287,7 @@ def url_retrieve(url, file_path):
         try:
             opener = urllib.request.build_opener()
             
-            opener.addheaders = [('User-Agent', USER_AGENT)]
+            opener.addheaders = [('User-Agent', DEFAULT_HEADERS['User-Agent'])]
         
             urllib.request.install_opener(opener)
             
