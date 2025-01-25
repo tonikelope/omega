@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.34"
+CHANNEL_VERSION = "6.35"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -297,6 +297,7 @@ def url_retrieve(url, file_path):
         except Exception as ex:
             if i==MAX_URL_RETRIEVE_ERROR:
                 raise ex
+            time.sleep(2**i)
 
 
 def buscar_titulo_tmdb(item):
@@ -5929,7 +5930,7 @@ def restore_files(pbar, remote_dir, local_dir, sha1_checksums=None, replace=True
     updated = False
 
     for filename, checksum in sha1_checksums.items():
-        pbar.update(message="Comprobando "+filename+"...")
+        pbar.update(message="Comprobando "+checksum+"...")
         if not os.path.exists(local_dir + "/" + filename):
             url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
             updated = True
@@ -5975,7 +5976,7 @@ def check_files_integrity(pbar, remote_dir, local_dir):
     integrity_error = False
 
     for filename, checksum in sha1_checksums.items():
-        pbar.update(message="Comprobando "+filename+"...")
+        pbar.update(message="Comprobando "+checksum+"...")
         if os.path.exists(local_dir + "/" + filename):
             with open(local_dir + "/" + filename, 'rb') as f:
                 file_hash = hashlib.sha1(f.read()).hexdigest()
