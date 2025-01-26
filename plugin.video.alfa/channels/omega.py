@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.42"
+CHANNEL_VERSION = "6.43"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -151,7 +151,7 @@ LAST_ITEMS_MAX = 100
 
 FORO_ITEMS_RETRY = 3
 
-MAX_URL_RETRIEVE_ERROR = 10
+MAX_URL_RETRIEVE_ERROR = 20
 
 URL_RETRIEVE_TIMEOUT = 10
 
@@ -288,10 +288,10 @@ def url_retrieve(url, file_path, timeout=URL_RETRIEVE_TIMEOUT, retries=MAX_URL_R
             with opener.open(url, timeout=timeout) as response, open(file_path, 'wb') as out_file:
                 out_file.write(response.read())
             break  # Salir del bucle si la descarga es exitosa
-        except URLError as e:
+        except Exception as e:
             if attempt < retries - 1:  # Si no es el último intento
                 print(f"Error de descarga (intento {attempt + 1}/{retries}): {e}. Reintentando...")
-                time.sleep(2)  # Esperar antes de reintentar
+                time.sleep(1)  # Esperar antes de reintentar
             else:
                 print(f"Error de descarga tras {retries} intentos: {e}")
                 break  # Salir del bucle después del último intento

@@ -54,7 +54,7 @@ NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 
-MAX_URL_RETRIEVE_ERROR = 10
+MAX_URL_RETRIEVE_ERROR = 20
 
 URL_RETRIEVE_TIMEOUT = 10
 
@@ -80,10 +80,10 @@ def url_retrieve(url, file_path, timeout=URL_RETRIEVE_TIMEOUT, retries=MAX_URL_R
             with opener.open(url, timeout=timeout) as response, open(file_path, 'wb') as out_file:
                 out_file.write(response.read())
             break  # Salir del bucle si la descarga es exitosa
-        except URLError as e:
+        except Exception as e:
             if attempt < retries - 1:  # Si no es el último intento
                 print(f"Error de descarga (intento {attempt + 1}/{retries}): {e}. Reintentando...")
-                time.sleep(2)  # Esperar antes de reintentar
+                time.sleep(1)  # Esperar antes de reintentar
             else:
                 print(f"Error de descarga tras {retries} intentos: {e}")
                 break  # Salir del bucle después del último intento
