@@ -82,9 +82,7 @@ def url_retrieve(url, file_path):
             
             opener.addheaders = [('User-Agent', USER_AGENT), ('Connection', 'close')]
         
-            urllib.request.install_opener(opener)
-            
-            urllib.request.urlretrieve(url, file_path)
+            opener.retrieve(url, file_path)
             
             ok = True
         except Exception as ex:
