@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.37"
+CHANNEL_VERSION = "6.38"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -127,9 +127,9 @@ OMEGA_RESOURCES_URL = "https://noestasinvitado.com/omega_resources/"
 
 OMEGA_MENSAJES_FORO_URL = "https://noestasinvitado.com/omega_foro.php?idtopic="
 
-ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/refs/heads/main/plugin.video.alfa/"
+ALFA_URL = "https://noestasinvitado.com/omega_src/plugin.video.alfa/"
 
-OMEGA_URL = "https://raw.githubusercontent.com/tonikelope/omega/refs/heads/main/plugin.video.omega/"
+OMEGA_URL = "https://noestasinvitado.com/omega_src/plugin.video.omega/"
 
 ALFA_PATH = xbmcvfs.translatePath("special://home/addons/plugin.video.alfa/")
 
@@ -288,8 +288,9 @@ def url_retrieve(url, file_path):
             opener = urllib.request.build_opener()
             
             opener.addheaders = [('User-Agent', USER_AGENT), ('Connection', 'close')]
-            
-            opener.retrieve(url, file_path)
+        
+            with opener.open(url) as response, open(file_path, 'wb') as out_file:
+                out_file.write(response.read())
             
             ok = True
         except Exception as ex:

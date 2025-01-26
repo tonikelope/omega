@@ -34,9 +34,9 @@ REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
 INTEGRITY_AUTO_CHECK_TIME = 3600 #Al arrancar KODI y cada 60 minutos comprobamos
 
-ALFA_URL = "https://raw.githubusercontent.com/tonikelope/omega/refs/heads/main/plugin.video.alfa/"
+ALFA_URL = "https://noestasinvitado.com/omega_src/plugin.video.alfa/"
 
-OMEGA_URL = "https://raw.githubusercontent.com/tonikelope/omega/refs/heads/main/plugin.video.omega/"
+OMEGA_URL = "https://noestasinvitado.com/omega_src/plugin.video.omega/"
 
 KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
 
@@ -82,7 +82,8 @@ def url_retrieve(url, file_path):
             
             opener.addheaders = [('User-Agent', USER_AGENT), ('Connection', 'close')]
         
-            opener.retrieve(url, file_path)
+            with opener.open(url) as response, open(file_path, 'wb') as out_file:
+                out_file.write(response.read())
             
             ok = True
         except Exception as ex:
