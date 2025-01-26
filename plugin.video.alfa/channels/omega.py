@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.39"
+CHANNEL_VERSION = "6.40"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
