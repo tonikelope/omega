@@ -80,7 +80,7 @@ def url_retrieve(url, file_path):
         try:
             opener = urllib.request.build_opener()
             
-            opener.addheaders = [('User-Agent', USER_AGENT), ('Connection', 'close')]
+            opener.addheaders = [('User-Agent', USER_AGENT)]
         
             with opener.open(url) as response, open(file_path, 'wb') as out_file:
                 out_file.write(response.read())
