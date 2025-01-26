@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.41"
+CHANNEL_VERSION = "6.42"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -151,7 +151,7 @@ LAST_ITEMS_MAX = 100
 
 FORO_ITEMS_RETRY = 3
 
-MAX_URL_RETRIEVE_ERROR = 5
+MAX_URL_RETRIEVE_ERROR = 10
 
 URL_RETRIEVE_TIMEOUT = 10
 
