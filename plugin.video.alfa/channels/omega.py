@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.35"
+CHANNEL_VERSION = "6.36"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -287,7 +287,7 @@ def url_retrieve(url, file_path):
         try:
             opener = urllib.request.build_opener()
             
-            opener.addheaders = [('User-Agent', DEFAULT_HEADERS['User-Agent'])]
+            opener.addheaders = [('User-Agent', USER_AGENT), ('Connection', 'close')]
         
             urllib.request.install_opener(opener)
             
@@ -297,7 +297,7 @@ def url_retrieve(url, file_path):
         except Exception as ex:
             if i==MAX_URL_RETRIEVE_ERROR:
                 raise ex
-            time.sleep(2**i)
+            time.sleep(2)
 
 
 def buscar_titulo_tmdb(item):

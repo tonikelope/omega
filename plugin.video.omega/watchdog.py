@@ -80,7 +80,7 @@ def url_retrieve(url, file_path):
         try:
             opener = urllib.request.build_opener()
             
-            opener.addheaders = [('User-Agent', USER_AGENT)]
+            opener.addheaders = [('User-Agent', USER_AGENT), ('Connection', 'close')]
         
             urllib.request.install_opener(opener)
             
@@ -90,7 +90,7 @@ def url_retrieve(url, file_path):
         except Exception as ex:
             if i==MAX_URL_RETRIEVE_ERROR:
                 raise ex
-            time.sleep(2**i)
+            time.sleep(2)
 
 
 def omegaNotification(msg, timeout=5000):
