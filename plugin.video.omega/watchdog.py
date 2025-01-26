@@ -54,8 +54,9 @@ NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 
-MAX_URL_RETRIEVE_ERROR = 5
+MAX_URL_RETRIEVE_ERROR = 10
 
+URL_RETRIEVE_TIMEOUT = 10
 
 
 def wait_for_dir(local_dir):
@@ -69,13 +70,23 @@ def omega_version():
     return xbmcaddon.Addon().getAddonInfo('version')
 
 
-def url_retrieve(url, file_path):
+def url_retrieve(url, file_path, timeout=URL_RETRIEVE_TIMEOUT, retries=MAX_URL_RETRIEVE_ERROR):
     opener = urllib.request.build_opener()
-    
     opener.addheaders = [('User-Agent', USER_AGENT)]
 
-    with opener.open(url) as response, open(file_path, 'wb') as out_file:
-        out_file.write(response.read())
+    # Intentar varias veces en caso de error por timeout
+    for attempt in range(retries):
+        try:
+            with opener.open(url, timeout=timeout) as response, open(file_path, 'wb') as out_file:
+                out_file.write(response.read())
+            break  # Salir del bucle si la descarga es exitosa
+        except URLError as e:
+            if attempt < retries - 1:  # Si no es el último intento
+                print(f"Error de descarga (intento {attempt + 1}/{retries}): {e}. Reintentando...")
+                time.sleep(2)  # Esperar antes de reintentar
+            else:
+                print(f"Error de descarga tras {retries} intentos: {e}")
+                break  # Salir del bucle después del último intento
 
         
 def omegaNotification(msg, timeout=5000):

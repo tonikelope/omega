@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.40"
+CHANNEL_VERSION = "6.41"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -152,6 +152,8 @@ LAST_ITEMS_MAX = 100
 FORO_ITEMS_RETRY = 3
 
 MAX_URL_RETRIEVE_ERROR = 5
+
+URL_RETRIEVE_TIMEOUT = 10
 
 DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
@@ -276,27 +278,23 @@ def omega_version():
     return xbmcaddon.Addon('plugin.video.omega').getAddonInfo('version')
 
 
-def url_retrieve(url, file_path):
-    ok = False
+def url_retrieve(url, file_path, timeout=URL_RETRIEVE_TIMEOUT, retries=MAX_URL_RETRIEVE_ERROR):
+    opener = urllib.request.build_opener()
+    opener.addheaders = [('User-Agent', DEFAULT_HEADERS['User-Agent'])]
 
-    i = 0
-
-    while not ok and i < MAX_URL_RETRIEVE_ERROR:
-        i+=1
-
+    # Intentar varias veces en caso de error por timeout
+    for attempt in range(retries):
         try:
-            opener = urllib.request.build_opener()
-            
-            opener.addheaders = [('User-Agent', DEFAULT_HEADERS['User-Agent'])]
-        
-            with opener.open(url) as response, open(file_path, 'wb') as out_file:
+            with opener.open(url, timeout=timeout) as response, open(file_path, 'wb') as out_file:
                 out_file.write(response.read())
-            
-            ok = True
-        except Exception as ex:
-            if i==MAX_URL_RETRIEVE_ERROR:
-                raise ex
-            time.sleep(2)
+            break  # Salir del bucle si la descarga es exitosa
+        except URLError as e:
+            if attempt < retries - 1:  # Si no es el último intento
+                print(f"Error de descarga (intento {attempt + 1}/{retries}): {e}. Reintentando...")
+                time.sleep(2)  # Esperar antes de reintentar
+            else:
+                print(f"Error de descarga tras {retries} intentos: {e}")
+                break  # Salir del bucle después del último intento
 
 
 def buscar_titulo_tmdb(item):
