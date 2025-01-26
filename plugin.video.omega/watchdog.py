@@ -70,28 +70,14 @@ def omega_version():
 
 
 def url_retrieve(url, file_path):
-    ok = False
+    opener = urllib.request.build_opener()
+    
+    opener.addheaders = [('User-Agent', USER_AGENT)]
 
-    i = 0
+    with opener.open(url) as response, open(file_path, 'wb') as out_file:
+        out_file.write(response.read())
 
-    while not ok and i < MAX_URL_RETRIEVE_ERROR:
-        i+=1
-
-        try:
-            opener = urllib.request.build_opener()
-            
-            opener.addheaders = [('User-Agent', USER_AGENT)]
         
-            with opener.open(url) as response, open(file_path, 'wb') as out_file:
-                out_file.write(response.read())
-            
-            ok = True
-        except Exception as ex:
-            if i==MAX_URL_RETRIEVE_ERROR:
-                raise ex
-            time.sleep(2)
-
-
 def omegaNotification(msg, timeout=5000):
     xbmcgui.Dialog().notification('OMEGA', msg, os.path.join(xbmcaddon.Addon().getAddonInfo('path'), 'resources', 'icon.gif'), timeout)
 
