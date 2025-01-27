@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.43"
+CHANNEL_VERSION = "6.44"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5921,13 +5921,18 @@ def restore_files(pbar, remote_dir, local_dir, sha1_checksums=None, replace=True
     wait_for_dir(local_dir)
 
     if not sha1_checksums:
-        pbar.update(message="Descargando checksums...")
+        if pbar:
+            pbar.update(message="Descargando checksums...")
+        
         sha1_checksums = read_remote_checksums(remote_dir)
 
     updated = False
 
     for filename, checksum in sha1_checksums.items():
-        pbar.update(message="Comprobando "+checksum+"...")
+        
+        if pbar:
+            pbar.update(message="Comprobando "+checksum+"...")
+        
         if not os.path.exists(local_dir + "/" + filename):
             url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
             updated = True
@@ -5967,13 +5972,17 @@ def check_files_integrity(pbar, remote_dir, local_dir):
     
     wait_for_dir(local_dir)
 
-    pbar.update(message="Descargando checksums...")
+    if pbar:
+        pbar.update(message="Descargando checksums...")
+    
     sha1_checksums = read_remote_checksums(remote_dir)
 
     integrity_error = False
 
     for filename, checksum in sha1_checksums.items():
-        pbar.update(message="Comprobando "+checksum+"...")
+        if pbar:
+            pbar.update(message="Comprobando "+checksum+"...")
+        
         if os.path.exists(local_dir + "/" + filename):
             with open(local_dir + "/" + filename, 'rb') as f:
                 file_hash = hashlib.sha1(f.read()).hexdigest()
