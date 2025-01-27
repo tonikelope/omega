@@ -86,7 +86,7 @@ def url_retrieve(url, file_path, timeout=URL_RETRIEVE_TIMEOUT, retries=MAX_URL_R
                 time.sleep(1)  # Esperar antes de reintentar
             else:
                 print(f"Error de descarga tras {retries} intentos: {e}")
-                break  # Salir del bucle después del último intento
+                raise e
 
         
 def omegaNotification(msg, timeout=5000):
