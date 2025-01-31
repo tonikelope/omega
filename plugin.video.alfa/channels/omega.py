@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.46"
+CHANNEL_VERSION = "6.47"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5910,14 +5910,15 @@ def get_filmaffinity_data_advanced(title, year, genre):
         url, ignore_response_code=True, headers=headers, timeout=DEFAULT_HTTP_TIMEOUT
     ).data
 
-    res = re.compile(
-        r"title=\"([^\"]+)\"[^<>]+href=\"https://www.filmaffinity.com/es/film([0-9]+)\.html\".*?(https://pics\.filmaffinity\.com/[^\"]+-msmall\.jpg).*?\"avgrat-box\" *?> *?([0-9,]+).*?",
+    regex = r"srcset=.*?(https.*?msmall\.jpg).*?mc-title.*?(\d+).*?>(.*?)<.*?avg *?mx.*?>(.*?)<"
+
+    res = re.compile(regex,
         re.DOTALL,
     ).findall(data)
 
     fa_data = []
 
-    for fa_title, film_id, thumb_url, rate in res:
+    for thumb_url, film_id, fa_title, rate in res:
 
         rate = rate.replace(",", ".")
 
