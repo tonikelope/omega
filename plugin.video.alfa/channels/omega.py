@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.45"
+CHANNEL_VERSION = "6.46"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -877,7 +877,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]PURGAR CACHÉ[/B]",
+            title="[B]PURGAR CACHÉ DE OMEGA[/B]",
             action="clean_cache",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
@@ -971,6 +971,16 @@ def ajustes(item):
             channel=item.channel,
             title="[B]REGENERAR MINIATURAS DE KODI[/B]",
             action="thumbnail_refresh",
+            fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
+            thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
+        )
+    )
+
+    itemlist.append(
+        Item(
+            channel=item.channel,
+            title="[B]PURGAR CACHÉ DE KODI[/B]",
+            action="clean_kodi_cache",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
         )
@@ -1841,6 +1851,23 @@ def restore_omega_userdata(item):
         omegaNotification("ERROR AL RESTAURAR EL BACKUP")
 
 
+def clean_kodi_cache(item):
+    for file in os.listdir(KODI_TEMP_PATH):
+        
+        file_path = os.path.join(KODI_TEMP_PATH, file)
+        
+        try:
+            if os.path.isfile(file_path):
+                os.remove(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except:
+            pass
+
+    omegaNotification("CACHÉ DE KODI PURGADA")
+    xbmc.executebuiltin("Container.Refresh")
+
+
 def clean_cache(item):
     conta_files = 0
 
@@ -1853,7 +1880,7 @@ def clean_cache(item):
         os.remove(KODI_NEI_MC_CACHE_PATH)
         KODI_NEI_MC_CACHE = {}
 
-    omegaNotification("CACHÉ PURGADA (" + str(conta_files) + " archivos eliminados)")
+    omegaNotification("CACHÉ DE OMEGA PURGADA (" + str(conta_files) + " archivos eliminados)")
     xbmc.executebuiltin("Container.Refresh")
 
 
