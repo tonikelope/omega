@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.49"
+CHANNEL_VERSION = "6.50"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -3252,6 +3252,10 @@ def checkHDR(title):
     return re.search(r"[^a-z](hdr|dv|dolbyvision)[^a-z]", title, re.IGNORECASE | re.DOTALL)
 
 
+def checkREMUX(title):
+    return re.search(r"[^a-z]remux[^a-z]", title, re.IGNORECASE | re.DOTALL)
+
+
 def foro(item, episode_count_call=False):
     logger.info("channels.omega foro")
 
@@ -3553,6 +3557,8 @@ def foro(item, episode_count_call=False):
 
                     hdr = checkHDR(scrapedtitle)
 
+                    remux = checkREMUX(scrapedtitle)
+
                     parsed_title = parse_title(scrapedtitle)
 
                     if custom_title:
@@ -3611,6 +3617,7 @@ def foro(item, episode_count_call=False):
                         + extra
                         + ("[" + quality + "]" if quality else "")
                         + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
+                        + (" [COLOR cyan][REMUX][/COLOR]" if remux else "")
                         + " ##*NOTA*## ("
                         + color_uploader(uploader)
                         + ")"
@@ -3988,6 +3995,8 @@ def search_parse(data, item):
 
             hdr = checkHDR(rawscrapedtitle)
 
+            remux = checkREMUX(rawscrapedtitle)
+
             if "<" in scrapedtitle or ">" in scrapedtitle:
                 scrapedtitle = re.sub(r"https://[^/]+/[^/]+/([^/]+).*", "\\1", scrapedurl)
 
@@ -4084,6 +4093,7 @@ def search_parse(data, item):
                 + extra
                 + ("[" + quality + "]" if quality else "")
                 + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
+                + (" [COLOR cyan][REMUX][/COLOR]" if remux else "")
                 + " ##*NOTA*## ("
                 + color_uploader(uploader)
                 + ")"
