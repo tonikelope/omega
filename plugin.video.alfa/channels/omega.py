@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.52"
+CHANNEL_VERSION = "6.53"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -2348,6 +2348,10 @@ def bibliotaku_series(item):
 
     for rawscrapedtitle, mc_id in matches:
 
+        hdr = checkHDR(rawscrapedtitle)
+
+        remux = checkREMUX(rawscrapedtitle)
+
         custom_title = findCustomTitle(rawscrapedtitle)
 
         scrapedtitle = parseScrapedTitle(rawscrapedtitle)
@@ -2407,6 +2411,8 @@ def bibliotaku_series(item):
                     + parsed_title["title"]
                     + "[/B][/COLOR] "
                     + extra
+                    + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
+                    + (" [COLOR cyan][REMUX][/COLOR]" if remux else "")
                     + (" [" + quality + "]" if quality else "")
                     + " ##*NOTA*## (Akantor)"
                 )
@@ -2728,6 +2734,10 @@ def bibliotaku_pelis(item):
 
     for rawscrapedtitle, mc_id in matches:
 
+        hdr = checkHDR(rawscrapedtitle)
+
+        remux = checkREMUX(rawscrapedtitle)
+
         custom_title = findCustomTitle(rawscrapedtitle)
 
         scrapedtitle = parseScrapedTitle(rawscrapedtitle)
@@ -2778,6 +2788,8 @@ def bibliotaku_pelis(item):
                 + parsed_title["title"]
                 + "[/B][/COLOR] "
                 + extra
+                + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
+                + (" [COLOR cyan][REMUX][/COLOR]" if remux else "")
                 + (" [" + quality + "]" if quality else "")
                 + " ##*NOTA*## (Akantor)"
             )
