@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.47"
+CHANNEL_VERSION = "6.48"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1063,7 +1063,7 @@ def watchdog_episodios(item):
             
             pbar = xbmcgui.DialogProgressBG()
             
-            pbar.create('[B]OMEGA[/B]', '[B]Activando vigilante de episodios para '+item.contentSerieName+'[/B]')
+            pbar.create('[B]OMEGA[/B]', '[B]Activando vigilante de episodios para '+item.contentSerieName+' (paciencia)[/B]')
             
             EPISODE_WATCHDOG[item.parent_item_url] = contar_episodios(
                 foro(Item().fromurl(item.parent_item_url), episode_count_call=True)
@@ -3291,12 +3291,20 @@ def foro(item, episode_count_call=False):
         item.id_topic = id_topic
 
         retry = 0
-
+        
+        pbar = xbmcgui.DialogProgressBG()
+        
+        pbar.create('[B]OMEGA[/B]', '[B]Buscando enlaces MEGA/MEGACRYPTER (paciencia)...[/B]')
+        
         while len(itemlist) == 0 and retry < FORO_ITEMS_RETRY:
             mega_links = find_video_mega_links(item, data)
             google_links = find_video_gvideo_links(item, data, (len(mega_links) == 0))
             itemlist = mega_links + google_links
             retry += 1
+
+        pbar.update(100)
+
+        pbar.close()
 
         if len(itemlist) == 0:
 
@@ -3414,7 +3422,7 @@ def foro(item, episode_count_call=False):
             if not episode_count_call and find_item_in_episode_watchdog(item):
                 pbar = xbmcgui.DialogProgressBG()
             
-                pbar.create('[B]OMEGA[/B]', '[B]Actualizando [COLOR yellow]vigilante de episodios[/COLOR] para '+item.contentSerieName+'[/B]')
+                pbar.create('[B]OMEGA[/B]', '[B]Actualizando [COLOR yellow]vigilante de episodios[/COLOR] para '+item.contentSerieName+' (paciencia)[/B]')
 
                 update_watchdog_episodes(
                     find_item_in_episode_watchdog(item), contar_episodios(itemlist), item.contentSerieName
@@ -3866,11 +3874,19 @@ def search_similares(item, comillas=True):
         "=84&brd%5B212%5D=212&brd%5B94%5D=94&brd%5B23%5D=23&submit=Buscar"
     )
 
+    pbar = xbmcgui.DialogProgressBG()
+        
+    pbar.create('[B]OMEGA[/B]', '[B]Buscando en NEI (paciencia)...[/B]')
+
     data = httptools.downloadpage(
         "https://noestasinvitado.com/search2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT
     ).data
 
     search_itemlist = search_parse(data, item)
+
+    pbar.update(100)
+
+    pbar.close()
 
     if search_itemlist and search_itemlist[-1].action == "search_pag":
         next_page = search_itemlist.pop()
@@ -3913,11 +3929,19 @@ def search(item, texto):
         "=84&brd%5B212%5D=212&brd%5B94%5D=94&brd%5B23%5D=23&submit=Buscar"
     )
 
+    pbar = xbmcgui.DialogProgressBG()
+        
+    pbar.create('[B]OMEGA[/B]', '[B]Buscando en NEI (paciencia)...[/B]')
+
     data = httptools.downloadpage(
         "https://noestasinvitado.com/search2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT
     ).data
 
     search_itemlist = search_parse(data, item)
+
+    pbar.update(100)
+
+    pbar.close()
 
     if search_itemlist and search_itemlist[-1].action == "search_pag":
         next_page = search_itemlist.pop()
@@ -4995,6 +5019,10 @@ def clean_title(title):
 
 def get_video_mega_links_group(item):
 
+    pbar = xbmcgui.DialogProgressBG()
+        
+    pbar.create('[B]OMEGA[/B]', '[B]Cargando enlaces MEGA/MEGACRYPTER (paciencia)...[/B]')
+
     mega_sid = mega_login(False)
 
     itemlist = []
@@ -5299,6 +5327,10 @@ def get_video_mega_links_group(item):
             )
 
     tmdb.set_infoLabels_itemlist(itemlist, True)
+
+    pbar.update(100)
+
+    pbar.close()
 
     return itemlist
 
