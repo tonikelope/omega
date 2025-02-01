@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.50"
+CHANNEL_VERSION = "6.51"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -3249,11 +3249,11 @@ def find_item_in_episode_watchdog(item):
 
 
 def checkHDR(title):
-    return re.search(r"[^a-z](hdr|dv|dolbyvision)[^a-z]", title, re.IGNORECASE | re.DOTALL)
+    return re.search(r"[^a-z](hdr|dv|dolby\-?vision)[^a-z]", title, re.IGNORECASE | re.DOTALL)
 
 
 def checkREMUX(title):
-    return re.search(r"[^a-z]remux[^a-z]", title, re.IGNORECASE | re.DOTALL)
+    return re.search(r"[^a-z](remux|4k\-?remux|uhd\-?remux)[^a-z]", title, re.IGNORECASE | re.DOTALL)
 
 
 def foro(item, episode_count_call=False):
