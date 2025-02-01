@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.48"
+CHANNEL_VERSION = "6.49"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -3248,6 +3248,10 @@ def find_item_in_episode_watchdog(item):
     return None
 
 
+def checkHDR(title):
+    return re.search(r"[^a-z](hdr|dv|dolbyvision)[^a-z]", title, re.IGNORECASE | re.DOTALL)
+
+
 def foro(item, episode_count_call=False):
     logger.info("channels.omega foro")
 
@@ -3547,6 +3551,8 @@ def foro(item, episode_count_call=False):
 
                 if final_item:
 
+                    hdr = checkHDR(scrapedtitle)
+
                     parsed_title = parse_title(scrapedtitle)
 
                     if custom_title:
@@ -3604,6 +3610,7 @@ def foro(item, episode_count_call=False):
                         + "[/B][/COLOR] "
                         + extra
                         + ("[" + quality + "]" if quality else "")
+                        + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
                         + " ##*NOTA*## ("
                         + color_uploader(uploader)
                         + ")"
@@ -3979,6 +3986,8 @@ def search_parse(data, item):
 
         if (uploader not in UPLOADERS_BLACKLIST and not any(word in scrapedtitle for word in TITLES_BLACKLIST)):
 
+            hdr = checkHDR(rawscrapedtitle)
+
             if "<" in scrapedtitle or ">" in scrapedtitle:
                 scrapedtitle = re.sub(r"https://[^/]+/[^/]+/([^/]+).*", "\\1", scrapedurl)
 
@@ -4074,6 +4083,7 @@ def search_parse(data, item):
                 + "[/B][/COLOR] "
                 + extra
                 + ("[" + quality + "]" if quality else "")
+                + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
                 + " ##*NOTA*## ("
                 + color_uploader(uploader)
                 + ")"
