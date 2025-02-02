@@ -6026,6 +6026,7 @@ def restore_files(pbar, remote_dir, local_dir, sha1_checksums=None, replace=True
             pbar.update(message="Comprobando "+checksum+"...")
         
         if not os.path.exists(local_dir + "/" + filename):
+            pbar.update(message="REPARANDO "+checksum+"...")
             url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
             updated = True
         elif replace:
