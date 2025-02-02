@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.53"
+CHANNEL_VERSION = "6.54"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -989,7 +989,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]VERIFICAR INTEGRIDAD DE ALFA/OMEGA[/B]",
+            title="[B]VERIFICAR (FULL) INTEGRIDAD DE ALFA/OMEGA[/B]",
             action="verificar_integridad_omega",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
@@ -6090,7 +6090,7 @@ def check_files_integrity(pbar, remote_dir, local_dir):
 
 
 
-def check_integrity(progress_bar=None, repair=True, notify=True):
+def check_integrity(progress_bar=None, repair=True, notify=True, only_critical=True):
 
     alfa_integrity_error = False
 
@@ -6138,7 +6138,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
                 omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
 
-    if repair:
+    if not only_critical:
         for non_critical_dir in NON_CRITICAL_ALFA_DIRS:
             if restore_files(progress_bar, ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 if progress_bar:
@@ -6167,10 +6167,10 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
 
 def verificar_integridad_omega(item):
     pbar = xbmcgui.DialogProgressBG()    
-    pbar.create('[B]OMEGA[/B]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
+    pbar.create('[B]OMEGA WATCHDOG[/B]' if os.path.exists(ALFA_PATH+"/channels/omega.py") else '[COLOR red][B]OMEGA WATCHDOG[/B][/COLOR]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
     
     try:
-        check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY)
+        check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, only_critical=os.path.exists(ALFA_PATH+"/channels/omega.py"))
     except Exception as ex:
         omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
         pass

@@ -54,7 +54,7 @@ NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
 USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
 
-MAX_URL_RETRIEVE_ERROR = 20
+MAX_URL_RETRIEVE_ERROR = 50
 
 URL_RETRIEVE_TIMEOUT = 10
 
@@ -112,6 +112,7 @@ def restore_files(pbar, remote_dir, local_dir, sha1_checksums=None, replace=True
             pbar.update(message="Comprobando "+checksum+"...")
         
         if not os.path.exists(local_dir + "/" + filename):
+            pbar.update(message="REPARANDO "+checksum+"...")
             url_retrieve(remote_dir+"/"+filename, local_dir+"/"+filename)
             updated = True
         elif replace:
@@ -175,7 +176,7 @@ def check_files_integrity(pbar, remote_dir, local_dir):
     return (integrity_error, sha1_checksums)
 
 
-def check_integrity(progress_bar=None, repair=True, notify=True):
+def check_integrity(progress_bar=None, repair=True, notify=True, only_critical=True):
 
     alfa_integrity_error = False
 
@@ -223,7 +224,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True):
                 omegaNotification('¡OMEGA ALTERADO! (NO SE REPARARÁ)')
                 break
 
-    if repair:
+    if not only_critical:
         for non_critical_dir in NON_CRITICAL_ALFA_DIRS:
             if restore_files(progress_bar, ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
                 if progress_bar:
@@ -271,10 +272,10 @@ while not monitor.abortRequested():
         try:
             if not auto_checked or t!=INTEGRITY_AUTO_CHECK_TIME:
                 pbar = xbmcgui.DialogProgressBG()    
-                pbar.create('[B]OMEGA WATCHDOG[/B]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
+                pbar.create('[B]OMEGA WATCHDOG[/B]' if os.path.exists(ALFA_PATH+"/channels/omega.py") else '[COLOR red][B]OMEGA WATCHDOG[/B][/COLOR]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
                 auto_checked = True
                
-            check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None))
+            check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None), only_critical=os.path.exists(ALFA_PATH+"/channels/omega.py"))
             
         except Exception as ex:
             omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
