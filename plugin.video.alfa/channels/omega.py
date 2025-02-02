@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.56"
+CHANNEL_VERSION = "6.57"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -6171,7 +6171,7 @@ def verificar_integridad_omega(item):
     pbar.create('[B]OMEGA WATCHDOG[/B]' if os.path.exists(ALFA_PATH+"/channels/omega.py") else '[COLOR red][B]OMEGA WATCHDOG[/B][/COLOR]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
     
     try:
-        check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, only_critical=os.path.exists(ALFA_PATH+"/channels/omega.py"))
+        check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, only_critical=False)
     except Exception as ex:
         omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
         pass
