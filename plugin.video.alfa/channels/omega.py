@@ -52,7 +52,7 @@ from collections import OrderedDict, deque
 from datetime import datetime
 
 
-CHANNEL_VERSION = "6.57"
+CHANNEL_VERSION = "6.58"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -3311,10 +3311,12 @@ def foro(item, episode_count_call=False):
         item.id_topic = id_topic
 
         retry = 0
+
+        pbar = None
         
-        pbar = xbmcgui.DialogProgressBG()
-        
-        pbar.create('[B]OMEGA[/B]', '[B]Buscando enlaces MEGA/MEGACRYPTER (paciencia)...[/B]')
+        if not episode_count_call:
+            pbar = xbmcgui.DialogProgressBG()
+            pbar.create('[B]OMEGA[/B]', '[B]Buscando enlaces MEGA/MEGACRYPTER (paciencia)...[/B]')
         
         while len(itemlist) == 0 and retry < FORO_ITEMS_RETRY:
             mega_links = find_video_mega_links(item, data)
@@ -3322,9 +3324,9 @@ def foro(item, episode_count_call=False):
             itemlist = mega_links + google_links
             retry += 1
 
-        pbar.update(100)
-
-        pbar.close()
+        if pbar:
+            pbar.update(100)
+            pbar.close()
 
         if len(itemlist) == 0:
 
