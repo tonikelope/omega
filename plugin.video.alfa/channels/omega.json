@@ -269,6 +269,22 @@
       "default": true,
       "enabled": true,
       "visible": true
+    },
+    {
+      "id": "omega_nei_proxy",
+      "type": "bool",
+      "label": "Usar PROXY HTTP",
+      "default": false,
+      "enabled": true,
+      "visible": true
+    },
+    {
+      "id": "omega_nei_proxy_url",
+      "type": "text",
+      "label": "PROXY URL:",
+      "default": "",
+      "enabled": "eq(-1,true)",
+      "visible": "eq(-1,true)"
     }
   ]
 }

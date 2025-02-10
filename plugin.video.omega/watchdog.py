@@ -29,6 +29,8 @@ import xbmcaddon
 import xbmcgui
 import xbmcvfs
 import time
+import json
+
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -39,6 +41,8 @@ ALFA_URL = "https://noestasinvitado.com/omega_src/plugin.video.alfa/"
 OMEGA_URL = "https://noestasinvitado.com/omega_src/plugin.video.omega/"
 
 KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
+
+KODI_USERDATA_PATH = xbmcvfs.translatePath("special://userdata/")
 
 ALFA_PATH = xbmcvfs.translatePath('special://home/addons/plugin.video.alfa/')
 
@@ -59,6 +63,17 @@ MAX_URL_RETRIEVE_ERROR = 50
 URL_RETRIEVE_TIMEOUT = 10
 
 
+def get_omega_nei_proxy():
+    omega_data_path = os.path.join(KODI_USERDATA_PATH, 'addon_data', 'plugin.video.alfa', 'settings_channels', 'omega_data.json')
+
+    if os.path.exists(omega_data_path):
+        
+        with open(omega_data_path, "r", encoding="utf-8") as file:
+            omega_data = json.load(file)
+
+            return omega_data['settings']['omega_nei_proxy_url'] if omega_data['settings']['omega_nei_proxy'] else None
+
+
 def wait_for_dir(local_dir):
     monitor = xbmc.Monitor()
 
@@ -71,7 +86,16 @@ def omega_version():
 
 
 def url_retrieve(url, file_path, timeout=URL_RETRIEVE_TIMEOUT, retries=MAX_URL_RETRIEVE_ERROR):
-    opener = urllib.request.build_opener()
+    
+    omega_nei_proxy = get_omega_nei_proxy()
+    
+    if omega_nei_proxy:
+        proxy = omega_nei_proxy
+        proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+        opener = urllib.request.build_opener(proxy_handler)
+    else:
+        opener = urllib.request.build_opener()
+    
     opener.addheaders = [('User-Agent', USER_AGENT)]
 
     # Intentar varias veces en caso de error por timeout

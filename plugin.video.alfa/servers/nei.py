@@ -34,7 +34,7 @@ Enlaces de vídeo que maneja este conector:
 
 """
 
-from core import httptools, scrapertools
+from core import scrapertools
 from platformcode import config, logger, platformtools
 from http.server import BaseHTTPRequestHandler, HTTPServer
 from servers.debriders import realdebrid, alldebrid
@@ -54,9 +54,13 @@ import os
 import pickle
 import shutil
 import json
+import http.cookiejar
+import urllib.error
 
 
 KODI_TEMP_PATH = xbmcvfs.translatePath('special://temp/')
+KODI_USERDATA_PATH = xbmcvfs.translatePath("special://userdata/")
+KODI_NEI_COOKIES_PATH = KODI_USERDATA_PATH + "kodi_nei_cookies"
 MEGA_FILES = None
 
 DEFAULT_HTTP_TIMEOUT = 300
@@ -82,9 +86,74 @@ DEBRID_AUX_MEGA_ACCOUNTS = []
 
 RESPONSE_READ_CHUNK_SIZE = 8*1024
 
+DEFAULT_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+}
+
+
+class HTTPClient:
+    def __init__(self, cookies_file=KODI_NEI_COOKIES_PATH, user_agent=None, proxy=None):
+        self.cookies_file = cookies_file
+        self.cookie_jar = http.cookiejar.LWPCookieJar()
+
+        # Cargar cookies si existen
+        if os.path.exists(self.cookies_file):
+            self.cookie_jar.load(self.cookies_file, ignore_discard=True, ignore_expires=True)
+
+        # Configurar el manejador de cookies
+        cookie_handler = urllib.request.HTTPCookieProcessor(self.cookie_jar)
+
+        # Configurar el proxy si se proporciona
+        if proxy:
+            proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+            self.opener = urllib.request.build_opener(cookie_handler, proxy_handler)
+        elif config.get_setting("omega_nei_proxy", "omega") and config.get_setting("omega_nei_proxy_url", "omega"):
+            proxy = config.get_setting("omega_nei_proxy_url", "omega")
+            proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+            self.opener = urllib.request.build_opener(cookie_handler, proxy_handler)
+        else:
+            self.opener = urllib.request.build_opener(cookie_handler)
+
+        # Configurar User-Agent si se proporciona
+        self.headers = DEFAULT_HEADERS
+
+    def save_cookies(self):
+        """Guarda las cookies en un archivo."""
+        self.cookie_jar.save(self.cookies_file, ignore_discard=True, ignore_expires=True)
+
+    def request(self, url, method="GET", data=None, headers=None, timeout=10, ignore_errors=False):
+        """Realiza una solicitud HTTP con GET o POST."""
+        if data:
+            data = urllib.parse.urlencode(data).encode("utf-8")
+
+        request = urllib.request.Request(url, data=data, headers={**self.headers, **(headers or {})}, method=method)
+
+        try:
+            response = self.opener.open(request, timeout=timeout)
+            self.save_cookies()
+            return response.read().decode("utf-8")
+
+        except urllib.error.HTTPError as e:
+            if ignore_errors:
+                return e.read().decode("utf-8")  # Devuelve el contenido a pesar del error
+            else:
+                raise  # Relanza la excepción si no se quiere ignorar errores
+
+        except urllib.error.URLError as e:
+            raise RuntimeError(f"Error de conexión: {e}")
+
+    def get(self, url, headers=None, timeout=10, ignore_errors=False):
+        """Realiza una solicitud GET."""
+        return self.request(url, method="GET", headers=headers, timeout=timeout, ignore_errors=ignore_errors)
+
+    def post(self, url, data=None, headers=None, timeout=10, ignore_errors=False):
+        """Realiza una solicitud POST."""
+        return self.request(url, method="POST", data=data, headers=headers, timeout=timeout, ignore_errors=ignore_errors)
+
 try:
     if config.get_setting("omega_debrid_mega_url", "omega"):
-        DEBRID_AUX_MEGA_ACCOUNTS=json.loads(httptools.downloadpage(config.get_setting("omega_debrid_mega_url", "omega"), timeout=DEFAULT_HTTP_TIMEOUT).data.encode().decode('utf-8-sig'))
+        client = HTTPClient()
+        DEBRID_AUX_MEGA_ACCOUNTS=json.loads(client.get(config.get_setting("omega_debrid_mega_url", "omega"), timeout=DEFAULT_HTTP_TIMEOUT).encode('utf-8').decode('utf-8-sig'))
 except:
     DEBRID_AUX_MEGA_ACCOUNTS = []
 
@@ -609,13 +678,15 @@ def megacrypter2auxmega(link, clean=True, account=1):
 
         noexpire = urllib.parse.quote(megacrypter_link[4]) #Hay que hacerlo así porque el noexpire está en base64 normal (no url safe)
 
-        mega_link_response = httptools.downloadpage(MEGACRYPTER2DEBRID_ENDPOINT+'?noexpire='+noexpire+'&c='+('1' if clean else '0')+'&l='+link_data+'&email='+email.decode('utf-8').replace('=','')+'&password='+password.decode('utf-8').replace('=',''), timeout=MEGACRYPTER2DEBRID_TIMEOUT)
+        client = HTTPClient()
+
+        mega_link_response = client.get(MEGACRYPTER2DEBRID_ENDPOINT+'?noexpire='+noexpire+'&c='+('1' if clean else '0')+'&l='+link_data+'&email='+email.decode('utf-8').replace('=','')+'&password='+password.decode('utf-8').replace('=',''), timeout=MEGACRYPTER2DEBRID_TIMEOUT)
 
         logger.info(MEGACRYPTER2DEBRID_ENDPOINT+'?c='+('1' if clean else '0')+'&l='+link_data+'&email='+email.decode('utf-8').replace('=','')+'&password='+password.decode('utf-8').replace('=',''))
 
-        logger.info(mega_link_response.data)
+        logger.info(mega_link_response)
 
-        json_response = json.loads(mega_link_response.data.encode().decode('utf-8-sig'))
+        json_response = json.loads(mega_link_response.encode('utf-8').decode('utf-8-sig'))
 
         logger.info(json_response)
 
@@ -648,13 +719,15 @@ def megacrypter2auxmegaHASH(link):
 
     noexpire = urllib.parse.quote(megacrypter_link[4]) #Hay que hacerlo así porque el noexpire está en base64 normal (no url safe)
 
-    mega_link_response = httptools.downloadpage(MEGACRYPTER2DEBRID_ENDPOINT+'?noexpire='+noexpire+'&l='+link_data, timeout=MEGACRYPTER2DEBRID_TIMEOUT)
+    client = HTTPClient()
+
+    mega_link_response = client.get(MEGACRYPTER2DEBRID_ENDPOINT+'?noexpire='+noexpire+'&l='+link_data, timeout=MEGACRYPTER2DEBRID_TIMEOUT)
 
     logger.info(MEGACRYPTER2DEBRID_ENDPOINT+'?l='+link_data)
 
-    logger.info(mega_link_response.data)
+    logger.info(mega_link_response)
 
-    json_response = json.loads(mega_link_response.data.encode().decode('utf-8-sig'))
+    json_response = json.loads(mega_link_response.encode('utf-8').decode('utf-8-sig'))
 
     logger.info(json_response)
 

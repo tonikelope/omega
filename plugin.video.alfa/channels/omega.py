@@ -45,14 +45,16 @@ import time
 import shutil
 from functools import cmp_to_key
 from core.item import Item
-from core import httptools, scrapertools, tmdb
+from core import scrapertools, tmdb
 from platformcode import config, logger, platformtools, updater
 from platformcode.platformtools import dialog_qr_message
 from collections import OrderedDict, deque
 from datetime import datetime
+import http.cookiejar
+import urllib.error
 
 
-CHANNEL_VERSION = "6.58"
+CHANNEL_VERSION = "6.59"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -91,6 +93,8 @@ KODI_TEMP_PATH = xbmcvfs.translatePath("special://temp/")
 KODI_USERDATA_PATH = xbmcvfs.translatePath("special://userdata/")
 
 KODI_HOME_PATH = xbmcvfs.translatePath("special://home/")
+
+KODI_NEI_COOKIES_PATH = KODI_USERDATA_PATH + "kodi_nei_cookies"
 
 KODI_NEI_LAST_ITEMS_PATH = KODI_USERDATA_PATH + "kodi_nei_last"
 
@@ -274,12 +278,79 @@ if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
             os.remove(KODI_NEI_MC_CACHE_PATH)
 
 
+class HTTPClient:
+    def __init__(self, cookies_file=KODI_NEI_COOKIES_PATH, user_agent=None, proxy=None):
+        self.cookies_file = cookies_file
+        self.cookie_jar = http.cookiejar.LWPCookieJar()
+
+        # Cargar cookies si existen
+        if os.path.exists(self.cookies_file):
+            self.cookie_jar.load(self.cookies_file, ignore_discard=True, ignore_expires=True)
+
+        # Configurar el manejador de cookies
+        cookie_handler = urllib.request.HTTPCookieProcessor(self.cookie_jar)
+
+        # Configurar el proxy si se proporciona
+        if proxy:
+            proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+            self.opener = urllib.request.build_opener(cookie_handler, proxy_handler)
+        elif config.get_setting("omega_nei_proxy", "omega") and config.get_setting("omega_nei_proxy_url", "omega"):
+            proxy = config.get_setting("omega_nei_proxy_url", "omega")
+            proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+            self.opener = urllib.request.build_opener(cookie_handler, proxy_handler)
+        else:
+            self.opener = urllib.request.build_opener(cookie_handler)
+
+        # Configurar User-Agent si se proporciona
+        self.headers = DEFAULT_HEADERS
+
+    def save_cookies(self):
+        """Guarda las cookies en un archivo."""
+        self.cookie_jar.save(self.cookies_file, ignore_discard=True, ignore_expires=True)
+
+    def request(self, url, method="GET", data=None, headers=None, timeout=10, ignore_errors=False):
+        """Realiza una solicitud HTTP con GET o POST."""
+        if data:
+            data = urllib.parse.urlencode(data).encode("utf-8")
+
+        request = urllib.request.Request(url, data=data, headers={**self.headers, **(headers or {})}, method=method)
+
+        try:
+            response = self.opener.open(request, timeout=timeout)
+            self.save_cookies()
+            return response.read().decode("utf-8")
+
+        except urllib.error.HTTPError as e:
+            if ignore_errors:
+                return e.read().decode("utf-8")  # Devuelve el contenido a pesar del error
+            else:
+                raise  # Relanza la excepción si no se quiere ignorar errores
+
+        except urllib.error.URLError as e:
+            raise RuntimeError(f"Error de conexión: {e}")
+
+    def get(self, url, headers=None, timeout=10, ignore_errors=False):
+        """Realiza una solicitud GET."""
+        return self.request(url, method="GET", headers=headers, timeout=timeout, ignore_errors=ignore_errors)
+
+    def post(self, url, data=None, headers=None, timeout=10, ignore_errors=False):
+        """Realiza una solicitud POST."""
+        return self.request(url, method="POST", data=data, headers=headers, timeout=timeout, ignore_errors=ignore_errors)
+
+
 def omega_version():
     return xbmcaddon.Addon('plugin.video.omega').getAddonInfo('version')
 
 
 def url_retrieve(url, file_path, timeout=URL_RETRIEVE_TIMEOUT, retries=MAX_URL_RETRIEVE_ERROR):
-    opener = urllib.request.build_opener()
+    
+    if config.get_setting("omega_nei_proxy", "omega") and config.get_setting("omega_nei_proxy_url", "omega"):
+        proxy = config.get_setting("omega_nei_proxy_url", "omega")
+        proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+        opener = urllib.request.build_opener(proxy_handler)
+    else:
+        opener = urllib.request.build_opener()
+    
     opener.addheaders = [('User-Agent', DEFAULT_HEADERS['User-Agent'])]
 
     # Intentar varias veces en caso de error por timeout
@@ -333,26 +404,15 @@ def save_mc_cache():
 
 
 def setNEITopicsPerPage(value):
-    httptools.downloadpage(
-        "https://noestasinvitado.com/omega_user_profile.php?topics_per_page="
-        + str(value),
-        timeout=DEFAULT_HTTP_TIMEOUT,
-    )
+    client = HTTPClient()
+    client.get("https://noestasinvitado.com/omega_user_profile.php?topics_per_page=" + str(value), timeout=DEFAULT_HTTP_TIMEOUT)
 
 
 def getNEITopicsPerPage():
-    httptools.downloadpage(
-        "https://noestasinvitado.com/omega_user_profile.php",
-        timeout=DEFAULT_HTTP_TIMEOUT,
-    )
-    res_json = json.loads(
-        httptools.downloadpage(
-            "https://noestasinvitado.com/omega_user_profile.php",
-            timeout=DEFAULT_HTTP_TIMEOUT,
-        )
-        .data.encode()
-        .decode("utf-8-sig")
-    )
+    client = HTTPClient()
+    client.get("https://noestasinvitado.com/omega_user_profile.php", timeout=DEFAULT_HTTP_TIMEOUT)
+    
+    res_json = json.loads(client.get("https://noestasinvitado.com/omega_user_profile.php", timeout=DEFAULT_HTTP_TIMEOUT))
 
     if "topics_per_page" in res_json:
         return int(res_json["topics_per_page"])
@@ -393,29 +453,23 @@ def get_omega_resource_path(resource):
 def login(force=False):
     logger.info("channels.omega login")
 
-    if not force:
-        data = httptools.downloadpage(
-            "https://noestasinvitado.com/profile", timeout=DEFAULT_HTTP_TIMEOUT
-        ).data
+    client = HTTPClient()
 
+    if not force:
+        data = client.get("https://noestasinvitado.com/profile", timeout=DEFAULT_HTTP_TIMEOUT)
+        
         if data.find(OMEGA_LOGIN) != -1:
             return True
 
     xbmc.executebuiltin("Container.Refresh")
 
-    httptools.downloadpage(
-        "https://noestasinvitado.com/login/", timeout=DEFAULT_HTTP_TIMEOUT
-    )
+    client.get("https://noestasinvitado.com/login/", timeout=DEFAULT_HTTP_TIMEOUT)
 
     if OMEGA_LOGIN and OMEGA_PASSWORD:
 
-        post = "user=" + OMEGA_LOGIN + "&passwrd=" + OMEGA_PASSWORD + "&cookielength=-1"
+        post = {"user": OMEGA_LOGIN, "passwrd": OMEGA_PASSWORD, "cookielength": "-1"}
 
-        data = httptools.downloadpage(
-            "https://noestasinvitado.com/login2/",
-            post=post,
-            timeout=DEFAULT_HTTP_TIMEOUT,
-        ).data
+        data = client.post("https://noestasinvitado.com/login2/", data=post, timeout=DEFAULT_HTTP_TIMEOUT)
 
         if data.find(OMEGA_LOGIN) != -1:
             setNEITopicsPerPage(ITEMS_PER_PAGE)
@@ -1247,20 +1301,15 @@ def buscar_por_genero(item):
 
     if item.page > 0 or indices:
 
-        res_json = json.loads(
-            httptools.downloadpage(
-                "https://noestasinvitado.com/generos.php",
-                post={
+        client = HTTPClient()
+
+        res_json = json.loads(client.post("https://noestasinvitado.com/generos.php", data={
                     "generosb64": item.generosb64,
                     "json": 1,
                     "page": item.page,
-                    "items_per_page": ITEMS_PER_PAGE,
+                    "items_per_page": ITEMS_PER_PAGE
                 },
-                timeout=DEFAULT_HTTP_TIMEOUT,
-            )
-            .data.encode()
-            .decode("utf-8-sig")
-        )
+                timeout=DEFAULT_HTTP_TIMEOUT).encode("utf-8").decode("utf-8-sig"))
 
         boards = {"pelis": ["44", "47", "229"], "series": ["53", "59", "235", "62"]}
 
@@ -2313,13 +2362,11 @@ def bibliotaku_series(item):
 
     data = ""
 
+    client = HTTPClient()
+
     for u in item.url.split("#"):
 
-        json_response = json.loads(
-            httptools.downloadpage(u, timeout=DEFAULT_HTTP_TIMEOUT)
-            .data.encode()
-            .decode("utf-8-sig")
-        )
+        json_response = json.loads(client.get(u, timeout=DEFAULT_HTTP_TIMEOUT).encode("utf-8").decode("utf-8-sig"))
 
         if "error" in json_response or not "body" in json_response:
             return None
@@ -2709,13 +2756,11 @@ def bibliotaku_pelis(item):
 
     data = ""
 
+    client = HTTPClient()
+
     for u in item.url.split("#"):
 
-        json_response = json.loads(
-            httptools.downloadpage(u, timeout=DEFAULT_HTTP_TIMEOUT)
-            .data.encode()
-            .decode("utf-8-sig")
-        )
+        json_response = json.loads(client.get(u, timeout=DEFAULT_HTTP_TIMEOUT).encode("utf-8").decode("utf-8-sig"))
 
         if "error" in json_response or not "body" in json_response:
             return None
@@ -3015,7 +3060,9 @@ def escribirMensajeHiloForo(item, msg=None):
             )
         )
 
-        data = httptools.downloadpage(url, timeout=DEFAULT_HTTP_TIMEOUT).data
+        client = HTTPClient()
+
+        data = client.get(url, timeout=DEFAULT_HTTP_TIMEOUT)
 
         m = re.compile(
             r'action="(http[^"]+action=post2)".*?input.*?"topic".*?"(.*?)".*?"last_msg".*?"(.*?)".*?name.*?"(.*?)".*?"(.*?)".*?"seqnum".*?"(.*?)"',
@@ -3024,27 +3071,22 @@ def escribirMensajeHiloForo(item, msg=None):
 
         res_post_url = m.group(1)
 
-        res_post_data = (
-            "topic="
-            + m.group(2)
-            + "&subject="
-            + urllib.parse.quote(asunto)
-            + "&icon=xx&from_qr=1&notify=0&not_approved=&goback=1&last_msg="
-            + m.group(3)
-            + "&"
-            + m.group(4)
-            + "="
-            + m.group(5)
-            + "&seqnum="
-            + m.group(6)
-            + "&message="
-            + urllib.parse.quote(mensaje)
-            + "&post=Publicar"
-        )
+        res_post_data = {
+            "topic": m.group(2),
+            "subject": asunto,
+            "icon": "xx",
+            "from_qr": "1",
+            "notify": "0",
+            "not_approved": "",
+            "goback": "1",
+            "last_msg": m.group(3),
+            m.group(4): m.group(5),  # Asume que m.group(4) es el nombre del parámetro
+            "seqnum": m.group(6),
+            "message": mensaje,
+            "post": "Publicar"
+        }
 
-        httptools.downloadpage(
-            res_post_url, post=res_post_data, timeout=DEFAULT_HTTP_TIMEOUT
-        )
+        client.post(res_post_url, data=res_post_data, timeout=DEFAULT_HTTP_TIMEOUT)
 
         omegaNotification("¡MENSAJE ENVIADO! (es posible que tengas que refrescar la lista para verlo)")
 
@@ -3052,12 +3094,12 @@ def escribirMensajeHiloForo(item, msg=None):
 
 
 def darGraciasMensajeForo(item):
-    httptools.downloadpage(
-        re.sub(r"/msg.*?$", "/", item.url)
+    client = HTTPClient()
+
+    client.get(re.sub(r"/msg.*?$", "/", item.url)
         + "?action=thankyou;msg="
         + item.msg["id_msg"],
-        timeout=DEFAULT_HTTP_TIMEOUT,
-    )
+        timeout=DEFAULT_HTTP_TIMEOUT)
 
     omegaNotification("HAS DADO LAS GRACIAS A: " + item.msg["nick"])
 
@@ -3066,13 +3108,9 @@ def darGraciasMensajeForo(item):
 
 def leerMensajesHiloForo(item):
 
-    json_response = json.loads(
-        httptools.downloadpage(
-            OMEGA_MENSAJES_FORO_URL + str(item.id_topic), timeout=DEFAULT_HTTP_TIMEOUT
-        )
-        .data.encode()
-        .decode("utf-8-sig")
-    )
+    client = HTTPClient()
+
+    json_response = json.loads(client.get(OMEGA_MENSAJES_FORO_URL + str(item.id_topic), timeout=DEFAULT_HTTP_TIMEOUT).encode("utf-8").decode("utf-8-sig"))
 
     logger.info(OMEGA_MENSAJES_FORO_URL + str(item.id_topic))
 
@@ -3276,7 +3314,9 @@ def foro(item, episode_count_call=False):
 
     itemlist = []
 
-    data = httptools.downloadpage(item.url, timeout=DEFAULT_HTTP_TIMEOUT).data
+    client = HTTPClient()
+
+    data = client.get(item.url, timeout=DEFAULT_HTTP_TIMEOUT)
 
     video_links = False
 
@@ -3885,30 +3925,29 @@ def search_similares(item, comillas=True):
     else:
         return []
 
-    post = (
-        "advanced=1&search="
-        + texto
-        + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&"
-        "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D"
-        "=229&brd%5B230%5D=230&brd%5B41%5D=41&brd%5B47%5D=47&brd%5B48%5D"
-        "=48&brd%5B42%5D=42&brd%5B44%5D=44&brd%5B46%5D=46&brd%5B218%5D=2"
-        "18&brd%5B225%5D=225&brd%5B7%5D=7&brd%5B52%5D=52&brd%5B59%5D=59&b"
-        "rd%5B61%5D=61&brd%5B62%5D=62&brd%5B51%5D=51&brd%5B53%5D=53&brd%5"
-        "B54%5D=54&brd%5B55%5D=55&brd%5B63%5D=63&brd%5B64%5D=64&brd%5B66%"
-        "5D=66&brd%5B67%5D=67&brd%5B65%5D=65&brd%5B68%5D=68&brd%5B69%5D=69"
-        "&brd%5B14%5D=14&brd%5B87%5D=87&brd%5B86%5D=86&brd%5B93%5D=93&brd"
-        "%5B83%5D=83&brd%5B89%5D=89&brd%5B85%5D=85&brd%5B82%5D=82&brd%5B9"
-        "1%5D=91&brd%5B90%5D=90&brd%5B92%5D=92&brd%5B88%5D=88&brd%5B84%5D"
-        "=84&brd%5B212%5D=212&brd%5B94%5D=94&brd%5B23%5D=23&submit=Buscar"
-    )
+    post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&"
+    "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D"
+    "=229&brd%5B230%5D=230&brd%5B41%5D=41&brd%5B47%5D=47&brd%5B48%5D"
+    "=48&brd%5B42%5D=42&brd%5B44%5D=44&brd%5B46%5D=46&brd%5B218%5D=2"
+    "18&brd%5B225%5D=225&brd%5B7%5D=7&brd%5B52%5D=52&brd%5B59%5D=59&b"
+    "rd%5B61%5D=61&brd%5B62%5D=62&brd%5B51%5D=51&brd%5B53%5D=53&brd%5"
+    "B54%5D=54&brd%5B55%5D=55&brd%5B63%5D=63&brd%5B64%5D=64&brd%5B66%"
+    "5D=66&brd%5B67%5D=67&brd%5B65%5D=65&brd%5B68%5D=68&brd%5B69%5D=69"
+    "&brd%5B14%5D=14&brd%5B87%5D=87&brd%5B86%5D=86&brd%5B93%5D=93&brd"
+    "%5B83%5D=83&brd%5B89%5D=89&brd%5B85%5D=85&brd%5B82%5D=82&brd%5B9"
+    "1%5D=91&brd%5B90%5D=90&brd%5B92%5D=92&brd%5B88%5D=88&brd%5B84%5D"
+    "=84&brd%5B212%5D=212&brd%5B94%5D=94&brd%5B23%5D=23&submit=Buscar"
+    
+
+    post_dict = dict(urllib.parse.parse_qsl(post))
 
     pbar = xbmcgui.DialogProgressBG()
         
     pbar.create('[B]OMEGA[/B]', '[B]Buscando en NEI (paciencia)...[/B]')
 
-    data = httptools.downloadpage(
-        "https://noestasinvitado.com/search2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT
-    ).data
+    client = HTTPClient()
+
+    data = client.post("https://noestasinvitado.com/search2/", data=post_dict, timeout=DEFAULT_HTTP_TIMEOUT)
 
     search_itemlist = search_parse(data, item)
 
@@ -3940,30 +3979,28 @@ def search(item, texto):
     if texto != "":
         texto = '"' + texto.replace("&", " ").replace(" ", "+") + '"'
 
-    post = (
-        "advanced=1&search="
-        + texto
-        + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&"
-        "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D"
-        "=229&brd%5B230%5D=230&brd%5B41%5D=41&brd%5B47%5D=47&brd%5B48%5D"
-        "=48&brd%5B42%5D=42&brd%5B44%5D=44&brd%5B46%5D=46&brd%5B218%5D=2"
-        "18&brd%5B225%5D=225&brd%5B7%5D=7&brd%5B52%5D=52&brd%5B59%5D=59&b"
-        "rd%5B61%5D=61&brd%5B62%5D=62&brd%5B51%5D=51&brd%5B53%5D=53&brd%5"
-        "B54%5D=54&brd%5B55%5D=55&brd%5B63%5D=63&brd%5B64%5D=64&brd%5B66%"
-        "5D=66&brd%5B67%5D=67&brd%5B65%5D=65&brd%5B68%5D=68&brd%5B69%5D=69"
-        "&brd%5B14%5D=14&brd%5B87%5D=87&brd%5B86%5D=86&brd%5B93%5D=93&brd"
-        "%5B83%5D=83&brd%5B89%5D=89&brd%5B85%5D=85&brd%5B82%5D=82&brd%5B9"
-        "1%5D=91&brd%5B90%5D=90&brd%5B92%5D=92&brd%5B88%5D=88&brd%5B84%5D"
-        "=84&brd%5B212%5D=212&brd%5B94%5D=94&brd%5B23%5D=23&submit=Buscar"
-    )
+    post = "advanced=1&search=" + texto + "&searchtype=1&userspec=*&sort=relevance%7Cdesc&subject_only=1&"
+    "minage=0&maxage=9999&brd%5B6%5D=6&brd%5B227%5D=227&brd%5B229%5D"
+    "=229&brd%5B230%5D=230&brd%5B41%5D=41&brd%5B47%5D=47&brd%5B48%5D"
+    "=48&brd%5B42%5D=42&brd%5B44%5D=44&brd%5B46%5D=46&brd%5B218%5D=2"
+    "18&brd%5B225%5D=225&brd%5B7%5D=7&brd%5B52%5D=52&brd%5B59%5D=59&b"
+    "rd%5B61%5D=61&brd%5B62%5D=62&brd%5B51%5D=51&brd%5B53%5D=53&brd%5"
+    "B54%5D=54&brd%5B55%5D=55&brd%5B63%5D=63&brd%5B64%5D=64&brd%5B66%"
+    "5D=66&brd%5B67%5D=67&brd%5B65%5D=65&brd%5B68%5D=68&brd%5B69%5D=69"
+    "&brd%5B14%5D=14&brd%5B87%5D=87&brd%5B86%5D=86&brd%5B93%5D=93&brd"
+    "%5B83%5D=83&brd%5B89%5D=89&brd%5B85%5D=85&brd%5B82%5D=82&brd%5B9"
+    "1%5D=91&brd%5B90%5D=90&brd%5B92%5D=92&brd%5B88%5D=88&brd%5B84%5D"
+    "=84&brd%5B212%5D=212&brd%5B94%5D=94&brd%5B23%5D=23&submit=Buscar"
+    
+    post_dict = dict(urllib.parse.parse_qsl(post)) 
 
     pbar = xbmcgui.DialogProgressBG()
         
     pbar.create('[B]OMEGA[/B]', '[B]Buscando en NEI (paciencia)...[/B]')
 
-    data = httptools.downloadpage(
-        "https://noestasinvitado.com/search2/", post=post, timeout=DEFAULT_HTTP_TIMEOUT
-    ).data
+    client = HTTPClient()
+
+    data = client.post("https://noestasinvitado.com/search2/", data=post_dict, timeout=DEFAULT_HTTP_TIMEOUT)
 
     search_itemlist = search_parse(data, item)
 
@@ -3982,7 +4019,9 @@ def search(item, texto):
 
 
 def search_pag(item):
-    data = httptools.downloadpage(item.url, timeout=DEFAULT_HTTP_TIMEOUT).data
+    client = HTTPClient()
+
+    data = client.get(item.url, timeout=DEFAULT_HTTP_TIMEOUT)
 
     return search_parse(data, item)
 
@@ -4501,16 +4540,16 @@ def find_video_gvideo_links(item, data, fa=False):
             r"/\?action=thankyou;msg=" + msg_id.group(1), re.IGNORECASE
         ).search(data)
 
-        if thanks_match:
-            httptools.downloadpage(
-                item.url + thanks_match.group(0), timeout=DEFAULT_HTTP_TIMEOUT
-            )
+        client = HTTPClient()
 
-        data = httptools.downloadpage(
+        if thanks_match:
+            client.get(item.url + thanks_match.group(0), timeout=DEFAULT_HTTP_TIMEOUT)
+
+        data = client.get(
             "https://noestasinvitado.com/msg.php?m=" + msg_id.group(1),
             timeout=DEFAULT_HTTP_TIMEOUT,
-        ).data
-        json_response = json.loads(data.encode().decode("utf-8-sig"))
+        )
+        json_response = json.loads(data.encode("utf-8").decode("utf-8-sig"))
         data = json_response["body"]
 
     itemlist = []
@@ -4721,16 +4760,16 @@ def find_video_mega_links(item, data):
             r"/\?action=thankyou;msg=" + msg_id.group(1), re.IGNORECASE
         ).search(data)
 
-        if thanks_match:
-            httptools.downloadpage(
-                item.url + thanks_match.group(0), timeout=DEFAULT_HTTP_TIMEOUT
-            )
+        client = HTTPClient()
 
-        data = httptools.downloadpage(
+        if thanks_match:
+            client.get(item.url + thanks_match.group(0), timeout=DEFAULT_HTTP_TIMEOUT)
+
+        data = client.get(
             "https://noestasinvitado.com/msg.php?m=" + msg_id.group(1),
             timeout=DEFAULT_HTTP_TIMEOUT,
-        ).data
-        json_response = json.loads(data.encode().decode("utf-8-sig"))
+        )
+        json_response = json.loads(data.encode("utf-8").decode("utf-8-sig"))
         data = json_response["body"]
 
     itemlist = []
@@ -4793,12 +4832,13 @@ def find_video_mega_links(item, data):
                             if id[0] in KODI_NEI_MC_CACHE:
                                 filename = KODI_NEI_MC_CACHE[id[0]]
                             else:
-                                d = httptools.downloadpage(
+                                client = HTTPClient()
+                                d = client.get(
                                     "https://noestasinvitado.com/gen_mc.php?id="
                                     + id[0]
                                     + "&raw=1",
                                     timeout=DEFAULT_HTTP_TIMEOUT,
-                                ).data
+                                )
 
                                 m = re.search(
                                     r"(.*?) *?\[[0-9.]+ *?.*?\] *?(https://megacrypter\.noestasinvitado\.com/.+)",
@@ -5068,11 +5108,13 @@ def get_video_mega_links_group(item):
 
         matches = False
 
+        client = HTTPClient()
+
         while not matches and conta_error < FORO_ITEMS_RETRY:
-            data = httptools.downloadpage(
+            data = client.get(
                 "https://noestasinvitado.com/gen_mc.php?id=" + id + "&raw=1",
                 timeout=DEFAULT_HTTP_TIMEOUT,
-            ).data
+            )
             matches = re.compile(
                 r"(.*? *?\[[0-9.]+ *?.*?\]) *?(https://megacrypter\.noestasinvitado\.com/.+)"
             ).findall(data)
@@ -5431,12 +5473,9 @@ def leer_criticas_fa(item):
 
         headers["Referer"] = criticas_url
 
-        data = httptools.downloadpage(
-            criticas_url,
-            ignore_response_code=True,
-            headers=headers,
-            timeout=DEFAULT_HTTP_TIMEOUT,
-        ).data
+        client = HTTPClient()
+
+        data = client.get(criticas_url, headers={'Referer':criticas_url}, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=True)
 
         criticas_pattern = r"revrat\" *?> *?([0-9]+).*?\"rwtitle\".*?href=\"([^\"]+)\" *?>([^<>]+).*?\"revuser\".*?href=\"[^\"]+\" *?>([^<>]+)"
 
@@ -5536,16 +5575,9 @@ def clean_html_tags(data):
 
 def cargar_critica(item):
 
-    headers = DEFAULT_HEADERS
+    client = HTTPClient()
 
-    headers["Referer"] = item.url
-
-    data = httptools.downloadpage(
-        item.url,
-        ignore_response_code=True,
-        headers=headers,
-        timeout=DEFAULT_HTTP_TIMEOUT,
-    ).data
+    data = client.get(item.url, headers={'Referer':item.url}, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=True)
 
     critica_pattern = r"\"review-text1\" *?>(.*?)< *?/ *?div"
 
@@ -5572,16 +5604,14 @@ def cargar_critica(item):
 
 def cargar_critica_con_spoiler(item):
 
-    headers = DEFAULT_HEADERS
+    client = HTTPClient()
 
-    headers["Referer"] = item.url
-
-    data = httptools.downloadpage(
+    data = client.get(
         item.url,
-        ignore_response_code=True,
-        headers=headers,
+        ignore_errors=True,
+        headers={'Referer':item.url},
         timeout=DEFAULT_HTTP_TIMEOUT,
-    ).data
+    )
 
     critica_pattern = r"\"review-text1\" *?>(.*?)< *?/ *?div"
 
@@ -5610,7 +5640,9 @@ def cargar_critica_con_spoiler(item):
 def indice_links(item):
     itemlist = []
 
-    data = httptools.downloadpage(item.url, timeout=DEFAULT_HTTP_TIMEOUT).data
+    client = HTTPClient()
+
+    data = client.get(item.url, timeout=DEFAULT_HTTP_TIMEOUT)
 
     patron = (
         r'<tr class="windowbg2">[^<>]*<td[^<>]*>[^<>]*<img[^<>]*>[^<>]'
@@ -5970,11 +6002,9 @@ def get_filmaffinity_data_advanced(title, year, genre):
 
     logger.info(url)
 
-    headers = DEFAULT_HEADERS
+    client = HTTPClient()
 
-    data = httptools.downloadpage(
-        url, ignore_response_code=True, headers=headers, timeout=DEFAULT_HTTP_TIMEOUT
-    ).data
+    data = client.get(url, ignore_errors=True,timeout=DEFAULT_HTTP_TIMEOUT)
 
     regex = r"srcset=.*?(https.*?msmall\.jpg).*?mc-title.*?(\d+).*?>(.*?)<.*?avg *?mx.*?>(.*?)<"
 
