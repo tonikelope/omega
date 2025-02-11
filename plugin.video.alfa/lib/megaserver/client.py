@@ -37,7 +37,6 @@ from .handler import Handler
 from .server import Server
 from .proxy import MegaProxyServer
 from platformcode import logger, config
-from functools import wraps
 import ssl
 
 
@@ -219,19 +218,9 @@ class Client(object):
         return json.loads(res)
 
     def __post(self, url, data, proxy=None):
-        # Crear un contexto SSL seguro en lugar de modificar ssl.wrap_socket
+        # Crear un contexto SSL seguro
         context = ssl.create_default_context()
-        context.options |= ssl.OP_NO_TLSv1  # Deshabilitar TLS 1.0
-
-        def sslwrap(func):
-            @wraps(func)
-            def bar(*args, **kw):
-                kw['context'] = context  # Usar el nuevo contexto SSL
-                return func(*args, **kw)
-            return bar
-
-        # No es necesario modificar ssl.wrap_socket globalmente
-        # ssl.wrap_socket = sslwrap(ssl.wrap_socket)
+        context.options |= ssl.OP_NO_TLSv1  # Deshabilitar TLS 1.0 por seguridad
 
         if proxy:
             proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
@@ -239,7 +228,7 @@ class Client(object):
         else:
             opener = urllib.request.build_opener()
 
-        # Asegurar que el contexto SSL se use en las peticiones HTTPS
+        # Asegurar que se usa el contexto SSL en HTTPS
         opener.add_handler(urllib.request.HTTPSHandler(context=context))
 
         request = urllib.request.Request(url, data=data.encode("utf-8"), headers={
