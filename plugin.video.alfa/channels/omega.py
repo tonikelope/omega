@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.60"
+CHANNEL_VERSION = "6.61"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5469,15 +5469,15 @@ def leer_criticas_fa(item):
 
         criticas_url = "https://www.filmaffinity.com/es/reviews2/1/" + film_id + ".html"
 
-        headers = DEFAULT_HEADERS
-
-        headers["Referer"] = criticas_url
+        logger.info(criticas_url)
 
         client = HTTPClient()
 
         data = client.get(criticas_url, headers={'Referer':criticas_url}, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=True)
 
-        criticas_pattern = r"revrat\" *?> *?([0-9]+).*?\"rwtitle\".*?href=\"([^\"]+)\" *?>([^<>]+).*?\"revuser\".*?href=\"[^\"]+\" *?>([^<>]+)"
+        logger.info(data)
+
+        criticas_pattern = r"rat-box.*?(\d+).*?(http[^\"]+rating.*?html).*?>(.*?)<.*?userreviews.*?>(.*?)<"
 
         res = re.compile(criticas_pattern, re.DOTALL).findall(data)
 
