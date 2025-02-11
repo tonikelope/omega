@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.61"
+CHANNEL_VERSION = "6.62"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5787,11 +5787,18 @@ def load_mega_proxy(host, port, password):
 def mc_api_req(api_url, req):
     load_mega_proxy("", MC_REVERSE_PORT, MC_REVERSE_PASS)
 
+    if config.get_setting("omega_nei_proxy", "omega") and config.get_setting("omega_nei_proxy_url", "omega"):
+        proxy = config.get_setting("omega_nei_proxy_url", "omega")
+        proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+        opener = urllib.request.build_opener(proxy_handler)
+    else:
+        opener = urllib.request.build_opener()
+
     request = urllib.request.Request(
         api_url, data=json.dumps(req).encode("utf-8"), headers=DEFAULT_HEADERS
     )
 
-    response = urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT).read()
+    response = opener.open(request, timeout=DEFAULT_HTTP_TIMEOUT).read()
 
     return json.loads(response.decode("utf-8-sig"))
 

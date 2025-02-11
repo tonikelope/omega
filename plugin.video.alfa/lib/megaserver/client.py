@@ -213,10 +213,10 @@ class Client(object):
         return json.loads(self.__post(url, json.dumps([req])))[0]
 
     def mc_api_req(self, api_url, req):
-        res = self.__post(api_url, json.dumps(req))
+        res = self.__post(api_url, json.dumps(req), proxy=(config.get_setting("omega_nei_proxy_url", "omega") if config.get_setting("omega_nei_proxy", "omega") else None))
         return json.loads(res)
 
-    def __post(self, url, data):
+    def __post(self, url, data, proxy=None):
         import ssl
         from functools import wraps
 
@@ -230,10 +230,16 @@ class Client(object):
 
         ssl.wrap_socket = sslwrap(ssl.wrap_socket)
 
+        if proxy:
+            proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
+            opener = urllib.request.build_opener(proxy_handler)
+        else:
+            opener = urllib.request.build_opener()
+
         request = urllib.request.Request(url, data=data.encode("utf-8"), headers={
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko)"
                           " Chrome/30.0.1599.101 Safari/537.36"})
 
-        contents = urllib.request.urlopen(request).read()
+        contents = opener.open(request).read()
 
         return contents
