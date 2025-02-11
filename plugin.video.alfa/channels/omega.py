@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.59"
+CHANNEL_VERSION = "6.60"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5994,7 +5994,7 @@ def get_filmaffinity_data_advanced(title, year, genre):
 
     url = (
         "https://www.filmaffinity.com/es/advsearch.php?stext="
-        + title.replace(" ", "+").replace("?", "")
+        + urllib.parse.quote(title)
         + "&stype%5B%5D"
         "=title&country="
         "&genre=" + genre + "&fromyear=" + year + "&toyear=" + year
@@ -6004,7 +6004,7 @@ def get_filmaffinity_data_advanced(title, year, genre):
 
     client = HTTPClient()
 
-    data = client.get(url, ignore_errors=True,timeout=DEFAULT_HTTP_TIMEOUT)
+    data = client.get(url, ignore_errors=True, timeout=DEFAULT_HTTP_TIMEOUT)
 
     regex = r"srcset=.*?(https.*?msmall\.jpg).*?mc-title.*?(\d+).*?>(.*?)<.*?avg *?mx.*?>(.*?)<"
 
