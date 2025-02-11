@@ -92,7 +92,7 @@ DEFAULT_HEADERS = {
 
 
 class HTTPClient:
-    def __init__(self, cookies_file=KODI_NEI_COOKIES_PATH, user_agent=None, proxy=None):
+    def __init__(self, cookies_file=KODI_NEI_COOKIES_PATH, user_agent=None, proxy=None, ignore_config_proxy=False):
         self.cookies_file = cookies_file
         self.cookie_jar = http.cookiejar.LWPCookieJar()
 
@@ -107,7 +107,7 @@ class HTTPClient:
         if proxy:
             proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
             self.opener = urllib.request.build_opener(cookie_handler, proxy_handler)
-        elif config.get_setting("omega_nei_proxy", "omega") and config.get_setting("omega_nei_proxy_url", "omega"):
+        elif not ignore_config_proxy and config.get_setting("omega_nei_proxy", "omega") and config.get_setting("omega_nei_proxy_url", "omega"):
             proxy = config.get_setting("omega_nei_proxy_url", "omega")
             proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
             self.opener = urllib.request.build_opener(cookie_handler, proxy_handler)
@@ -152,7 +152,7 @@ class HTTPClient:
 
 try:
     if config.get_setting("omega_debrid_mega_url", "omega"):
-        client = HTTPClient()
+        client = HTTPClient(ignore_config_proxy=True)
         DEBRID_AUX_MEGA_ACCOUNTS=json.loads(client.get(config.get_setting("omega_debrid_mega_url", "omega"), timeout=DEFAULT_HTTP_TIMEOUT).encode('utf-8').decode('utf-8-sig'))
 except:
     DEBRID_AUX_MEGA_ACCOUNTS = []
