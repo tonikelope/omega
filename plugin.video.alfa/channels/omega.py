@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.62"
+CHANNEL_VERSION = "6.63"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -279,7 +279,7 @@ if os.path.isfile(KODI_NEI_MC_CACHE_PATH):
 
 
 class HTTPClient:
-    def __init__(self, cookies_file=KODI_NEI_COOKIES_PATH, user_agent=None, proxy=None):
+    def __init__(self, cookies_file=KODI_NEI_COOKIES_PATH, user_agent=None, proxy=None, ignore_config_proxy=False):
         self.cookies_file = cookies_file
         self.cookie_jar = http.cookiejar.LWPCookieJar()
 
@@ -294,7 +294,7 @@ class HTTPClient:
         if proxy:
             proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
             self.opener = urllib.request.build_opener(cookie_handler, proxy_handler)
-        elif config.get_setting("omega_nei_proxy", "omega") and config.get_setting("omega_nei_proxy_url", "omega"):
+        elif not ignore_config_proxy and config.get_setting("omega_nei_proxy", "omega") and config.get_setting("omega_nei_proxy_url", "omega"):
             proxy = config.get_setting("omega_nei_proxy_url", "omega")
             proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
             self.opener = urllib.request.build_opener(cookie_handler, proxy_handler)
@@ -5471,7 +5471,7 @@ def leer_criticas_fa(item):
 
         logger.info(criticas_url)
 
-        client = HTTPClient()
+        client = HTTPClient(ignore_config_proxy=True)
 
         data = client.get(criticas_url, headers={'Referer':criticas_url}, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=True)
 
@@ -5575,7 +5575,7 @@ def clean_html_tags(data):
 
 def cargar_critica(item):
 
-    client = HTTPClient()
+    client = HTTPClient(ignore_config_proxy=True)
 
     data = client.get(item.url, headers={'Referer':item.url}, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=True)
 
@@ -5604,7 +5604,7 @@ def cargar_critica(item):
 
 def cargar_critica_con_spoiler(item):
 
-    client = HTTPClient()
+    client = HTTPClient(ignore_config_proxy=True)
 
     data = client.get(
         item.url,
@@ -6009,7 +6009,7 @@ def get_filmaffinity_data_advanced(title, year, genre):
 
     logger.info(url)
 
-    client = HTTPClient()
+    client = HTTPClient(ignore_config_proxy=True)
 
     data = client.get(url, ignore_errors=True, timeout=DEFAULT_HTTP_TIMEOUT)
 

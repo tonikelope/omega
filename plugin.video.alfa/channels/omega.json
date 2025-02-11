@@ -273,7 +273,7 @@
     {
       "id": "omega_nei_proxy",
       "type": "bool",
-      "label": "Usar PROXY HTTP",
+      "label": "Usar PROXY HTTP para NEI",
       "default": false,
       "enabled": true,
       "visible": true
