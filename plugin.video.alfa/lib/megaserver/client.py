@@ -38,6 +38,7 @@ from .server import Server
 from .proxy import MegaProxyServer
 from platformcode import logger, config
 from functools import wraps
+import ssl
 
 
 class Client(object):
