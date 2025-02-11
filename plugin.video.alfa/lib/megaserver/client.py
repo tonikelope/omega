@@ -37,6 +37,7 @@ from .handler import Handler
 from .server import Server
 from .proxy import MegaProxyServer
 from platformcode import logger, config
+from functools import wraps
 
 
 class Client(object):
@@ -217,18 +218,19 @@ class Client(object):
         return json.loads(res)
 
     def __post(self, url, data, proxy=None):
-        import ssl
-        from functools import wraps
+        # Crear un contexto SSL seguro en lugar de modificar ssl.wrap_socket
+        context = ssl.create_default_context()
+        context.options |= ssl.OP_NO_TLSv1  # Deshabilitar TLS 1.0
 
         def sslwrap(func):
             @wraps(func)
             def bar(*args, **kw):
-                kw['ssl_version'] = ssl.PROTOCOL_TLSv1
+                kw['context'] = context  # Usar el nuevo contexto SSL
                 return func(*args, **kw)
-
             return bar
 
-        ssl.wrap_socket = sslwrap(ssl.wrap_socket)
+        # No es necesario modificar ssl.wrap_socket globalmente
+        # ssl.wrap_socket = sslwrap(ssl.wrap_socket)
 
         if proxy:
             proxy_handler = urllib.request.ProxyHandler({"http": proxy, "https": proxy})
@@ -236,10 +238,13 @@ class Client(object):
         else:
             opener = urllib.request.build_opener()
 
+        # Asegurar que el contexto SSL se use en las peticiones HTTPS
+        opener.add_handler(urllib.request.HTTPSHandler(context=context))
+
         request = urllib.request.Request(url, data=data.encode("utf-8"), headers={
             "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_8_5) AppleWebKit/537.36 (KHTML, like Gecko)"
-                          " Chrome/30.0.1599.101 Safari/537.36"})
+                          " Chrome/30.0.1599.101 Safari/537.36"
+        })
 
         contents = opener.open(request).read()
-
         return contents
