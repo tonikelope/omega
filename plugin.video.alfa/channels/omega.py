@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.64"
+CHANNEL_VERSION = "6.65"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -3297,15 +3297,15 @@ def find_item_in_episode_watchdog(item):
 
 
 def checkHDR(title):
-    return re.search(r"[^a-z](hlg|hdr|dv|dolby[\- _]*vision)[^a-z]", title, re.IGNORECASE | re.DOTALL)
+    return re.search(r"[^a-z](hlg|hdr|dv|dolby[\- _]*?vision)[^a-z]", title, re.IGNORECASE | re.DOTALL)
 
 
 def checkREMUX(title):
-    return re.search(r"[^a-z](remux|4k[\- _]*remux|u?hd[\- _]*remux)[^a-z]", title, re.IGNORECASE | re.DOTALL)
+    return re.search(r"[^a-z](remux|4k[\- _]*?remux|u?hd[\- _]*?remux)[^a-z]", title, re.IGNORECASE | re.DOTALL)
 
 
 def checkIA(title):
-    return re.search(r"[^a-z]((?:IA|AI) *?(?:remastered)?)[^a-z]", title, re.IGNORECASE | re.DOTALL)
+    return re.search(r"[^a-z]((?:IA|AI)[\- _]*?(?:remastered)?)[^a-z]", title, re.IGNORECASE | re.DOTALL)
 
 
 def checkSpecialTitleTags(title):
