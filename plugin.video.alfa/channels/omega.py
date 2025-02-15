@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.63"
+CHANNEL_VERSION = "6.64"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -2395,9 +2395,7 @@ def bibliotaku_series(item):
 
     for rawscrapedtitle, mc_id in matches:
 
-        hdr = checkHDR(rawscrapedtitle)
-
-        remux = checkREMUX(rawscrapedtitle)
+        special_tags = checkSpecialTitleTags(rawscrapedtitle)
 
         custom_title = findCustomTitle(rawscrapedtitle)
 
@@ -2458,8 +2456,9 @@ def bibliotaku_series(item):
                     + parsed_title["title"]
                     + "[/B][/COLOR] "
                     + extra
-                    + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
-                    + (" [COLOR cyan][REMUX][/COLOR]" if remux else "")
+                    + (" [COLOR cyan][HDR][/COLOR]" if special_tags['hdr'] else "")
+                    + (" [COLOR cyan][REMUX][/COLOR]" if special_tags['remux'] else "")
+                    + (" [COLOR cyan][IA][/COLOR]" if special_tags['ia'] else "")
                     + (" [" + quality + "]" if quality else "")
                     + " ##*NOTA*## (Akantor)"
                 )
@@ -2779,9 +2778,7 @@ def bibliotaku_pelis(item):
 
     for rawscrapedtitle, mc_id in matches:
 
-        hdr = checkHDR(rawscrapedtitle)
-
-        remux = checkREMUX(rawscrapedtitle)
+        special_tags = checkSpecialTitleTags(rawscrapedtitle)
 
         custom_title = findCustomTitle(rawscrapedtitle)
 
@@ -2833,8 +2830,9 @@ def bibliotaku_pelis(item):
                 + parsed_title["title"]
                 + "[/B][/COLOR] "
                 + extra
-                + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
-                + (" [COLOR cyan][REMUX][/COLOR]" if remux else "")
+                + (" [COLOR cyan][HDR][/COLOR]" if special_tags['hdr'] else "")
+                + (" [COLOR cyan][REMUX][/COLOR]" if special_tags['remux'] else "")
+                + (" [COLOR cyan][IA][/COLOR]" if special_tags['ia'] else "")
                 + (" [" + quality + "]" if quality else "")
                 + " ##*NOTA*## (Akantor)"
             )
@@ -3306,6 +3304,14 @@ def checkREMUX(title):
     return re.search(r"[^a-z](remux|4k[\- _]*remux|u?hd[\- _]*remux)[^a-z]", title, re.IGNORECASE | re.DOTALL)
 
 
+def checkIA(title):
+    return re.search(r"[^a-z]((?:IA|AI) *?(?:remastered)?)[^a-z]", title, re.IGNORECASE | re.DOTALL)
+
+
+def checkSpecialTitleTags(title):
+    return {'hdr': checkHDR(title), 'remux': checkREMUX(title), 'ia': checkIA(title)}
+
+
 def foro(item, episode_count_call=False):
     logger.info("channels.omega foro")
 
@@ -3609,9 +3615,7 @@ def foro(item, episode_count_call=False):
 
                 if final_item:
 
-                    hdr = checkHDR(scrapedtitle)
-
-                    remux = checkREMUX(scrapedtitle)
+                    special_tags = checkSpecialTitleTags(scrapedtitle)
 
                     parsed_title = parse_title(scrapedtitle)
 
@@ -3670,8 +3674,9 @@ def foro(item, episode_count_call=False):
                         + "[/B][/COLOR] "
                         + extra
                         + ("[" + quality + "]" if quality else "")
-                        + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
-                        + (" [COLOR cyan][REMUX][/COLOR]" if remux else "")
+                        + (" [COLOR cyan][HDR][/COLOR]" if special_tags['hdr'] else "")
+                        + (" [COLOR cyan][REMUX][/COLOR]" if special_tags['remux'] else "")
+                        + (" [COLOR cyan][IA][/COLOR]" if special_tags['ia'] else "")
                         + " ##*NOTA*## ("
                         + color_uploader(uploader)
                         + ")"
@@ -4046,9 +4051,7 @@ def search_parse(data, item):
 
         if (uploader not in UPLOADERS_BLACKLIST and not any(word in scrapedtitle for word in TITLES_BLACKLIST)):
 
-            hdr = checkHDR(rawscrapedtitle)
-
-            remux = checkREMUX(rawscrapedtitle)
+            special_tags = checkSpecialTitleTags(rawscrapedtitle)
 
             if "<" in scrapedtitle or ">" in scrapedtitle:
                 scrapedtitle = re.sub(r"https://[^/]+/[^/]+/([^/]+).*", "\\1", scrapedurl)
@@ -4145,8 +4148,9 @@ def search_parse(data, item):
                 + "[/B][/COLOR] "
                 + extra
                 + ("[" + quality + "]" if quality else "")
-                + (" [COLOR cyan][HDR][/COLOR]" if hdr else "")
-                + (" [COLOR cyan][REMUX][/COLOR]" if remux else "")
+                + (" [COLOR cyan][HDR][/COLOR]" if special_tags['hdr'] else "")
+                + (" [COLOR cyan][REMUX][/COLOR]" if special_tags['remux'] else "")
+                + (" [COLOR cyan][IA][/COLOR]" if special_tags['ia'] else "")
                 + " ##*NOTA*## ("
                 + color_uploader(uploader)
                 + ")"
