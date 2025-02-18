@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.65"
+CHANNEL_VERSION = "6.67"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -147,7 +147,9 @@ NON_CRITICAL_ALFA_DIRS = ['/resources/media/channels/thumb', '/resources/media/c
 
 NON_CRITICAL_OMEGA_DIRS = ['/resources']
 
-DEFAULT_HTTP_TIMEOUT = 300 #Para no pillarnos los dedos al generar enlaces Megacrypter
+DEFAULT_HTTP_TIMEOUT = 30
+
+HTTP_MC_TIMEOUT = 300
 
 ADVANCED_SETTINGS_TIMEOUT = 300
 
@@ -617,7 +619,7 @@ def mainlist(item):
         itemlist.append(
             Item(
                 channel=item.channel,
-                title="[COLOR darkorange][B]Habilita tu cuenta de NEI en preferencias.[/B][/COLOR]",
+                title="[COLOR darkorange][B]Habilita tu cuenta de NEI en preferencias (o activa el PROXY HTTP).[/B][/COLOR]",
                 action="settings_nei",
             )
         )
@@ -1679,12 +1681,9 @@ def settings_nei(item):
     elif check_items_updated(old_debrid_settings):
         shutdown_debrid_proxy()
 
-    xbmc.executebuiltin("Container.Refresh")
-
 
 def settings_alfa(item):
     config.open_settings()
-    xbmc.executebuiltin("Container.Refresh")
 
 
 def check_alfa_update(item):
@@ -4841,7 +4840,7 @@ def find_video_mega_links(item, data):
                                     "https://noestasinvitado.com/gen_mc.php?id="
                                     + id[0]
                                     + "&raw=1",
-                                    timeout=DEFAULT_HTTP_TIMEOUT,
+                                    timeout=HTTP_MC_TIMEOUT,
                                 )
 
                                 m = re.search(
@@ -5117,7 +5116,7 @@ def get_video_mega_links_group(item):
         while not matches and conta_error < FORO_ITEMS_RETRY:
             data = client.get(
                 "https://noestasinvitado.com/gen_mc.php?id=" + id + "&raw=1",
-                timeout=DEFAULT_HTTP_TIMEOUT,
+                timeout=HTTP_MC_TIMEOUT,
             )
             matches = re.compile(
                 r"(.*? *?\[[0-9.]+ *?.*?\]) *?(https://megacrypter\.noestasinvitado\.com/.+)"
