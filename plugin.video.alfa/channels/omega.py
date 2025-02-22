@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.67"
+CHANNEL_VERSION = "6.68"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -3300,7 +3300,7 @@ def checkHDR(title):
 
 
 def checkREMUX(title):
-    return re.search(r"[^a-z](remux|4k[\- _]*?remux|u?hd[\- _]*?remux)[^a-z]", title, re.IGNORECASE | re.DOTALL)
+    return re.search(r"[^a-z](remux|4k[\- _]*?remux|u?hd[\- _]*?remux|bd[\- _]*?remux)[^a-z]", title, re.IGNORECASE | re.DOTALL)
 
 
 def checkIA(title):
