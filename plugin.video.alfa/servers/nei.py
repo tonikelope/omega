@@ -855,6 +855,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
             if progress_bar:
                 close_background_pbar(pbar)
             omegaNotification("ERROR: POSIBLE ENLACE MEGACRYPTER CADUCADO")
+            xbmcgui.Dialog().dialog.ok('OMEGA ERROR', "HAY ALGÚN FALLO DE CONEXIÓN ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN o espera unos minutos)\n\nSugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.")
             return [["NEI DEBRID ERROR (posible enlace de MegaCrypter caducado (sal y vuelve a entrar en la carpeta))", ""]]
 
         filename_hash = KODI_TEMP_PATH + 'kodi_nei_'+getDebridServiceString()+'_' + fid_hash
@@ -882,6 +883,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     if progress_bar:
                         close_background_pbar(pbar)
                     omegaNotification("ERROR: REVISA TUS CUENTAS DE MEGA AUXILIARES")
+                    xbmcgui.Dialog().dialog.ok('OMEGA ERROR', "HAY ALGÚN FALLO DE CONEXIÓN ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN o espera unos minutos)\n\nSugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.")
                     return [["NEI DEBRID ERROR (revisa que haya espacio suficiente en tus cuentas de MEGA auxiliares)", ""]]
 
                 page_url = response[0]
@@ -904,7 +906,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                                 close_background_pbar(pbar)
                             
                             omegaNotification("ERROR: REAL/ALLDEBRID <----> MEGA")
-                            xbmcgui.Dialog().dialog.ok('OMEGA ERROR', "HAY ALGÚN FALLO DE CONEXIÓN ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN o espera unos minutos)\n\nSugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.")
+                            xbmcgui.Dialog().ok('ERROR DE REAL/ALLDEBRID', "HAY ALGÚN PROBLEMA ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
                             return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
 
                     pickle.dump(urls, file)
@@ -913,7 +915,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                         close_background_pbar(pbar)
 
                     omegaNotification("ERROR: REAL/ALLDEBRID <----> MEGA")
-                    xbmcgui.Dialog().dialog.ok('OMEGA ERROR', "HAY ALGÚN FALLO DE CONEXIÓN ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN o espera unos minutos)\n\nSugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.")
+                    xbmcgui.Dialog().ok('ERROR DE REAL/ALLDEBRID', "HAY ALGÚN PROBLEMA ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
                     return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
     else:
 
@@ -958,7 +960,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                                 close_background_pbar(pbar)
                             
                             omegaNotification("ERROR: REAL/ALLDEBRID <----> MEGA")
-                            xbmcgui.Dialog().dialog.ok('OMEGA ERROR', "HAY ALGÚN FALLO DE CONEXIÓN ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN o espera unos minutos)\n\nSugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.")
+                            xbmcgui.Dialog().ok('ERROR DE REAL/ALLDEBRID', "HAY ALGÚN PROBLEMA ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
                             return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
 
                     pickle.dump(urls, file)
@@ -967,7 +969,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                         close_background_pbar(pbar)
 
                     omegaNotification("ERROR: REAL/ALLDEBRID <----> MEGA")
-                    xbmcgui.Dialog().dialog.ok('OMEGA ERROR', "HAY ALGÚN FALLO DE CONEXIÓN ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN o espera unos minutos)\n\nSugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.")
+                    xbmcgui.Dialog().ok('ERROR DE REAL/ALLDEBRID', "HAY ALGÚN PROBLEMA ENTRE REAL/ALLDEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
                     return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
 
     if progress_bar:
