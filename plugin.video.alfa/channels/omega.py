@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.68"
+CHANNEL_VERSION = "6.69"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -933,7 +933,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]PURGAR CACHÉ DE OMEGA[/B]",
+            title="[COLOR yellow][B]PURGAR CACHÉ DE OMEGA[/B][/COLOR]",
             action="clean_cache",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_setting_0.png",
