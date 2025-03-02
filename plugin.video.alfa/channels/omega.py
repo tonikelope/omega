@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.69"
+CHANNEL_VERSION = "6.70"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -2648,7 +2648,7 @@ def bibliotaku_series_temporadas(item):
 
     search_item = item.clone()
 
-    search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+    search_item.title = "[COLOR yellow][B]BUSCAR APORTES CON EL MISMO TÍTULO[/B][/COLOR]"
 
     search_item.contentPlot = "Buscar en NEI otros aportes con el mismo título"
 
@@ -2659,6 +2659,20 @@ def bibliotaku_series_temporadas(item):
     search_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
     itemlist.append(search_item)
+
+    recomendados_item = item.clone()
+
+    recomendados_item.title = "[COLOR blue][B]BUSCAR APORTES RECOMENDADOS[/B][/COLOR]"
+
+    recomendados_item.contentPlot = "Buscar en TMDB aportes recomendados relacionados con este aporte"
+
+    recomendados_item.action = "get_tmdb_recomendados"
+
+    recomendados_item.url = ""
+
+    recomendados_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+
+    itemlist.append(recomendados_item)
 
     trailer_item = item.clone()
 
@@ -2935,7 +2949,7 @@ def bibliotaku_pelis_megacrypter(item):
 
     search_item = item.clone()
 
-    search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+    search_item.title = "[COLOR yellow][B]BUSCAR APORTES CON EL MISMO TÍTULO[/B][/COLOR]"
 
     search_item.contentPlot = "Busca en NEI otros aportes con el mismo título"
 
@@ -2946,6 +2960,20 @@ def bibliotaku_pelis_megacrypter(item):
     search_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
     itemlist.append(search_item)
+
+    recomendados_item = item.clone()
+
+    recomendados_item.title = "[COLOR blue][B]BUSCAR APORTES RECOMENDADOS[/B][/COLOR]"
+
+    recomendados_item.contentPlot = "Buscar en TMDB aportes recomendados relacionados con este aporte"
+
+    recomendados_item.action = "get_tmdb_recomendados"
+
+    recomendados_item.url = ""
+
+    recomendados_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+
+    itemlist.append(recomendados_item)
 
     trailer_item = item.clone()
 
@@ -3455,7 +3483,7 @@ def foro(item, episode_count_call=False):
 
         search_item = item.clone()
 
-        search_item.title = "[COLOR blue][B]BUSCAR APORTES SIMILARES[/B][/COLOR]"
+        search_item.title = "[COLOR yellow][B]BUSCAR APORTES CON EL MISMO TÍTULO[/B][/COLOR]"
 
         search_item.contentPlot = "Busca en NEI otros aportes con el mismo título"
 
@@ -3466,6 +3494,20 @@ def foro(item, episode_count_call=False):
         search_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
         itemlist.append(search_item)
+
+        recomendados_item = item.clone()
+
+        recomendados_item.title = "[COLOR blue][B]BUSCAR APORTES RECOMENDADOS[/B][/COLOR]"
+
+        recomendados_item.contentPlot = "Buscar en TMDB aportes recomendados relacionados con este aporte"
+
+        recomendados_item.action = "get_tmdb_recomendados"
+
+        recomendados_item.url = ""
+
+        recomendados_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
+
+        itemlist.append(recomendados_item)
 
         if item.contentSerieName != "":
 
@@ -5410,6 +5452,39 @@ def get_video_mega_links_group(item):
     pbar.update(100)
 
     pbar.close()
+
+    return itemlist
+
+
+def get_tmdb_recomendados(item):
+    url = 'https://api.themoviedb.org/3/'+item.contentType+'/'+item.infoLabels['tmdb_id']+'/recommendations?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
+    
+    resultados = tmdb.Tmdb.get_json(url)
+    
+    itemlist = []
+
+    itemlist.append(
+            Item(
+                channel=item.channel,
+                contentPlot="[I]Recomendaciones para: " + item.contentTitle + "[/I]",
+                title='[B]RECOMENDACIONES[/B]',
+                action="",
+                thumbnail=item.thumbnail,
+            )
+        )
+
+    if isinstance(resultados, dict) and 'results' in resultados:
+        for peli in resultados['results']:
+            itemlist.append(Item(
+                channel = item.channel,
+                title = peli['title'],
+                action = 'search_similares',
+                viewmode='list',
+                contentTitle = peli['title'],
+                contentType = item.contentType,
+                infoLabels = {'year':peli['release_date'].split("-")[0]}))
+
+        tmdb.set_infoLabels_itemlist(itemlist, True)
 
     return itemlist
 
