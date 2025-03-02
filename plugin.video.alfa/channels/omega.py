@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.70"
+CHANNEL_VERSION = "6.71"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5459,6 +5459,8 @@ def get_video_mega_links_group(item):
 def get_tmdb_recomendados(item):
     url = 'https://api.themoviedb.org/3/'+item.contentType+'/'+item.infoLabels['tmdb_id']+'/recommendations?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
     
+    resultados = tmdb.Tmdb.get_json(url)
+
     resultados = tmdb.Tmdb.get_json(url)
     
     itemlist = []
