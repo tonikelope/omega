@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.71"
+CHANNEL_VERSION = "6.72"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -674,6 +674,18 @@ def mainlist(item):
                 )
             )
             
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="[B]TENDENCIAS EN TMDB[/B]",
+                    action="get_tmdb_tendencias_semanales",
+                    fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
+                    viewcontent="movies",
+                    viewmode="list",
+                    thumbnail="special://home/addons/plugin.video.omega/resources/tmdb_logo.png",
+                )
+            )
+
             itemlist.append(
                 Item(
                     channel=item.channel,
@@ -5455,6 +5467,65 @@ def get_video_mega_links_group(item):
 
     return itemlist
 
+
+def get_tmdb_tendencias_semanales(item):
+    itemlist = []
+
+    itemlist.append(
+            Item(
+                channel=item.channel,
+                contentPlot="[I]TENDENCIAS EN PELIS[/I]",
+                title='[B]TENDENCIAS EN PELIS[/B]',
+                action="get_tmdb_tendencias_list",
+                contentType='movie',
+                trendingType="movie",
+                viewcontent = 'movies',
+                viewmode='poster',
+                thumbnail=item.thumbnail
+            )
+        )
+
+    itemlist.append(
+            Item(
+                channel=item.channel,
+                contentPlot="[I]TENDENCIAS EN SERIES[/I]",
+                title='[B]TENDENCIAS EN SERIES[/B]',
+                action="get_tmdb_tendencias_list",
+                trendingType="tv",
+                contentType='tvshow',
+                viewcontent = 'movies',
+                viewmode='poster',
+                thumbnail=item.thumbnail
+            )
+        )
+
+    return itemlist
+
+def get_tmdb_tendencias_list(item):
+    url = 'https://api.themoviedb.org/3/trending/'+item.trendingType+'/week?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
+    
+    resultados = tmdb.Tmdb.get_json(url)
+
+    resultados = tmdb.Tmdb.get_json(url)
+
+    itemlist = []
+
+    if isinstance(resultados, dict) and 'results' in resultados:
+        for peli in resultados['results']:
+            itemlist.append(Item(
+                channel = item.channel,
+                title = '[TMDB] '+peli['title' if item.trendingType == 'movie' else 'name'],
+                action = 'search_similares',
+                viewmode='list',
+                viewcontent = 'movies',
+                contentTitle = peli['title' if item.trendingType == 'movie' else 'name'],
+                contentSerieName = None if item.trendingType == 'movie' else peli['name'],
+                contentType = 'movie' if item.trendingType == 'movie' else 'tvshow',
+                infoLabels = {'year': peli['release_date' if item.trendingType == 'movie' else 'first_air_date'].split("-")[0]}))
+
+        tmdb.set_infoLabels_itemlist(itemlist, True)
+
+    return itemlist
 
 def get_tmdb_recomendados(item):
     url = 'https://api.themoviedb.org/3/'+item.contentType+'/'+item.infoLabels['tmdb_id']+'/recommendations?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
