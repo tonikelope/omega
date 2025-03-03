@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.73"
+CHANNEL_VERSION = "6.74"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5586,8 +5586,6 @@ def leer_criticas_fa(item):
             item.originalTitle, str(item.year), "TV_SE" if item.mode == "tvshow" else ""
         )
 
-    logger.info(fa_data)
-
     if isinstance(fa_data, list) and len(fa_data) > 1:
 
         itemlist = []
@@ -5633,8 +5631,6 @@ def leer_criticas_fa(item):
 
         data = client.get(criticas_url, headers={'Referer':criticas_url}, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=True)
 
-        logger.info(data)
-
         criticas_pattern = r"rat-box.*?(\d+).*?(http[^\"]+rating.*?html).*?>(.*?)<.*?userreviews.*?>(.*?)<"
 
         res = re.compile(criticas_pattern, re.DOTALL).findall(data)
@@ -5653,18 +5649,21 @@ def leer_criticas_fa(item):
 
         itemlist = []
 
-        if float(fa_data["rate"]) >= 7.0:
-            rating_text = (
-                "[B][COLOR lightgreen]NOTA MEDIA: ["
-                + str(fa_data["rate"])
-                + "][/COLOR][/B]"
-            )
-        elif float(fa_data["rate"]) < 5.0:
-            rating_text = (
-                "[B][COLOR red]NOTA MEDIA: [" + str(fa_data["rate"]) + "][/COLOR][/B]"
-            )
-        else:
-            rating_text = "[B]NOTA MEDIA: [" + str(fa_data["rate"]) + "][/B]"
+        try:
+            if float(fa_data["rate"]) >= 7.0:
+                rating_text = (
+                    "[B][COLOR lightgreen]NOTA MEDIA: ["
+                    + str(fa_data["rate"])
+                    + "][/COLOR][/B]"
+                )
+            elif float(fa_data["rate"]) < 5.0:
+                rating_text = (
+                    "[B][COLOR red]NOTA MEDIA: [" + str(fa_data["rate"]) + "][/COLOR][/B]"
+                )
+            else:
+                rating_text = "[B]NOTA MEDIA: [" + str(fa_data["rate"]) + "][/B]"
+        except:
+            rating_text = "[B]NOTA MEDIA: [---][/B]"
 
         itemlist.append(
             Item(
