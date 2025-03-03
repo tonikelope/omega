@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.72"
+CHANNEL_VERSION = "6.73"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -2682,6 +2682,8 @@ def bibliotaku_series_temporadas(item):
 
     recomendados_item.url = ""
 
+    recomendados_item.trendingType = 'tv'
+
     recomendados_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
     itemlist.append(recomendados_item)
@@ -2982,6 +2984,8 @@ def bibliotaku_pelis_megacrypter(item):
     recomendados_item.action = "get_tmdb_recomendados"
 
     recomendados_item.url = ""
+
+    recomendados_item.trendingType = 'movie'
 
     recomendados_item.thumbnail = "special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_search_more.png"
 
@@ -3514,6 +3518,8 @@ def foro(item, episode_count_call=False):
         recomendados_item.contentPlot = "Buscar en TMDB aportes recomendados relacionados con este aporte"
 
         recomendados_item.action = "get_tmdb_recomendados"
+
+        recomendados_item.trendingType = 'tv' if item.contentSerieName != "" else 'movie'
 
         recomendados_item.url = ""
 
@@ -5528,7 +5534,7 @@ def get_tmdb_tendencias_list(item):
     return itemlist
 
 def get_tmdb_recomendados(item):
-    url = 'https://api.themoviedb.org/3/'+item.contentType+'/'+item.infoLabels['tmdb_id']+'/recommendations?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
+    url = 'https://api.themoviedb.org/3/'+item.trendingType+'/'+item.infoLabels['tmdb_id']+'/recommendations?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
     
     resultados = tmdb.Tmdb.get_json(url)
 
@@ -5550,15 +5556,16 @@ def get_tmdb_recomendados(item):
         for peli in resultados['results']:
             itemlist.append(Item(
                 channel = item.channel,
-                title = peli['title'],
+                title = '[TMDB] '+peli['title' if item.trendingType == 'movie' else 'name'],
                 action = 'search_similares',
                 viewmode='list',
-                contentTitle = peli['title'],
-                contentType = item.contentType,
-                infoLabels = {'year':peli['release_date'].split("-")[0]}))
+                viewcontent = 'movies',
+                contentTitle = peli['title' if item.trendingType == 'movie' else 'name'],
+                contentSerieName = None if item.trendingType == 'movie' else peli['name'],
+                contentType = 'movie' if item.trendingType == 'movie' else 'tvshow',
+                infoLabels = {'year': peli['release_date' if item.trendingType == 'movie' else 'first_air_date'].split("-")[0]}))
 
         tmdb.set_infoLabels_itemlist(itemlist, True)
-
     return itemlist
 
 
