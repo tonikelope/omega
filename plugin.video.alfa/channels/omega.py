@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.75"
+CHANNEL_VERSION = "6.76"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5508,7 +5508,7 @@ def get_tmdb_tendencias_semanales(item):
     return itemlist
 
 def get_tmdb_tendencias_list(item):
-    url = 'https://api.themoviedb.org/3/trending/'+item.trendingType+'/week?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
+    url = 'https://api.themoviedb.org/3/trending/'+item.trendingType+'/week?sort_by=vote_average.desc&api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
     
     resultados = tmdb.Tmdb.get_json(url)
 
@@ -5536,7 +5536,7 @@ def get_tmdb_tendencias_list(item):
     return itemlist
 
 def get_tmdb_recomendados(item):
-    url = 'https://api.themoviedb.org/3/'+item.trendingType+'/'+item.infoLabels['tmdb_id']+'/recommendations?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
+    url = 'https://api.themoviedb.org/3/'+item.trendingType+'/'+item.infoLabels['tmdb_id']+'/recommendations?sort_by=vote_average.desc&api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
     
     resultados = tmdb.Tmdb.get_json(url)
 
