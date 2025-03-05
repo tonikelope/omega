@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.74"
+CHANNEL_VERSION = "6.75"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5516,11 +5516,13 @@ def get_tmdb_tendencias_list(item):
 
     itemlist = []
 
+    tipo = 'PELIS' if item.trendingType == 'movie' else 'SERIES'
+
     if isinstance(resultados, dict) and 'results' in resultados:
         for peli in resultados['results']:
             itemlist.append(Item(
                 channel = item.channel,
-                title = '[TMDB] '+peli['title' if item.trendingType == 'movie' else 'name'],
+                title = '[TMDB-'+tipo+'] '+peli['title' if item.trendingType == 'movie' else 'name'],
                 action = 'search_similares',
                 viewmode='list',
                 viewcontent = 'movies',
