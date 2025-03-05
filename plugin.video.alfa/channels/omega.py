@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.77"
+CHANNEL_VERSION = "6.78"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5480,9 +5480,9 @@ def get_tmdb_tendencias_semanales(item):
     itemlist.append(
             Item(
                 channel=item.channel,
-                contentPlot="[I]TENDENCIAS SEMANALES EN PELIS[/I]",
-                title='[B]TENDENCIAS SEMANALES EN PELIS[/B]',
-                action="get_tmdb_tendencias_list",
+                contentPlot="[I]TENDENCIAS SEMANALES EN CINE[/I]",
+                title='[B]TENDENCIAS SEMANALES EN CINE[/B]',
+                action="get_tmdb_tendencias",
                 contentType='movie',
                 tmdbType="movie",
                 viewcontent = 'movies',
@@ -5496,7 +5496,7 @@ def get_tmdb_tendencias_semanales(item):
                 channel=item.channel,
                 contentPlot="[I]TENDENCIAS SEMANALES EN SERIES[/I]",
                 title='[B]TENDENCIAS SEMANALES EN SERIES[/B]',
-                action="get_tmdb_tendencias_list",
+                action="get_tmdb_tendencias",
                 tmdbType="tv",
                 contentType='tvshow',
                 viewcontent = 'movies',
@@ -5510,7 +5510,7 @@ def get_tmdb_tendencias_semanales(item):
                 channel=item.channel,
                 contentPlot="[I]PELIS POPULARES[/I]",
                 title='[B]PELIS MÁS POPULARES[/B]',
-                action="get_tmdb_populares_list",
+                action="get_tmdb_populares",
                 contentType='movie',
                 tmdbType="movie",
                 viewcontent = 'movies',
@@ -5524,7 +5524,7 @@ def get_tmdb_tendencias_semanales(item):
                 channel=item.channel,
                 contentPlot="[I]SERIES POPULARES[/I]",
                 title='[B]SERIES MÁS POPULARES[/B]',
-                action="get_tmdb_populares_list",
+                action="get_tmdb_populares",
                 tmdbType="tv",
                 contentType='tvshow',
                 viewcontent = 'movies',
@@ -5536,7 +5536,7 @@ def get_tmdb_tendencias_semanales(item):
     return itemlist
 
 
-def get_tmdb_populares_list(item):
+def get_tmdb_populares(item):
     url = 'https://api.themoviedb.org/3/'+item.tmdbType+'/popular?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
     
     resultados = tmdb.Tmdb.get_json(url)
@@ -5545,13 +5545,13 @@ def get_tmdb_populares_list(item):
 
     itemlist = []
 
-    tipo = 'PELIS' if item.tmdbType == 'movie' else 'SERIES'
+    tipo = 'PELIS POPULARES' if item.tmdbType == 'movie' else 'SERIES POPULARES'
 
     if isinstance(resultados, dict) and 'results' in resultados:
         for peli in resultados['results']:
             itemlist.append(Item(
                 channel = item.channel,
-                title = '[TMDB-'+tipo+'] '+peli['title' if item.tmdbType == 'movie' else 'name'],
+                title = '['+tipo+'] '+peli['title' if item.tmdbType == 'movie' else 'name'],
                 action = 'search_similares',
                 viewmode='list',
                 viewcontent = 'movies',
@@ -5564,7 +5564,7 @@ def get_tmdb_populares_list(item):
 
     return itemlist
 
-def get_tmdb_tendencias_list(item):
+def get_tmdb_tendencias(item):
     url = 'https://api.themoviedb.org/3/trending/'+item.tmdbType+'/week?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
     
     resultados = tmdb.Tmdb.get_json(url)
@@ -5573,13 +5573,13 @@ def get_tmdb_tendencias_list(item):
 
     itemlist = []
 
-    tipo = 'PELIS' if item.tmdbType == 'movie' else 'SERIES'
+    tipo = 'PELIS DE MODA' if item.tmdbType == 'movie' else 'SERIES DE MODA'
 
     if isinstance(resultados, dict) and 'results' in resultados:
         for peli in resultados['results']:
             itemlist.append(Item(
                 channel = item.channel,
-                title = '[TMDB-'+tipo+'] '+peli['title' if item.tmdbType == 'movie' else 'name'],
+                title = '['+tipo+'] '+peli['title' if item.tmdbType == 'movie' else 'name'],
                 action = 'search_similares',
                 viewmode='list',
                 viewcontent = 'movies',
@@ -5604,7 +5604,7 @@ def get_tmdb_recomendados(item):
     itemlist.append(
             Item(
                 channel=item.channel,
-                contentPlot="[I]Recomendaciones para: " + item.contentTitle + "[/I]",
+                contentPlot="[I]RECOMENDACIONES PARA: " + item.contentTitle + "[/I]",
                 title='[B]RECOMENDACIONES[/B]',
                 action="",
                 thumbnail=item.thumbnail,
