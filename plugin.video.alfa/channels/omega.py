@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.79"
+CHANNEL_VERSION = "6.80"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5570,7 +5570,7 @@ def get_tmdb_populares(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="SIGUIENTE PÁGINA",
+                    title="",
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png",
                     fanart=item.fanart,
                     action=item.action,
@@ -5615,7 +5615,7 @@ def get_tmdb_tendencias(item):
             itemlist.append(
                 Item(
                     channel=item.channel,
-                    title="SIGUIENTE PÁGINA",
+                    title="",
                     thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png",
                     fanart=item.fanart,
                     action=item.action,
