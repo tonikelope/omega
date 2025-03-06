@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.78"
+CHANNEL_VERSION = "6.79"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5485,6 +5485,7 @@ def get_tmdb_tendencias_semanales(item):
                 action="get_tmdb_tendencias",
                 contentType='movie',
                 tmdbType="movie",
+                tmdbPage=1,
                 viewcontent = 'movies',
                 viewmode='poster',
                 thumbnail=item.thumbnail
@@ -5498,6 +5499,7 @@ def get_tmdb_tendencias_semanales(item):
                 title='[B]TENDENCIAS SEMANALES EN SERIES[/B]',
                 action="get_tmdb_tendencias",
                 tmdbType="tv",
+                tmdbPage=1,
                 contentType='tvshow',
                 viewcontent = 'movies',
                 viewmode='poster',
@@ -5513,6 +5515,7 @@ def get_tmdb_tendencias_semanales(item):
                 action="get_tmdb_populares",
                 contentType='movie',
                 tmdbType="movie",
+                tmdbPage=1,
                 viewcontent = 'movies',
                 viewmode='poster',
                 thumbnail=item.thumbnail
@@ -5526,6 +5529,7 @@ def get_tmdb_tendencias_semanales(item):
                 title='[B]SERIES MÁS POPULARES[/B]',
                 action="get_tmdb_populares",
                 tmdbType="tv",
+                tmdbPage=1,
                 contentType='tvshow',
                 viewcontent = 'movies',
                 viewmode='poster',
@@ -5537,7 +5541,7 @@ def get_tmdb_tendencias_semanales(item):
 
 
 def get_tmdb_populares(item):
-    url = 'https://api.themoviedb.org/3/'+item.tmdbType+'/popular?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
+    url = 'https://api.themoviedb.org/3/'+item.tmdbType+'/popular?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es&page='+str(item.tmdbPage)
     
     resultados = tmdb.Tmdb.get_json(url)
 
@@ -5562,10 +5566,27 @@ def get_tmdb_populares(item):
 
         tmdb.set_infoLabels_itemlist(itemlist, True)
 
+        if resultados['total_pages'] > 1 and item.tmdbPage<resultados['total_pages']:
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="SIGUIENTE PÁGINA",
+                    thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png",
+                    fanart=item.fanart,
+                    action=item.action,
+                    tmdbType=item.tmdbType,
+                    tmdbPage=(item.tmdbPage+1),
+                    contentType=item.contentType,
+                    viewcontent = item.viewcontent,
+                    viewmode=item.viewmode
+                )
+            )
+
     return itemlist
 
+
 def get_tmdb_tendencias(item):
-    url = 'https://api.themoviedb.org/3/trending/'+item.tmdbType+'/week?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
+    url = 'https://api.themoviedb.org/3/trending/'+item.tmdbType+'/week?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es&page='+str(item.tmdbPage)
     
     resultados = tmdb.Tmdb.get_json(url)
 
@@ -5590,7 +5611,24 @@ def get_tmdb_tendencias(item):
 
         tmdb.set_infoLabels_itemlist(itemlist, True)
 
+        if resultados['total_pages'] > 1 and item.tmdbPage<resultados['total_pages']:
+            itemlist.append(
+                Item(
+                    channel=item.channel,
+                    title="SIGUIENTE PÁGINA",
+                    thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_next.png",
+                    fanart=item.fanart,
+                    action=item.action,
+                    tmdbType=item.tmdbType,
+                    tmdbPage=(item.tmdbPage+1),
+                    contentType=item.contentType,
+                    viewcontent = item.viewcontent,
+                    viewmode=item.viewmode
+                )
+            )
+
     return itemlist
+
 
 def get_tmdb_recomendados(item):
     url = 'https://api.themoviedb.org/3/'+item.tmdbType+'/'+item.infoLabels['tmdb_id']+'/recommendations?api_key=a1ab8b8669da03637a4b98fa39c39228&language=es'
