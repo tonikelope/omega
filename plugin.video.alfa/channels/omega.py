@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.80"
+CHANNEL_VERSION = "6.81"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -5833,14 +5833,14 @@ def cargar_critica(item):
 
     data = client.get(item.url, headers={'Referer':item.url}, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=True)
 
-    critica_pattern = r"\"review-text1\" *?>(.*?)< *?/ *?div"
+    critica_pattern = r"rev-text1\".*?mx\-\d+.*?>(.*?)< *?/ *?div"
 
     res = re.compile(critica_pattern, re.DOTALL).search(data)
 
     if res:
         respuesta = res.group(1)
 
-        critica_pattern_spoiler = r"\"review-text2\" *?>(.*?)< *?/ *?div"
+        critica_pattern_spoiler = r"rev-text2\".*?mx\-\d+.*?>(.*?)< *?/ *?div"
 
         res_spoiler = re.compile(critica_pattern_spoiler, re.DOTALL).search(data)
 
@@ -5867,14 +5867,14 @@ def cargar_critica_con_spoiler(item):
         timeout=DEFAULT_HTTP_TIMEOUT,
     )
 
-    critica_pattern = r"\"review-text1\" *?>(.*?)< *?/ *?div"
+    critica_pattern = r"rev-text1\".*?mx\-\d+.*?>(.*?)< *?/ *?div"
 
     res = re.compile(critica_pattern, re.DOTALL).search(data)
 
     if res:
         respuesta = res.group(1)
 
-        critica_pattern_spoiler = r"\"review-text2\" *?>(.*?)< *?/ *?div"
+        critica_pattern_spoiler = r"rev-text2\".*?mx\-\d+.*?>(.*?)< *?/ *?div"
 
         res_spoiler = re.compile(critica_pattern_spoiler, re.DOTALL).search(data)
 
