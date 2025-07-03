@@ -327,28 +327,34 @@ class neiDebridVideoProxyChunkWriter():
             with self.chunk_queue_lock:
                 self.queue.clear()
         else:
-            partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(self.start_offset, self.end_offset)
+            
+            try:
+                partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(self.start_offset, self.end_offset)
 
-            for partial_range in partial_ranges:
+                for partial_range in partial_ranges:
 
-                p_inicio = partial_range[0]
+                    p_inicio = partial_range[0]
 
-                p_final = partial_range[1]
+                    p_final = partial_range[1]
 
-                url = partial_range[2]
+                    url = partial_range[2]
 
-                p_length = p_final-p_inicio+1
+                    p_length = p_final-p_inicio+1
 
-                request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
+                    request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
 
-                request = urllib.request.Request(url, headers=request_headers)
+                    request = urllib.request.Request(url, headers=request_headers)
 
-                with urllib.request.urlopen(request) as response:
-                    p_chunk_read = 0
-                    while p_chunk_read < p_length:
-                        p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
-                        p_chunk_read+=len(p_chunk)
-                        self.output.write(p_chunk)
+                    with urllib.request.urlopen(request) as response:
+                        p_chunk_read = 0
+                        while p_chunk_read < p_length:
+                            p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
+                            p_chunk_read+=len(p_chunk)
+                            self.output.write(p_chunk)
+            except Exception as ex:
+                logger.info(ex)
+
+            self.exit = True
 
         logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] BYE')
 
