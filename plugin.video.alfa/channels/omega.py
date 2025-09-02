@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.85"
+CHANNEL_VERSION = "6.86"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1704,6 +1704,8 @@ def settings_nei(item):
     setNEITopicsPerPage(
         (int(config.get_setting("omega_items_per_page", "omega")) + 1) * 50
     )
+
+    checkTebasProxy()
 
     if check_items_updated(old_reboot_settings) and xbmcgui.Dialog().yesno(dialog_title(),"ES NECESARIO [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
         xbmc.executebuiltin("RestartApp")
