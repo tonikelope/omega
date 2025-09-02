@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.84"
+CHANNEL_VERSION = "6.85"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -489,7 +489,9 @@ def login(force=False):
 
 def checkTebasProxy():
 
-    if not config.get_setting("omega_nei_proxy_url", "omega"):
+    if not config.get_setting("omega_nei_proxy", "omega"):
+        config.set_setting("omega_nei_proxy_url", "", "omega")
+    elif not config.get_setting("omega_nei_proxy_url", "omega"):
 
         client = HTTPClient(ignore_config_proxy=True)
 
