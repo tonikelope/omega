@@ -274,17 +274,17 @@
       "id": "omega_nei_proxy",
       "type": "bool",
       "label": "USAR PROXY ANTI-TEBAS",
-      "default": false,
+      "default": true,
       "enabled": true,
       "visible": true
     },
     {
       "id": "omega_nei_proxy_url",
       "type": "text",
-      "label": "PROXY URL ANTI-TEBAS:",
+      "label": "URL PROXY ANTI-TEBAS:",
       "default": "",
       "enabled": "eq(-1,true)",
-      "visible": "eq(-1,true)"
+      "visible": "false"
     }
   ]
 }
