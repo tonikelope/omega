@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.82"
+CHANNEL_VERSION = "6.83"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -478,8 +478,6 @@ def login(force=False):
         if data.find(OMEGA_LOGIN) != -1:
             setNEITopicsPerPage(ITEMS_PER_PAGE)
 
-            checkTebasProxy()
-
             omegaNotification("¡Bienvenido " + OMEGA_LOGIN + "!")
 
             return True
@@ -497,7 +495,7 @@ def checkTebasProxy():
 
         json_response = json.loads(client.get(TEBAS_URL, timeout=DEFAULT_HTTP_TIMEOUT).encode("utf-8").decode("utf-8-sig"))
 
-        config.set_setting("omega_nei_proxy_url", json_response["proxy"])
+        config.set_setting("omega_nei_proxy_url", json_response["proxy"], "omega")
 
 
 def kodi_advancedsettings(verbose=True):
@@ -662,6 +660,8 @@ def mainlist(item):
         if login():
 
             mega_login(True)
+
+            checkTebasProxy()
 
             load_mega_proxy("", MC_REVERSE_PORT, MC_REVERSE_PASS)
 
