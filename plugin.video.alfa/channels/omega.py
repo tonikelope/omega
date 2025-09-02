@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.81"
+CHANNEL_VERSION = "6.82"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -124,6 +124,8 @@ BIBLIOTAKU_ANIME_URL = [
     "https://noestasinvitado.com/msg.php?m=123120",
     "https://noestasinvitado.com/msg.php?m=123121",
 ]
+
+TEBAS_URL = "https://noestasinvitado.com/putotebas.php"
 
 BIBLIOTAKU_DONGHUA_URL = ["https://noestasinvitado.com/msg.php?m=113531"]
 
@@ -476,6 +478,8 @@ def login(force=False):
         if data.find(OMEGA_LOGIN) != -1:
             setNEITopicsPerPage(ITEMS_PER_PAGE)
 
+            checkTebasProxy()
+
             omegaNotification("¡Bienvenido " + OMEGA_LOGIN + "!")
 
             return True
@@ -483,6 +487,17 @@ def login(force=False):
     omegaNotification("ERROR AL HACER LOGIN EN NEI")
 
     return False
+
+
+def checkTebasProxy():
+
+    if not config.get_setting("omega_nei_proxy_url", "omega"):
+
+        client = HTTPClient(ignore_config_proxy=True)
+
+        json_response = json.loads(client.get(TEBAS_URL, timeout=DEFAULT_HTTP_TIMEOUT).encode("utf-8").decode("utf-8-sig"))
+
+        config.set_setting("omega_nei_proxy_url", json_response["proxy"])
 
 
 def kodi_advancedsettings(verbose=True):
