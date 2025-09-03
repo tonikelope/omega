@@ -653,9 +653,9 @@ if OMEGA_REALDEBRID or OMEGA_ALLDEBRID:
         proxy_server = ThreadingSimpleServer((DEBRID_PROXY_HOST, DEBRID_PROXY_PORT), neiDebridVideoProxy)
         
         if DEBRID_WORKERS > 1:
-            omegaNotification('PROXY ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((WORKER_CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
+            omegaNotification('NEIDEBRIDER ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((WORKER_CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
         else:
-            omegaNotification('PROXY ON (un hilo sin buffer)', sound=False)
+            omegaNotification('NEIDEBRIDER ON (un hilo sin buffer)', sound=False)
     except:
         proxy_server = None 
 

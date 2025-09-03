@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.86"
+CHANNEL_VERSION = "6.87"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
