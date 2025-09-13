@@ -224,7 +224,7 @@ class multiPartVideoDebridURL():
     
     #Este método traduce una petición de un rango de bytes absoluto en una lista de tuplas con rangos parciales de las diferentes URLS involucradas (en caso de que el vídeo esté troceado)
     def absolute2PartialRanges(self, start_offset, end_offset):
-        if self.multi_urls == None:
+        if self.multi_urls is None:
             return [(start_offset, end_offset, self.url)]
         else:
 
@@ -232,21 +232,23 @@ class multiPartVideoDebridURL():
             final = end_offset
             u = 0
 
-            while inicio>self.multi_urls[u][1] and u<len(self.multi_urls):
+            # Evita IndexError comprobando el límite primero
+            while u < len(self.multi_urls) and inicio > self.multi_urls[u][1]:
                 u+=1
 
-            if u>=len(self.multi_urls):
-                return None
+            if u >= len(self.multi_urls):
+                return []  # lista vacía (nunca None)
 
             rangos_parciales=[]
 
-            while inicio < final and u < len(self.multi_urls):
+            # Incluye el último byte (<=)
+            while inicio <= final and u < len(self.multi_urls):
                 
                 url_trozo = self.multi_urls[u][2]
 
                 rango_absoluto = (inicio, min(final, self.multi_urls[u][1]))
 
-                inicio+=rango_absoluto[1]-rango_absoluto[0]+1
+                inicio += rango_absoluto[1] - rango_absoluto[0] + 1
 
                 rango_parcial = (rango_absoluto[0] - self.multi_urls[u][0], rango_absoluto[1] - self.multi_urls[u][0], url_trozo)
 
@@ -295,9 +297,9 @@ class neiDebridVideoProxyChunkWriter():
 
             try:
 
-                while not self.exit and self.bytes_written < self.end_offset:
+                while not self.exit and self.bytes_written <= self.end_offset:
                     
-                    while not self.exit and self.bytes_written < self.end_offset and self.bytes_written in self.queue:
+                    while not self.exit and self.bytes_written <= self.end_offset and self.bytes_written in self.queue:
 
                         with self.chunk_queue_lock:
 
@@ -311,7 +313,7 @@ class neiDebridVideoProxyChunkWriter():
 
                         self.bytes_written+=len(current_chunk)
                         
-                    if not self.exit and self.bytes_written < self.end_offset:
+                    if not self.exit and self.bytes_written <= self.end_offset:
                         
                         with self.cv_new_element:
                             self.cv_new_element.wait(1)
@@ -367,7 +369,8 @@ class neiDebridVideoProxyChunkWriter():
 
             next_offset = self.next_offset_required
 
-            self.next_offset_required = self.next_offset_required + WORKER_CHUNK_SIZE if self.next_offset_required + WORKER_CHUNK_SIZE < self.end_offset else -1
+            # <= para no saltarse el último chunk
+            self.next_offset_required = self.next_offset_required + WORKER_CHUNK_SIZE if self.next_offset_required + WORKER_CHUNK_SIZE <= self.end_offset else -1
 
             return next_offset
 
@@ -425,6 +428,11 @@ class neiDebridVideoProxyChunkDownloader():
                     required_chunk_size = final-offset+1
 
                     partial_ranges = self.url.absolute2PartialRanges(offset, final) #Si el vídeo está troceado, es posible que el chunk pedido por el reproductor de KODI tenga bytes de diferentes trozos (URLs)
+
+                    # Si no hay rangos que descargar (lista vacía), rechazamos el offset para evitar bucles
+                    if not partial_ranges:
+                        self.chunk_writer.rejectThisOffset(self, offset)
+                        continue
 
                     while not self.exit and not self.chunk_writer.exit and len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE and offset!=self.chunk_writer.bytes_written:
                         with self.chunk_writer.cv_queue_full:
@@ -816,9 +824,9 @@ def neiURL2DEBRIDCheckCache(page_url):
             return True
     else:
 
-        fid = re.subr(r'^.*?#F?!(.*?)!.*$', r'\1', page_url)
+        fid = re.sub(r'^.*?#F?!(.*?)!.*$', r'\1', page_url)
 
-        fid_hash = hashlib.sha256(fid).hexdigest()
+        fid_hash = hashlib.sha256(fid.encode('utf-8')).hexdigest()
 
         filename_hash = KODI_TEMP_PATH + 'kodi_nei_'+getDebridServiceString()+'_' + fid_hash
 
@@ -861,7 +869,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
             if progress_bar:
                 close_background_pbar(pbar)
             omegaNotification("ERROR: POSIBLE ENLACE MEGACRYPTER CADUCADO")
-            xbmcgui.Dialog().dialog.ok('MEGACRYPTER ERROR', "Hay algún error con MEGACRYPTER (posible enlace caducado)\n\n[B]Sugerencia: purga la caché de OMEGA y vuelve a entrar en la carpeta.[/B]")
+            xbmcgui.Dialog().ok('MEGACRYPTER ERROR', "Hay algún error con MEGACRYPTER (posible enlace caducado)\n\n[B]Sugerencia: purga la caché de OMEGA y vuelve a entrar en la carpeta.[/B]")
             return [["NEI DEBRID ERROR (posible enlace de MegaCrypter caducado (purga la caché de OMEGA, sal y vuelve a entrar en la carpeta))", ""]]
 
         filename_hash = KODI_TEMP_PATH + 'kodi_nei_'+getDebridServiceString()+'_' + fid_hash
@@ -889,7 +897,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     if progress_bar:
                         close_background_pbar(pbar)
                     omegaNotification("ERROR: REVISA TUS CUENTAS DE MEGA AUXILIARES")
-                    xbmcgui.Dialog().dialog.ok('DEBRID ERROR (FALLO EN CUENTAS DE MEGA AUXILIARES)', "Ha fallado la generación del enlace de MEGA auxiliar.\n\n[B]Sugerencia: revisa que haya espacio suficiente en tus cuentas de MEGA auxiliares.[/B]")
+                    xbmcgui.Dialog().ok('DEBRID ERROR (FALLO EN CUENTAS DE MEGA AUXILIARES)', "Ha fallado la generación del enlace de MEGA auxiliar.\n\n[B]Sugerencia: revisa que haya espacio suficiente en tus cuentas de MEGA auxiliares.[/B]")
                     return [["NEI DEBRID ERROR (revisa que haya espacio suficiente en tus cuentas de MEGA auxiliares)", ""]]
 
                 page_url = response[0]
@@ -925,9 +933,9 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
     else:
 
-        fid = re.subr(r'^.*?#F?!(.*?)!.*$', r'\1', page_url)
+        fid = re.sub(r'^.*?#F?!(.*?)!.*$', r'\1', page_url)
 
-        fid_hash = hashlib.sha256(fid).hexdigest()
+        fid_hash = hashlib.sha256(fid.encode('utf-8')).hexdigest()
 
         filename_hash = KODI_TEMP_PATH + 'kodi_nei_'+getDebridServiceString()+'_' + fid_hash
 
@@ -1198,7 +1206,7 @@ def proxy2DebridURL(url):
 
 
 def proxy_run():
-    logger.info(time.asctime(), "NEI DEBRID VIDEO PROXY SERVER Starts - %s:%s" % (DEBRID_PROXY_HOST, DEBRID_PROXY_PORT))
+    logger.info("%s NEI DEBRID VIDEO PROXY SERVER Starts - %s:%s" % (time.asctime(), DEBRID_PROXY_HOST, DEBRID_PROXY_PORT))
     proxy_server.serve_forever()
 
 
