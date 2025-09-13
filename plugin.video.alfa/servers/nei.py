@@ -77,6 +77,9 @@ MEGACRYPTER2DEBRID_MULTI_RETRY = 5
 VIDEO_MULTI_DEBRID_URL = None
 VIDEO_MULTI_DEBRID_URL_LOCK = threading.Lock()
 
+PROXY_STARTED = False
+PROXY_STARTED_LOCK = threading.Lock()
+
 WORKER_CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 DEBRID_WORKERS = int(config.get_setting("omega_debrid_proxy_workers", "omega"))+1
 MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "omega"))+1)*10) #Si sobra la RAM se puede aumentar (este buffer se suma al propio buffer de KODI)
@@ -535,7 +538,7 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
             self.end_headers()
 
-            self.server.shutdown()
+            threading.Thread(target=self.server.shutdown, daemon=True).start()
 
         elif self.path.startswith('/isalive'):
             
@@ -609,20 +612,18 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
             return range_request
 
-    
+
     def __parseRequestRanges(self):
-
         if 'Range' in self.headers:
-
             m = re.compile(r'bytes=([0-9]+)-([0-9]+)?', re.DOTALL).search(self.headers['Range'])
-
+            if not m:
+                logger.debug('Bad Range header: %s', self.headers['Range'])
+                return None
             return (m.group(1), m.group(2))
-
         else:
-
             return None
 
-    
+
     def __sendPartialResponseHeaders(self, inicio, final):
 
         headers = {'Accept-Ranges':'bytes', 'Content-Length': str(int(final)-int(inicio)+1), 'Content-Range': 'bytes '+str(inicio)+'-'+str(final)+'/'+str(VIDEO_MULTI_DEBRID_URL.size), 'Content-Disposition':'attachment', 'Content-Type':'application/octet-stream', 'Connection':'close'}
@@ -907,7 +908,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                 elif OMEGA_ALLDEBRID:
                     urls = alldebrid.get_video_url(page_url)
                 else:
-                    return None
+                    return []
 
                 if urls and len(urls)>0:
                     for u in urls:
@@ -1211,6 +1212,11 @@ def proxy_run():
 
 
 def start_proxy():
+    global PROXY_STARTED
+    with PROXY_STARTED_LOCK:
+        if PROXY_STARTED:
+            return
+        PROXY_STARTED = True
     t = threading.Thread(target=proxy_run)
     t.setDaemon(True)
     t.start()
