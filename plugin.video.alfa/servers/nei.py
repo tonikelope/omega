@@ -314,8 +314,6 @@ class neiDebridVideoProxyChunkWriter():
 
                         self.output.write(current_chunk)
 
-                        self.output.flush()
-
                         self.bytes_written+=len(current_chunk)
                         
                     if not self.exit and self.bytes_written <= self.end_offset:
@@ -358,7 +356,6 @@ class neiDebridVideoProxyChunkWriter():
                             p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
                             p_chunk_read+=len(p_chunk)
                             self.output.write(p_chunk)
-                            self.output.flush()
             except Exception as ex:
                 logger.info(ex)
 
