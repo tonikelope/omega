@@ -87,7 +87,7 @@ MAX_CHUNKS_IN_QUEUE = ((int(config.get_setting("omega_debrid_proxy_chunks", "ome
 DEBRID_ACCOUNT_FREE_SPACE = None
 DEBRID_AUX_MEGA_ACCOUNTS = []
 
-RESPONSE_READ_CHUNK_SIZE = 8*1024
+RESPONSE_READ_CHUNK_SIZE = 256*1024
 
 DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
@@ -314,6 +314,8 @@ class neiDebridVideoProxyChunkWriter():
 
                         self.output.write(current_chunk)
 
+                        self.output.flush()
+
                         self.bytes_written+=len(current_chunk)
                         
                     if not self.exit and self.bytes_written <= self.end_offset:
@@ -356,6 +358,7 @@ class neiDebridVideoProxyChunkWriter():
                             p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
                             p_chunk_read+=len(p_chunk)
                             self.output.write(p_chunk)
+                            self.output.flush()
             except Exception as ex:
                 logger.info(ex)
 
@@ -572,11 +575,11 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                             for murl in VIDEO_MULTI_DEBRID_URL.multi_urls:
                                 request = urllib.request.Request(murl[2])
                                 with urllib.request.urlopen(request) as response:
-                                    shutil.copyfileobj(response, self.wfile)
+                                    shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
                         else:
                             request = urllib.request.Request(VIDEO_MULTI_DEBRID_URL.url)
                             with urllib.request.urlopen(request) as response:
-                                shutil.copyfileobj(response, self.wfile)
+                                shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
 
                 except Exception as ex:
                     logger.info(ex)
