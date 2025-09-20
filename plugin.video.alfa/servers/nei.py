@@ -63,7 +63,8 @@ KODI_USERDATA_PATH = xbmcvfs.translatePath("special://userdata/")
 KODI_NEI_COOKIES_PATH = KODI_USERDATA_PATH + "kodi_nei_cookies"
 MEGA_FILES = None
 
-DEFAULT_HTTP_TIMEOUT = 300
+DEFAULT_HTTP_TIMEOUT = 30
+HTTP_HEAD_TIMEOUT = 10
 
 DEBRID_PROXY_HOST = 'localhost'
 DEBRID_PROXY_PORT = int(config.get_setting("omega_debrid_proxy_port", "omega").strip())
@@ -76,9 +77,6 @@ MEGACRYPTER2DEBRID_TIMEOUT = 300 #Cuando aumente la demanda habrá que implement
 MEGACRYPTER2DEBRID_MULTI_RETRY = 5
 VIDEO_MULTI_DEBRID_URL = None
 VIDEO_MULTI_DEBRID_URL_LOCK = threading.Lock()
-
-PROXY_STARTED = False
-PROXY_STARTED_LOCK = threading.Lock()
 
 WORKER_CHUNK_SIZE = 5*1024*1024 #COMPROMISO
 DEBRID_WORKERS = int(config.get_setting("omega_debrid_proxy_workers", "omega"))+1
@@ -124,7 +122,7 @@ class HTTPClient:
         """Guarda las cookies en un archivo."""
         self.cookie_jar.save(self.cookies_file, ignore_discard=True, ignore_expires=True)
 
-    def request(self, url, method="GET", data=None, headers=None, timeout=10, ignore_errors=False):
+    def request(self, url, method="GET", data=None, headers=None, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=False):
         """Realiza una solicitud HTTP con GET o POST."""
         if data:
             data = urllib.parse.urlencode(data).encode("utf-8")
@@ -145,11 +143,11 @@ class HTTPClient:
         except urllib.error.URLError as e:
             raise RuntimeError(f"Error de conexión: {e}")
 
-    def get(self, url, headers=None, timeout=10, ignore_errors=False):
+    def get(self, url, headers=None, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=False):
         """Realiza una solicitud GET."""
         return self.request(url, method="GET", headers=headers, timeout=timeout, ignore_errors=ignore_errors)
 
-    def post(self, url, data=None, headers=None, timeout=10, ignore_errors=False):
+    def post(self, url, data=None, headers=None, timeout=DEFAULT_HTTP_TIMEOUT, ignore_errors=False):
         """Realiza una solicitud POST."""
         return self.request(url, method="POST", data=data, headers=headers, timeout=timeout, ignore_errors=ignore_errors)
 
@@ -217,7 +215,7 @@ class multiPartVideoDebridURL():
 
     def __getUrlSizeAndRanges(self, url):
         request = urllib.request.Request(url, method='HEAD')
-        response = urllib.request.urlopen(request)
+        response = urllib.request.urlopen(request, timeout=HTTP_HEAD_TIMEOUT)
 
         if 'Content-Length' in response.headers:
             return (int(response.headers['Content-Length']), ('Accept-Ranges' in response.headers and response.headers['Accept-Ranges']!='none'))
@@ -350,7 +348,7 @@ class neiDebridVideoProxyChunkWriter():
 
                     request = urllib.request.Request(url, headers=request_headers)
 
-                    with urllib.request.urlopen(request) as response:
+                    with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
                         p_chunk_read = 0
                         while p_chunk_read < p_length:
                             p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
@@ -411,7 +409,6 @@ class neiDebridVideoProxyChunkDownloader():
         self.exit = False
         self.chunk_writer = chunk_writer
         
-
     def run(self):
 
         logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' HELLO')
@@ -465,7 +462,7 @@ class neiDebridVideoProxyChunkDownloader():
                                     
                                     request = urllib.request.Request(url, headers=request_headers)
 
-                                    with urllib.request.urlopen(request) as response:
+                                    with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
 
                                         required_partial_chunk_size = p_final-p_offset+1
 
@@ -538,7 +535,9 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
             self.end_headers()
 
-            threading.Thread(target=self.server.shutdown, daemon=True).start()
+            threading.Thread(target=self.__close, daemon=True).start()
+
+            return
 
         elif self.path.startswith('/isalive'):
             
@@ -571,17 +570,28 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                         if VIDEO_MULTI_DEBRID_URL.multi_urls:
                             for murl in VIDEO_MULTI_DEBRID_URL.multi_urls:
                                 request = urllib.request.Request(murl[2])
-                                with urllib.request.urlopen(request) as response:
+                                with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
                                     shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
                         else:
                             request = urllib.request.Request(VIDEO_MULTI_DEBRID_URL.url)
-                            with urllib.request.urlopen(request) as response:
+                            with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
                                 shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
 
                 except Exception as ex:
                     logger.info(ex)
 
     
+    def __close(self):
+        try:
+            self.server.shutdown()
+        except Exception:
+            pass
+        try:
+            self.server.server_close()
+        except Exception:
+            pass
+
+
     def __updateURL(self):
         global VIDEO_MULTI_DEBRID_URL
 
@@ -655,7 +665,8 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
 
 class ThreadingSimpleServer(ThreadingMixIn, HTTPServer):
-    pass
+    daemon_threads = True
+    allow_reuse_address = True
 
 if OMEGA_REALDEBRID or OMEGA_ALLDEBRID:
     try:
@@ -783,14 +794,14 @@ def check_debrid_urls(itemlist):
             url = proxy2DebridURL(i[1])
             logger.info(url)
             request = urllib.request.Request(url, method='HEAD')
-            response = urllib.request.urlopen(request)
+            response = urllib.request.urlopen(request, timeout=HTTP_HEAD_TIMEOUT)
 
             if response.status != 200 or 'Content-Length' not in response.headers:
                 return False
             elif 'Accept-Ranges' in response.headers and response.headers['Accept-Ranges']!='none':
                 size = int(response.headers['Content-Length'])
                 request2 = urllib.request.Request(url, headers={'Range': 'bytes='+str(size-1)+'-'+str(size-1)})
-                response2 = urllib.request.urlopen(request2)
+                response2 = urllib.request.urlopen(request2, timeout=DEFAULT_HTTP_TIMEOUT)
 
                 if response2.status != 206:
                     return False
@@ -1207,16 +1218,29 @@ def proxy2DebridURL(url):
 
 
 def proxy_run():
-    logger.info("%s NEI DEBRID VIDEO PROXY SERVER Starts - %s:%s" % (time.asctime(), DEBRID_PROXY_HOST, DEBRID_PROXY_PORT))
-    proxy_server.serve_forever()
+    try:
+        logger.info("%s NEI DEBRID VIDEO PROXY SERVER Starts - %s:%s" % (time.asctime(), DEBRID_PROXY_HOST, DEBRID_PROXY_PORT))
+        proxy_server.serve_forever()
+    finally:
+        # opcional, sólo si piensas reutilizar el mismo objeto
+        try:
+            proxy_server.server_close()
+        except Exception:
+            pass
+        setattr(proxy_server, "_serving_thread", None)
 
 
 def start_proxy():
-    global PROXY_STARTED
-    with PROXY_STARTED_LOCK:
-        if PROXY_STARTED:
-            return
-        PROXY_STARTED = True
-    t = threading.Thread(target=proxy_run)
-    t.setDaemon(True)
+    global proxy_server
+    
+    # si el bind falló (otro proceso tiene el puerto), no hacemos nada
+    if proxy_server is None:
+        return
+    
+    # evita arrancar dos veces en este proceso
+    if getattr(proxy_server, "_serving_thread", None) and proxy_server._serving_thread.is_alive():
+        return
+    
+    t = threading.Thread(target=proxy_run, daemon=True)
+    proxy_server._serving_thread = t
     t.start()
