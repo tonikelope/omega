@@ -334,26 +334,39 @@ class neiDebridVideoProxyChunkWriter():
             try:
                 partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(self.start_offset, self.end_offset)
 
-                for partial_range in partial_ranges:
+                for p_inicio, p_final, url in partial_ranges:
+                    p_length = p_final - p_inicio + 1
+                    
+                    request_headers = {'Range': f'bytes={p_inicio}-'}
 
-                    p_inicio = partial_range[0]
+                    success = False
 
-                    p_final = partial_range[1]
+                    while not success:
+                        try:
+                            request = urllib.request.Request(url, headers=request_headers)
+                            with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
+                                p_chunk_read = 0
 
-                    url = partial_range[2]
+                                while p_chunk_read < p_length:
+                                    to_read = min(RESPONSE_READ_CHUNK_SIZE, p_length - p_chunk_read)
+                                    
+                                    p_chunk = response.read(to_read)
 
-                    p_length = p_final-p_inicio+1
+                                    if not p_chunk:
+                                        # EOF inesperado
+                                        break
 
-                    request_headers = {'Range': 'bytes='+str(p_inicio)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
+                                    self.output.write(p_chunk)
+                                    p_chunk_read += len(p_chunk)
 
-                    request = urllib.request.Request(url, headers=request_headers)
+                            if p_chunk_read == p_length:
+                                success = True
+                            else:
+                                logger.debug(f"PARCIAL INCOMPLETO ({p_chunk_read}/{p_length}) en {url}, reintento {retries+1}")
 
-                    with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                        p_chunk_read = 0
-                        while p_chunk_read < p_length:
-                            p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length-p_chunk_read))
-                            p_chunk_read+=len(p_chunk)
-                            self.output.write(p_chunk)
+                        except Exception as e:
+                            logger.debug(f"Error al descargar parcial {url}: {e}")
+
             except Exception as ex:
                 logger.info(ex)
 
@@ -410,8 +423,17 @@ class neiDebridVideoProxyChunkDownloader():
         self.chunk_writer = chunk_writer
         
     def run(self):
-
         logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' HELLO')
+
+        def read_exact(resp, size, bufsize=RESPONSE_READ_CHUNK_SIZE):
+            """Lee exactamente `size` bytes, acumulando hasta llegar o EOF."""
+            out = bytearray()
+            while len(out) < size:
+                chunk = resp.read(min(bufsize, size - len(out)))
+                if not chunk:
+                    break
+                out.extend(chunk)
+            return bytes(out)
 
         bytes_downloaded = 0
 
@@ -420,91 +442,74 @@ class neiDebridVideoProxyChunkDownloader():
             offset = self.chunk_writer.nextOffsetRequired()
 
             try:
-
-                if offset >=0:
-
+                if offset >= 0:
                     final = min(offset + WORKER_CHUNK_SIZE - 1, self.chunk_writer.end_offset)
+                    required_chunk_size = final - offset + 1
 
-                    required_chunk_size = final-offset+1
-
-                    partial_ranges = self.url.absolute2PartialRanges(offset, final) #Si el vídeo está troceado, es posible que el chunk pedido por el reproductor de KODI tenga bytes de diferentes trozos (URLs)
-
-                    # Si no hay rangos que descargar (lista vacía), rechazamos el offset para evitar bucles
+                    partial_ranges = self.url.absolute2PartialRanges(offset, final)
+                    
                     if not partial_ranges:
                         self.chunk_writer.rejectThisOffset(self, offset)
                         continue
 
-                    while not self.exit and not self.chunk_writer.exit and len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE and offset!=self.chunk_writer.bytes_written:
+                    while (not self.exit and not self.chunk_writer.exit and
+                           len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE and
+                           offset != self.chunk_writer.bytes_written):
                         with self.chunk_writer.cv_queue_full:
                             self.chunk_writer.cv_queue_full.wait(1)
 
                     if not self.chunk_writer.exit and not self.exit:
-                        
                         chunk_error = True
-
                         while not self.exit and not self.chunk_writer.exit and chunk_error:
-
                             chunk = bytearray()
 
-                            for partial_range in partial_ranges:
+                            for p_offset, p_final, url in partial_ranges:
+                                request_headers = {'Range': 'bytes='+str(p_offset)+'-'}
+                                request = urllib.request.Request(url, headers=request_headers)
 
-                                p_offset = partial_range[0]
+                                with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
+                                    required_partial_chunk_size = p_final - p_offset + 1
+                                    partial_chunk = read_exact(response, required_partial_chunk_size)
+                                    bytes_downloaded += len(partial_chunk)
 
-                                p_final = partial_range[1]
-
-                                url = partial_range[2]
-
-                                request_headers = {'Range': 'bytes='+str(p_offset)+'-'+str(p_final+5)} #Chapu-hack: pedimos unos bytes extra porque a veces RealDebrid devuelve alguno menos
-
-                                partial_chunk_error = True
-
-                                while not self.exit and not self.chunk_writer.exit and partial_chunk_error:
-                                    
-                                    request = urllib.request.Request(url, headers=request_headers)
-
-                                    with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-
-                                        required_partial_chunk_size = p_final-p_offset+1
-
-                                        partial_chunk=response.read(required_partial_chunk_size)
-
-                                        bytes_downloaded+=len(partial_chunk)
-
-                                        if len(partial_chunk) == required_partial_chunk_size:
-                                            chunk+=partial_chunk
-                                            partial_chunk_error = False
-                                        else:
-                                            logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(p_offset)+'-'+str(p_final)+' ('+str(len(partial_chunk))+' bytes) PARTIAL CHUNK SIZE ERROR! (¿posible bug del DEBRIDER?)')
+                                    if len(partial_chunk) == required_partial_chunk_size:
+                                        chunk += partial_chunk
+                                    else:
+                                        logger.debug(
+                                            f'CHUNKDOWNLOADER {self.id} -> {p_offset}-{p_final} '
+                                            f'({len(partial_chunk)} bytes) PARTIAL SHORT READ'
+                                        )
 
                             if not self.exit and not self.chunk_writer.exit:
-
                                 if len(chunk) == required_chunk_size:
-
                                     with self.chunk_writer.chunk_queue_lock:
-                                    
                                         if not self.exit and not self.chunk_writer.exit:
-                                            self.chunk_writer.queue[offset]=chunk
-
+                                            self.chunk_writer.queue[offset] = bytes(chunk)
                                     with self.chunk_writer.cv_new_element:
                                         self.chunk_writer.cv_new_element.notify_all()
-
                                     chunk_error = False
                                 else:
-                                    logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> '+str(offset)+'-'+str(final)+' ('+str(len(chunk))+' bytes) CHUNK SIZE ERROR! (¿posible bug del DEBRIDER?)')
-
+                                    logger.debug(
+                                        f'CHUNKDOWNLOADER {self.id} -> {offset}-{final} '
+                                        f'({len(chunk)} bytes) CHUNK SHORT READ'
+                                    )
+                                    self.chunk_writer.rejectThisOffset(self, offset)
+                                    break
                 else:
                     with self.chunk_writer.chunk_offset_lock:
                         if len(self.chunk_writer.rejected_offsets) == 0:
                             self.exit = True
 
             except Exception as ex:
-                logger.debug('CHUNKDOWNLOADER '+str(self.id)+' -> OFFSET '+str(offset)+' HTTP ERROR! (¿muchos hilos?)')
+                logger.debug(f'CHUNKDOWNLOADER {self.id} -> OFFSET {offset} HTTP ERROR! (¿muchos hilos?)')
                 logger.debug(ex)
                 self.chunk_writer.rejectThisOffset(self, offset)
 
         self.exit = True
+        logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+
+                    ' BYE ('+str(bytes_downloaded)+' bytes downloaded)')
 
-        logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' BYE ('+str(bytes_downloaded)+' bytes downloaded)')
+
 
 
 """
