@@ -362,7 +362,7 @@ class neiDebridVideoProxyChunkWriter():
                             if p_chunk_read == p_length:
                                 success = True
                             else:
-                                logger.debug(f"PARCIAL INCOMPLETO ({p_chunk_read}/{p_length}) en {url}, reintento {retries+1}")
+                                logger.debug(f"PARCIAL INCOMPLETO ({p_chunk_read}/{p_length}) en {url}")
 
                         except Exception as e:
                             logger.debug(f"Error al descargar parcial {url}: {e}")
