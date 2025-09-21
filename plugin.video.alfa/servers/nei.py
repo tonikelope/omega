@@ -272,15 +272,21 @@ class neiDebridVideoProxyChunkWriter():
         self.output = wfile
         self.chunk_downloaders = []
         self.queue = {}
-        self.cv_queue_full = threading.Condition()
-        self.cv_new_element = threading.Condition()
+
+        # Locks
+        self.chunk_offset_lock = threading.Lock()
+        self.chunk_queue_lock = threading.Lock()
+
+        # ✅ Conditions ligadas al MISMO lock de la cola
+        self.cv_new_element = threading.Condition(self.chunk_queue_lock)
+        self.cv_queue_full = threading.Condition(self.chunk_queue_lock)
+
         self.bytes_written = start_offset
         self.exit = False
         self.next_offset_required = start_offset
-        self.chunk_offset_lock = threading.Lock()
-        self.chunk_queue_lock = threading.Lock()
         self.chunk_error_notify = False
         self.rejected_offsets = []
+
 
 
     def run(self):
@@ -297,27 +303,21 @@ class neiDebridVideoProxyChunkWriter():
                 t.start()
 
             try:
-
                 while not self.exit and self.bytes_written <= self.end_offset:
-                    
-                    while not self.exit and self.bytes_written <= self.end_offset and self.bytes_written in self.queue:
+                    with self.chunk_queue_lock:
+                        # ✅ Pop atómico bajo el mismo lock (evita check-then-act)
+                        current_chunk = self.queue.pop(self.bytes_written, None)
+                        if current_chunk is None:
+                            # No hay el chunk que toca → espera notificación (en bucle por spurious wakeups)
+                            self.cv_new_element.wait(timeout=1)
+                            continue
 
-                        with self.chunk_queue_lock:
+                        # ✅ Hay hueco en la cola tras consumir → notifica a productores
+                        self.cv_queue_full.notify_all()
 
-                            current_chunk = self.queue.pop(self.bytes_written)
-
-                        with self.cv_queue_full:
-
-                            self.cv_queue_full.notify_all()
-
-                        self.output.write(current_chunk)
-
-                        self.bytes_written+=len(current_chunk)
-                        
-                    if not self.exit and self.bytes_written <= self.end_offset:
-                        
-                        with self.cv_new_element:
-                            self.cv_new_element.wait(1)
+                    # Escribe FUERA del lock para no bloquear a los productores mientras I/O
+                    self.output.write(current_chunk)
+                    self.bytes_written += len(current_chunk)
 
             except Exception as ex:
                 logger.info(ex)
@@ -329,6 +329,7 @@ class neiDebridVideoProxyChunkWriter():
 
             with self.chunk_queue_lock:
                 self.queue.clear()
+
         else:
             
             try:
@@ -337,16 +338,17 @@ class neiDebridVideoProxyChunkWriter():
                 for p_inicio, p_final, url in partial_ranges:
                     p_length = p_final - p_inicio + 1
                     
-                    request_headers = {'Range': f'bytes={p_inicio}-'}
-
                     success = False
+                    p_chunk_read = 0
 
-                    while not success:
+                    while not success and not self.exit:
                         try:
-                            request = urllib.request.Request(url, headers=request_headers)
-                            with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                                p_chunk_read = 0
+                            request_headers = {'Range': f'bytes={(p_inicio+p_chunk_read)}-'} #Rango abierto para evitar bug aleatorio de RealDebrid devolviendo menos bytes
 
+                            request = urllib.request.Request(url, headers=request_headers)
+                            
+                            with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
+                                
                                 while p_chunk_read < p_length:
                                     to_read = min(RESPONSE_READ_CHUNK_SIZE, p_length - p_chunk_read)
                                     
@@ -425,14 +427,19 @@ class neiDebridVideoProxyChunkDownloader():
     def run(self):
         logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' HELLO')
 
-        def read_exact(resp, size, bufsize=RESPONSE_READ_CHUNK_SIZE):
+        def read_complete_partial_chunk(resp, size, bufsize=RESPONSE_READ_CHUNK_SIZE):
             """Lee exactamente `size` bytes, acumulando hasta llegar o EOF."""
             out = bytearray()
+            
             while len(out) < size:
+                
                 chunk = resp.read(min(bufsize, size - len(out)))
+                
                 if not chunk:
                     break
+                
                 out.extend(chunk)
+            
             return bytes(out)
 
         bytes_downloaded = 0
@@ -452,47 +459,72 @@ class neiDebridVideoProxyChunkDownloader():
                         self.chunk_writer.rejectThisOffset(self, offset)
                         continue
 
-                    while (not self.exit and not self.chunk_writer.exit and
-                           len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE and
-                           offset != self.chunk_writer.bytes_written):
-                        with self.chunk_writer.cv_queue_full:
-                            self.chunk_writer.cv_queue_full.wait(1)
+                    with self.chunk_writer.chunk_queue_lock:
+                        while (not self.exit and not self.chunk_writer.exit
+                               and len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE
+                               and offset != self.chunk_writer.bytes_written):
+                            self.chunk_writer.cv_queue_full.wait(timeout=1)
+
 
                     if not self.chunk_writer.exit and not self.exit:
                         chunk_error = True
+                       
                         while not self.exit and not self.chunk_writer.exit and chunk_error:
                             chunk = bytearray()
 
                             for p_offset, p_final, url in partial_ranges:
-                                request_headers = {'Range': 'bytes='+str(p_offset)+'-'}
-                                request = urllib.request.Request(url, headers=request_headers)
+                                required_partial_chunk_size = p_final - p_offset + 1
+                                
+                                partial_chunk = bytearray()
 
-                                with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                                    required_partial_chunk_size = p_final - p_offset + 1
-                                    partial_chunk = read_exact(response, required_partial_chunk_size)
-                                    bytes_downloaded += len(partial_chunk)
+                                while len(partial_chunk) < required_partial_chunk_size:
+                                    try:
+                                        request_headers = {'Range': f'bytes={(p_offset+len(partial_chunk))}-'} #Rango abierto para evitr bug aleatorio Real-Debrid
+                                        
+                                        request = urllib.request.Request(url, headers=request_headers)
 
-                                    if len(partial_chunk) == required_partial_chunk_size:
-                                        chunk += partial_chunk
-                                    else:
-                                        logger.debug(
+                                        with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
+                                            
+                                            partial_chunk_size_rem = required_partial_chunk_size - len(partial_chunk)
+
+                                            partial_chunk_read = read_complete_partial_chunk(response, partial_chunk_size_rem)
+
+                                            if partial_chunk_read:
+                                                partial_chunk.extend(partial_chunk_read)
+                                                bytes_downloaded += len(partial_chunk_read)
+
+                                            if len(partial_chunk) == required_partial_chunk_size:
+                                                chunk.extend(partial_chunk)
+                                            else:
+                                                logger.debug(
+                                                    f'CHUNKDOWNLOADER {self.id} -> {p_offset}-{p_final} '
+                                                    f'({len(partial_chunk)}/{required_partial_chunk_size} bytes) '
+                                                    f'PARTIAL SHORT READ, retrying...'
+                                                )
+
+                                    except Exception as e:
+                                        logger.warning(
                                             f'CHUNKDOWNLOADER {self.id} -> {p_offset}-{p_final} '
-                                            f'({len(partial_chunk)} bytes) PARTIAL SHORT READ'
+                                            f'ERROR {e}, retrying...'
                                         )
+                                        
 
                             if not self.exit and not self.chunk_writer.exit:
                                 if len(chunk) == required_chunk_size:
+                                    
                                     with self.chunk_writer.chunk_queue_lock:
                                         if not self.exit and not self.chunk_writer.exit:
                                             self.chunk_writer.queue[offset] = bytes(chunk)
-                                    with self.chunk_writer.cv_new_element:
-                                        self.chunk_writer.cv_new_element.notify_all()
+                                            # ✅ Notificar bajo el mismo lock que protege la cola
+                                            self.chunk_writer.cv_new_element.notify_all()
+
                                     chunk_error = False
                                 else:
                                     logger.debug(
                                         f'CHUNKDOWNLOADER {self.id} -> {offset}-{final} '
                                         f'({len(chunk)} bytes) CHUNK SHORT READ'
                                     )
+
                                     self.chunk_writer.rejectThisOffset(self, offset)
                                     break
                 else:
@@ -540,9 +572,7 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
             self.end_headers()
 
-            threading.Thread(target=self.__close, daemon=True).start()
-
-            return
+            self.server.shutdown()
 
         elif self.path.startswith('/isalive'):
             
@@ -564,6 +594,7 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                     range_request = self.__sendResponseHeaders()
                     
                     if range_request:
+                        #Allá vamos
 
                         chunk_writer = neiDebridVideoProxyChunkWriter(self.wfile, int(range_request[0]), int(range_request[1]) if range_request[1] else int(VIDEO_MULTI_DEBRID_URL.size-1))
                         t = threading.Thread(target=chunk_writer.run)
@@ -571,6 +602,7 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                         t.join()
                                           
                     else:
+                        #El servidor no admite peticiones por rangos
 
                         if VIDEO_MULTI_DEBRID_URL.multi_urls:
                             for murl in VIDEO_MULTI_DEBRID_URL.multi_urls:
@@ -584,17 +616,6 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
                 except Exception as ex:
                     logger.info(ex)
-
-    
-    def __close(self):
-        try:
-            self.server.shutdown()
-        except Exception:
-            pass
-        try:
-            self.server.server_close()
-        except Exception:
-            pass
 
 
     def __updateURL(self):
@@ -678,9 +699,9 @@ if OMEGA_REALDEBRID or OMEGA_ALLDEBRID:
         proxy_server = ThreadingSimpleServer((DEBRID_PROXY_HOST, DEBRID_PROXY_PORT), neiDebridVideoProxy)
         
         if DEBRID_WORKERS > 1:
-            omegaNotification('NEIDEBRIDER ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((WORKER_CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
+            omegaNotification('PROXY ON ('+str(DEBRID_WORKERS)+' hilos + '+str(round((WORKER_CHUNK_SIZE*MAX_CHUNKS_IN_QUEUE)/(1024*1024)))+'MB)', sound=False)
         else:
-            omegaNotification('NEIDEBRIDER ON (un hilo sin buffer)', sound=False)
+            omegaNotification('PROXY ON (un hilo directo)', sound=False)
     except:
         proxy_server = None 
 
@@ -1223,22 +1244,23 @@ def proxy2DebridURL(url):
 
 
 def proxy_run():
+    
     try:
         logger.info("%s NEI DEBRID VIDEO PROXY SERVER Starts - %s:%s" % (time.asctime(), DEBRID_PROXY_HOST, DEBRID_PROXY_PORT))
         proxy_server.serve_forever()
     finally:
-        # opcional, sólo si piensas reutilizar el mismo objeto
+
         try:
             proxy_server.server_close()
         except Exception:
             pass
+        
         setattr(proxy_server, "_serving_thread", None)
 
 
 def start_proxy():
     global proxy_server
     
-    # si el bind falló (otro proceso tiene el puerto), no hacemos nada
     if proxy_server is None:
         return
     
