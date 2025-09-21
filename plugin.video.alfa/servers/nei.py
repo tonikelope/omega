@@ -352,7 +352,7 @@ class neiDebridVideoProxyChunkWriter():
                     p_chunk_read = 0
 
                     while not success and not self.exit:
-                        request_headers = {'Range': f'bytes={(p_inicio+p_chunk_read)}-'} #Rango abierto para evitar bug aleatorio de RealDebrid devolviendo menos bytes
+                        request_headers = {'Range': f'bytes={(p_inicio+p_chunk_read)}-', 'Connection': 'close'} #Rango abierto para evitar bug aleatorio de RealDebrid devolviendo menos bytes
 
                         request = urllib.request.Request(url, headers=request_headers)
                         
@@ -486,7 +486,7 @@ class neiDebridVideoProxyChunkDownloader():
 
                                 while len(partial_chunk) < required_partial_chunk_size:
                                     try:
-                                        request_headers = {'Range': f'bytes={(p_offset+len(partial_chunk))}-'} #Rango abierto para evitr bug aleatorio Real-Debrid
+                                        request_headers = {'Range': f'bytes={(p_offset+len(partial_chunk))}-', 'Connection': 'close'} #Rango abierto para evitr bug aleatorio Real-Debrid
                                         
                                         request = urllib.request.Request(url, headers=request_headers)
 
