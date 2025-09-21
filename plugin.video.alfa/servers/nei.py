@@ -91,6 +91,7 @@ DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 }
 
+proxy_server = None
 
 class HTTPClient:
     def __init__(self, cookies_file=KODI_NEI_COOKIES_PATH, user_agent=None, proxy=None, ignore_config_proxy=False):
@@ -116,7 +117,10 @@ class HTTPClient:
             self.opener = urllib.request.build_opener(cookie_handler)
 
         # Configurar User-Agent si se proporciona
-        self.headers = DEFAULT_HEADERS
+        if user_agent:
+            self.headers = {**DEFAULT_HEADERS, "User-Agent": user_agent}
+        else:
+            self.headers = DEFAULT_HEADERS
 
     def save_cookies(self):
         """Guarda las cookies en un archivo."""
@@ -194,35 +198,71 @@ class multiPartVideoDebridURL():
 
     #Carga el tamaño del vídeo y si el servidor acepta consultas parciales por rangos 
     def __updateSizeAndRanges(self):
-
         if self.multi_urls:
-
             self.accept_ranges = True
             self.size = 0
-
             for url in self.multi_urls:
                 data = self.__getUrlSizeAndRanges(url[2])
-                self.size+=data[0]
-
+                if data[0] < 0:  # fallo en este trozo
+                    self.size = -1
+                    self.accept_ranges = False
+                    break
+                self.size += data[0]
                 if self.accept_ranges:
                     self.accept_ranges = data[1]
-
         else:
             self.size, self.accept_ranges = self.__getUrlSizeAndRanges(self.url)
 
         if not self.accept_ranges:
             omegaNotification("ESTE VÍDEO NO PERMITE AVANZAR/RETROCEDER")
 
-    def __getUrlSizeAndRanges(self, url):
-        request = urllib.request.Request(url, method='HEAD')
-        response = urllib.request.urlopen(request, timeout=HTTP_HEAD_TIMEOUT)
 
-        if 'Content-Length' in response.headers:
-            return (int(response.headers['Content-Length']), ('Accept-Ranges' in response.headers and response.headers['Accept-Ranges']!='none'))
+    def __getUrlSizeAndRanges(self, url):
+        try:
+            # 1) Intento HEAD
+            req = urllib.request.Request(url, method='HEAD', headers=DEFAULT_HEADERS)
+            resp = urllib.request.urlopen(req, timeout=HTTP_HEAD_TIMEOUT)
+            status = getattr(resp, "status", None) or resp.getcode()
+        except urllib.error.HTTPError as e:
+            # 2) Fallback: algunos orígenes devuelven 405 a HEAD
+            if e.code == 405:
+                try:
+                    req = urllib.request.Request(url, headers={**DEFAULT_HEADERS, 'Range': 'bytes=0-0'})
+                    resp = urllib.request.urlopen(req, timeout=DEFAULT_HTTP_TIMEOUT)
+                    status = getattr(resp, "status", None) or resp.getcode()
+                    if status == 206:
+                        cr = resp.headers.get('Content-Range')  # "bytes 0-0/12345"
+                        if cr and '/' in cr:
+                            total = int(cr.split('/')[-1])
+                            return (total, True)  # Soporta rangos (probado real)
+                except Exception:
+                    return (-1, False)
+            else:
+                return (-1, False)
+        except Exception:
+            return (-1, False)
+
+        if status >= 400:
+            return (-1, False)
+
+        length = resp.headers.get('Content-Length')
+        if length is None:
+            # último intento: deducir de Content-Range si vino 206
+            cr = resp.headers.get('Content-Range')
+            if cr and '/' in cr:
+                try:
+                    length = int(cr.split('/')[-1])
+                except Exception:
+                    length = None
+
+        if length is not None:
+            accept = (resp.headers.get('Accept-Ranges') or '').lower() != 'none'
+            return (int(length), accept)
         else:
             return (-1, False)
 
-    
+
+
     #Este método traduce una petición de un rango de bytes absoluto en una lista de tuplas con rangos parciales de las diferentes URLS involucradas (en caso de que el vídeo esté troceado)
     def absolute2PartialRanges(self, start_offset, end_offset):
         if self.multi_urls is None:
@@ -288,40 +328,55 @@ class neiDebridVideoProxyChunkWriter():
         self.rejected_offsets = []
 
 
-
     def run(self):
 
-        logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] HELLO')
+        logger.info('CHUNKWRITER ' + ' [' + str(self.start_offset) + '-] HELLO')
 
         if DEBRID_WORKERS > 1:
 
+            # Lanzar workers
             for c in range(0, DEBRID_WORKERS):
-                chunk_downloader = neiDebridVideoProxyChunkDownloader(c+1, self)
+                chunk_downloader = neiDebridVideoProxyChunkDownloader(c + 1, self)
                 self.chunk_downloaders.append(chunk_downloader)
                 t = threading.Thread(target=chunk_downloader.run)
                 t.daemon = True
                 t.start()
 
             try:
+                # Consumidor: pop atómico + wait/notify bajo el mismo lock
                 while not self.exit and self.bytes_written <= self.end_offset:
+                    # 1) Obtener el chunk que toca y reservar el avance del "head" bajo el lock
                     with self.chunk_queue_lock:
-                        # ✅ Pop atómico bajo el mismo lock (evita check-then-act)
                         current_chunk = self.queue.pop(self.bytes_written, None)
                         if current_chunk is None:
-                            # No hay el chunk que toca → espera notificación (en bucle por spurious wakeups)
+                            # Spurious wakeups: re-chequear en bucle
                             self.cv_new_element.wait(timeout=1)
                             continue
 
-                        # ✅ Hay hueco en la cola tras consumir → notifica a productores
+                        # Reservamos el nuevo head lógico ya aquí (bajo el lock)
+                        next_bytes_written = self.bytes_written + len(current_chunk)
+
+                        # Al consumir, liberamos hueco → notificar a productores
                         self.cv_queue_full.notify_all()
 
-                    # Escribe FUERA del lock para no bloquear a los productores mientras I/O
-                    self.output.write(current_chunk)
-                    self.bytes_written += len(current_chunk)
+                    # 2) Escribir fuera del lock (no bloquear productores durante I/O)
+                    try:
+                        self.output.write(current_chunk)
+                    except Exception as ex:
+                        logger.info(ex)
+                        self.exit = True
+                        break
+
+                    # 3) Aplicar el nuevo head bajo el lock para visibilidad inmediata
+                    with self.chunk_queue_lock:
+                        self.bytes_written = next_bytes_written
+                        # Notificamos por si alguien esperaba a que avanzara la cabeza
+                        self.cv_queue_full.notify_all()
 
             except Exception as ex:
                 logger.info(ex)
 
+            # Señal de salida y limpieza
             self.exit = True
 
             for downloader in self.chunk_downloaders:
@@ -331,31 +386,42 @@ class neiDebridVideoProxyChunkWriter():
                 self.queue.clear()
 
         else:
-            
+            # Modo 1 worker (descarga directa)
             try:
                 partial_ranges = VIDEO_MULTI_DEBRID_URL.absolute2PartialRanges(self.start_offset, self.end_offset)
 
                 for p_inicio, p_final, url in partial_ranges:
                     p_length = p_final - p_inicio + 1
-                    
+
                     success = False
                     p_chunk_read = 0
 
                     while not success and not self.exit:
                         try:
-                            request_headers = {'Range': f'bytes={(p_inicio+p_chunk_read)}-'} #Rango abierto para evitar bug aleatorio de RealDebrid devolviendo menos bytes
+                            start = p_inicio + p_chunk_read  # inicio real del parcial
+                            request_headers = {'Range': f'bytes={start}-'}  # rango abierto (workaround)
 
                             request = urllib.request.Request(url, headers=request_headers)
-                            
+
                             with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                                
-                                while p_chunk_read < p_length:
+                                # PROTECT-200: si el origen ignora Range (200), descartar 'start' bytes
+                                status = getattr(response, "status", None) or response.getcode()
+                                if status == 200 and start > 0:
+                                    to_discard = start
+                                    while to_discard > 0 and not self.exit:
+                                        n = min(RESPONSE_READ_CHUNK_SIZE, to_discard)
+                                        discarded = response.read(n)
+                                        if not discarded:
+                                            raise IOError("EOF al descartar bytes (respuesta 200 sin Range).")
+                                        to_discard -= len(discarded)
+
+                                # Leer hasta completar el parcial
+                                while p_chunk_read < p_length and not self.exit:
                                     to_read = min(RESPONSE_READ_CHUNK_SIZE, p_length - p_chunk_read)
-                                    
                                     p_chunk = response.read(to_read)
 
                                     if not p_chunk:
-                                        # EOF inesperado
+                                        # EOF inesperado → reintento desde 'start + p_chunk_read'
                                         break
 
                                     self.output.write(p_chunk)
@@ -374,7 +440,7 @@ class neiDebridVideoProxyChunkWriter():
 
             self.exit = True
 
-        logger.info('CHUNKWRITER '+' ['+str(self.start_offset)+'-] BYE')
+        logger.info('CHUNKWRITER ' + ' [' + str(self.start_offset) + '-] BYE')
 
 
     def nextOffsetRequired(self):
@@ -424,23 +490,19 @@ class neiDebridVideoProxyChunkDownloader():
         self.exit = False
         self.chunk_writer = chunk_writer
         
+    
     def run(self):
-        logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+' HELLO')
+        logger.info('CHUNKDOWNLOADER [' + str(self.chunk_writer.start_offset) + '-] ' + str(self.id) + ' HELLO')
 
         def read_complete_partial_chunk(resp, size, bufsize=RESPONSE_READ_CHUNK_SIZE):
-            """Lee exactamente `size` bytes, acumulando hasta llegar o EOF."""
+            """Lee exactamente `size` bytes, acumulando hasta llegar o EOF. Devuelve bytearray."""
             out = bytearray()
-            
             while len(out) < size:
-                
                 chunk = resp.read(min(bufsize, size - len(out)))
-                
                 if not chunk:
                     break
-                
                 out.extend(chunk)
-            
-            return bytes(out)
+            return out
 
         bytes_downloaded = 0
 
@@ -454,39 +516,51 @@ class neiDebridVideoProxyChunkDownloader():
                     required_chunk_size = final - offset + 1
 
                     partial_ranges = self.url.absolute2PartialRanges(offset, final)
-                    
+
                     if not partial_ranges:
                         self.chunk_writer.rejectThisOffset(self, offset)
                         continue
 
+                    # Espera por cola llena bajo el mismo lock
                     with self.chunk_writer.chunk_queue_lock:
                         while (not self.exit and not self.chunk_writer.exit
                                and len(self.chunk_writer.queue) >= MAX_CHUNKS_IN_QUEUE
                                and offset != self.chunk_writer.bytes_written):
                             self.chunk_writer.cv_queue_full.wait(timeout=1)
 
-
                     if not self.chunk_writer.exit and not self.exit:
                         chunk_error = True
-                       
+
                         while not self.exit and not self.chunk_writer.exit and chunk_error:
                             chunk = bytearray()
 
                             for p_offset, p_final, url in partial_ranges:
                                 required_partial_chunk_size = p_final - p_offset + 1
-                                
+
                                 partial_chunk = bytearray()
 
                                 while len(partial_chunk) < required_partial_chunk_size:
                                     try:
-                                        request_headers = {'Range': f'bytes={(p_offset+len(partial_chunk))}-'} #Rango abierto para evitr bug aleatorio Real-Debrid
-                                        
+                                        request_headers = {
+                                            'Range': f'bytes={(p_offset + len(partial_chunk))}-'
+                                        }  # rango abierto (workaround)
                                         request = urllib.request.Request(url, headers=request_headers)
 
                                         with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                                            
-                                            partial_chunk_size_rem = required_partial_chunk_size - len(partial_chunk)
+                                            # PROTECT-200: si el origen ignora Range (200), descartar bytes hasta 'start'
+                                            status = getattr(response, "status", None) or response.getcode()
+                                            start = p_offset + len(partial_chunk)
+                                            if status == 200 and start > 0:
+                                                to_discard = start
+                                                while to_discard > 0:
+                                                    n = min(RESPONSE_READ_CHUNK_SIZE, to_discard)
+                                                    discarded = response.read(n)
+                                                    if not discarded:
+                                                        raise IOError("EOF al descartar bytes (respuesta 200 sin Range).")
+                                                    to_discard -= len(discarded)
 
+                                            # Leer exactamente lo que falta del parcial
+                                            partial_chunk_size_rem = required_partial_chunk_size - len(partial_chunk)
                                             partial_chunk_read = read_complete_partial_chunk(response, partial_chunk_size_rem)
 
                                             if partial_chunk_read:
@@ -507,24 +581,21 @@ class neiDebridVideoProxyChunkDownloader():
                                             f'CHUNKDOWNLOADER {self.id} -> {p_offset}-{p_final} '
                                             f'ERROR {e}, retrying...'
                                         )
-                                        
 
                             if not self.exit and not self.chunk_writer.exit:
                                 if len(chunk) == required_chunk_size:
-                                    
+                                    # Encolar bajo lock + notificar
                                     with self.chunk_writer.chunk_queue_lock:
                                         if not self.exit and not self.chunk_writer.exit:
-                                            self.chunk_writer.queue[offset] = bytes(chunk)
-                                            # ✅ Notificar bajo el mismo lock que protege la cola
+                                            # Puedes elegir encolar bytearray (rendimiento) o congelar con bytes(chunk) (seguridad)
+                                            self.chunk_writer.queue[offset] = chunk
                                             self.chunk_writer.cv_new_element.notify_all()
-
                                     chunk_error = False
                                 else:
                                     logger.debug(
                                         f'CHUNKDOWNLOADER {self.id} -> {offset}-{final} '
                                         f'({len(chunk)} bytes) CHUNK SHORT READ'
                                     )
-
                                     self.chunk_writer.rejectThisOffset(self, offset)
                                     break
                 else:
@@ -538,10 +609,8 @@ class neiDebridVideoProxyChunkDownloader():
                 self.chunk_writer.rejectThisOffset(self, offset)
 
         self.exit = True
-        logger.info('CHUNKDOWNLOADER ['+str(self.chunk_writer.start_offset)+'-] '+str(self.id)+
-                    ' BYE ('+str(bytes_downloaded)+' bytes downloaded)')
-
-
+        logger.info('CHUNKDOWNLOADER [' + str(self.chunk_writer.start_offset) + '-] ' + str(self.id) +
+                    ' BYE (' + str(bytes_downloaded) + ' bytes downloaded)')
 
 
 """
@@ -572,7 +641,7 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
             self.end_headers()
 
-            self.server.shutdown()
+            threading.Thread(target=self.server.shutdown, daemon=True).start()  # <- en hilo aparte
 
         elif self.path.startswith('/isalive'):
             
@@ -606,13 +675,21 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
 
                         if VIDEO_MULTI_DEBRID_URL.multi_urls:
                             for murl in VIDEO_MULTI_DEBRID_URL.multi_urls:
-                                request = urllib.request.Request(murl[2])
+                                request = urllib.request.Request(murl[2], headers=DEFAULT_HEADERS)
                                 with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                                    shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
+                                    try:
+                                        shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
+                                    except BrokenPipeError:
+                                        # Cliente cerró la conexión: terminar silenciosamente
+                                        return
                         else:
-                            request = urllib.request.Request(VIDEO_MULTI_DEBRID_URL.url)
+                            request = urllib.request.Request(VIDEO_MULTI_DEBRID_URL.url, headers=DEFAULT_HEADERS)
                             with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                                shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
+                                try:
+                                    shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
+                                except BrokenPipeError:
+                                    # Cliente cerró la conexión: terminar silenciosamente
+                                    return
 
                 except Exception as ex:
                     logger.info(ex)
@@ -812,29 +889,77 @@ def test_video_exists(page_url):
     return True, ""
 
 
-#Para comprobar si las urls de Real/Alldebrid cacheadas aún funcionan
 def check_debrid_urls(itemlist):
-
+    """
+    Valida URLs Real/AllDebrid cacheadas.
+    - Acepta servidores sin rangos (reproducción lineal).
+    - Si anuncian rangos, verifica con una petición Range real.
+    Devuelve False si alguna URL está caída o inconsistente.
+    """
     try:
         for i in itemlist:
             url = proxy2DebridURL(i[1])
             logger.info(url)
-            request = urllib.request.Request(url, method='HEAD')
-            response = urllib.request.urlopen(request, timeout=HTTP_HEAD_TIMEOUT)
 
-            if response.status != 200 or 'Content-Length' not in response.headers:
-                return False
-            elif 'Accept-Ranges' in response.headers and response.headers['Accept-Ranges']!='none':
-                size = int(response.headers['Content-Length'])
-                request2 = urllib.request.Request(url, headers={'Range': 'bytes='+str(size-1)+'-'+str(size-1)})
-                response2 = urllib.request.urlopen(request2, timeout=DEFAULT_HTTP_TIMEOUT)
+            resp = None
+            status = None
+            size_from_range = None  # tamaño deducido de Content-Range en fallback
 
-                if response2.status != 206:
+            # Intento HEAD
+            try:
+                req = urllib.request.Request(url, method='HEAD', headers=DEFAULT_HEADERS)
+                resp = urllib.request.urlopen(req, timeout=HTTP_HEAD_TIMEOUT)
+                status = getattr(resp, "status", None) or resp.getcode()
+            except urllib.error.HTTPError as e:
+                # Algunos CDNs devuelven 405 a HEAD: fallback GET con Range 0-0
+                if e.code == 405:
+                    req = urllib.request.Request(url, headers={**DEFAULT_HEADERS, 'Range': 'bytes=0-0'})
+                    resp = urllib.request.urlopen(req, timeout=DEFAULT_HTTP_TIMEOUT)
+                    status = getattr(resp, "status", None) or resp.getcode()
+                    if status == 206:
+                        cr = resp.headers.get('Content-Range')  # "bytes 0-0/12345"
+                        if cr and '/' in cr:
+                            try:
+                                size_from_range = int(cr.split('/')[-1])
+                            except Exception:
+                                size_from_range = None
+                else:
                     return False
-    except:
-        return False
 
-    return True
+            if status not in (200, 206):
+                return False
+
+            # Tamaño positivo requerido
+            cl = resp.headers.get('Content-Length')
+            try:
+                size = int(cl) if cl is not None else (size_from_range if size_from_range is not None else -1)
+            except Exception:
+                size = -1
+            if size <= 0:
+                return False
+
+            # ¿Anuncia soporte de rangos?
+            ar = (resp.headers.get('Accept-Ranges') or '').lower()
+            if ar and ar != 'none':
+                # Verificación real del último byte
+                last = size - 1
+                req2 = urllib.request.Request(
+                    url,
+                    headers={**DEFAULT_HEADERS, 'Range': f'bytes={last}-{last}'}
+                )
+                resp2 = urllib.request.urlopen(req2, timeout=DEFAULT_HTTP_TIMEOUT)
+                status2 = getattr(resp2, "status", None) or resp2.getcode()
+                if status2 != 206:
+                    return False
+                if not resp2.read(1):
+                    return False
+            # Si no soporta rangos, válido (reproducción lineal)
+
+        return True
+
+    except Exception as e:
+        logger.debug(f"check_debrid_urls error: {e}")
+        return False
 
 
 #Comprueba la cache de URLS convertidas MEGA/MegaCrypter -> Real/Alldebrid (devuelve True si el enlace no está cacheado)
