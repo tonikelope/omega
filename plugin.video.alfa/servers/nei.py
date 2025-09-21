@@ -365,7 +365,6 @@ class neiDebridVideoProxyChunkWriter():
                     except Exception as ex:
                         logger.info(ex)
                         self.exit = True
-                        break
 
                     # 3) Aplicar el nuevo head bajo el lock para visibilidad inmediata
                     with self.chunk_queue_lock:
@@ -433,6 +432,7 @@ class neiDebridVideoProxyChunkWriter():
                                 logger.debug(f"PARCIAL INCOMPLETO ({p_chunk_read}/{p_length}) en {url}")
 
                         except Exception as e:
+                            self.exit = True
                             logger.debug(f"Error al descargar parcial {url}: {e}")
 
             except Exception as ex:
@@ -677,19 +677,11 @@ class neiDebridVideoProxy(BaseHTTPRequestHandler):
                             for murl in VIDEO_MULTI_DEBRID_URL.multi_urls:
                                 request = urllib.request.Request(murl[2], headers=DEFAULT_HEADERS)
                                 with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                                    try:
-                                        shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
-                                    except BrokenPipeError:
-                                        # Cliente cerró la conexión: terminar silenciosamente
-                                        return
+                                    shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
                         else:
                             request = urllib.request.Request(VIDEO_MULTI_DEBRID_URL.url, headers=DEFAULT_HEADERS)
                             with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
-                                try:
-                                    shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
-                                except BrokenPipeError:
-                                    # Cliente cerró la conexión: terminar silenciosamente
-                                    return
+                                shutil.copyfileobj(response, self.wfile, length=RESPONSE_READ_CHUNK_SIZE)
 
                 except Exception as ex:
                     logger.info(ex)
@@ -953,7 +945,6 @@ def check_debrid_urls(itemlist):
                     return False
                 if not resp2.read(1):
                     return False
-            # Si no soporta rangos, válido (reproducción lineal)
 
         return True
 
