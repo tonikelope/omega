@@ -93,6 +93,12 @@ DEFAULT_HEADERS = {
 
 proxy_server = None
 
+def frena_un_poco(tiempo):
+    try:
+        xbmc.Monitor().waitForAbort(tiempo)
+    except Exception:
+        time.sleep(tiempo)
+
 class HTTPClient:
     def __init__(self, cookies_file=KODI_NEI_COOKIES_PATH, user_agent=None, proxy=None, ignore_config_proxy=False):
         self.cookies_file = cookies_file
@@ -347,21 +353,17 @@ class neiDebridVideoProxyChunkWriter():
 
                 for p_inicio, p_final, url in partial_ranges:
                     p_length = p_final - p_inicio + 1
-                    
-                    success = False
                     p_chunk_read = 0
 
-                    while not success and not self.exit:
+                    while p_chunk_read < p_length and not self.exit:
                         request_headers = {'Range': f'bytes={(p_inicio+p_chunk_read)}-', 'Connection': 'close'} #Rango abierto para evitar bug aleatorio de RealDebrid devolviendo menos bytes
 
                         request = urllib.request.Request(url, headers=request_headers)
                         
                         with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
                             
-                            while p_chunk_read < p_length:
-                                to_read = min(RESPONSE_READ_CHUNK_SIZE, p_length - p_chunk_read)
-                                
-                                p_chunk = response.read(to_read)
+                            while p_chunk_read < p_length and not self.exit:
+                                p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length - p_chunk_read))
 
                                 if not p_chunk:
                                     # EOF inesperado
@@ -371,12 +373,12 @@ class neiDebridVideoProxyChunkWriter():
 
                                 p_chunk_read += len(p_chunk)
 
-                        if p_chunk_read == p_length:
-                            success = True
-                        else:
+                        if p_chunk_read != p_length:
                             logger.debug(f"PARCIAL INCOMPLETO ({p_chunk_read}/{p_length}) en {url}")
+                            frena_un_poco(0.3)
 
             except Exception as ex:
+                logger.debug(f"ERROR en CHUNK {self.start_offset}-{self.end_offset} en {url}")
                 logger.info(ex)
 
             self.exit = True
@@ -438,11 +440,12 @@ class neiDebridVideoProxyChunkDownloader():
             """Lee exactamente `size` bytes, acumulando hasta llegar o EOF."""
             out = bytearray()
             
-            while len(out) < size:
+            while len(out) < size and not self.exit and not self.chunk_writer.exit:
                 
                 chunk = resp.read(min(bufsize, size - len(out)))
                 
                 if not chunk:
+                    #EOF
                     break
                 
                 out.extend(chunk)
@@ -481,10 +484,9 @@ class neiDebridVideoProxyChunkDownloader():
 
                             for p_offset, p_final, url in partial_ranges:
                                 required_partial_chunk_size = p_final - p_offset + 1
-                                
                                 partial_chunk = bytearray()
 
-                                while len(partial_chunk) < required_partial_chunk_size:
+                                while len(partial_chunk) < required_partial_chunk_size and not self.exit and not self.chunk_writer.exit:
                                     try:
                                         request_headers = {'Range': f'bytes={(p_offset+len(partial_chunk))}-', 'Connection': 'close'} #Rango abierto para evitr bug aleatorio Real-Debrid
                                         
@@ -506,34 +508,36 @@ class neiDebridVideoProxyChunkDownloader():
                                                 logger.debug(
                                                     f'CHUNKDOWNLOADER {self.id} -> {p_offset}-{p_final} '
                                                     f'({len(partial_chunk)}/{required_partial_chunk_size} bytes) '
-                                                    f'PARTIAL SHORT READ, retrying...'
+                                                    f'PARCIAL INCOMPLETO, reintentando...'
                                                 )
+                                                
+                                                frena_un_poco(0.3)
 
                                     except Exception as e:
                                         logger.warning(
                                             f'CHUNKDOWNLOADER {self.id} -> {p_offset}-{p_final} '
-                                            f'ERROR {e}, retrying...'
+                                            f'EXCEPCIÓN EN PARCIAL {e}'
                                         )
-                                        
+                                        break
+
+                                if self.exit or self.chunk_writer.exit or len(partial_chunk) != required_partial_chunk_size:
+                                    break
 
                             if not self.exit and not self.chunk_writer.exit:
                                 if len(chunk) == required_chunk_size:
-                                    
                                     with self.chunk_writer.chunk_queue_lock:
                                         if not self.exit and not self.chunk_writer.exit:
                                             self.chunk_writer.queue[offset] = chunk
-                                            # ✅ Notificar bajo el mismo lock que protege la cola
                                             self.chunk_writer.cv_new_element.notify_all()
 
                                     chunk_error = False
                                 else:
                                     logger.debug(
                                         f'CHUNKDOWNLOADER {self.id} -> {offset}-{final} '
-                                        f'({len(chunk)} bytes) CHUNK SHORT READ'
+                                        f'({len(chunk)} bytes) CHUNK INCOMPLETO. Reintentando...'
                                     )
-
-                                    self.chunk_writer.rejectThisOffset(self, offset)
-                                    break
+                                    
+                                    frena_un_poco(0.3)
                 else:
                     with self.chunk_writer.chunk_offset_lock:
                         if len(self.chunk_writer.rejected_offsets) == 0:
