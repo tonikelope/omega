@@ -63,6 +63,10 @@ MAX_URL_RETRIEVE_ERROR = 50
 URL_RETRIEVE_TIMEOUT = 10
 
 
+def is_alfa_installed():
+    return xbmc.getCondVisibility('System.HasAddon(plugin.video.alfa)')
+
+
 def get_omega_nei_proxy():
     omega_data_path = os.path.join(KODI_USERDATA_PATH, 'addon_data', 'plugin.video.alfa', 'settings_channels', 'omega_data.json')
 
@@ -284,34 +288,42 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
 monitor = xbmc.Monitor()
 
 auto_checked = False
+alfa_error = False
 t=0
 
 while not monitor.abortRequested():
 
-    verify_now = (not os.path.exists(ALFA_PATH+"/channels/omega.py") or t==INTEGRITY_AUTO_CHECK_TIME or not auto_checked)
-
-    if verify_now:
-        pbar=None
-
-        try:
-            if not auto_checked or t!=INTEGRITY_AUTO_CHECK_TIME:
-                pbar = xbmcgui.DialogProgressBG()    
-                pbar.create('[B]OMEGA WATCHDOG[/B]' if os.path.exists(ALFA_PATH+"/channels/omega.py") else '[COLOR red][B]OMEGA WATCHDOG[/B][/COLOR]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
-                auto_checked = True
-               
-            check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None), only_critical=os.path.exists(ALFA_PATH+"/channels/omega.py"))
-            
-        except Exception as ex:
-            omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
-            pass
-
-        if pbar:
-            pbar.update(100)
-            pbar.close()
-
-        t=0
-
+    if not is_alfa_installed():
+        if not alfa_error:
+            alfa_error = True
+            xbmcgui.Dialog().ok('OMEGA', "ERROR: NO SE ENCUENTRA EL ADDON ALFA\n\n(ES OBLIGATORIO INSTALAR ALFA PARA QUE OMEGA FUNCIONE)")
     else:
-        t+=1
+        alfa_error = False
+
+        verify_now = (not os.path.exists(ALFA_PATH+"/channels/omega.py") or t==INTEGRITY_AUTO_CHECK_TIME or not auto_checked)
+
+        if verify_now:
+            pbar=None
+
+            try:
+                if not auto_checked or t!=INTEGRITY_AUTO_CHECK_TIME:
+                    pbar = xbmcgui.DialogProgressBG()    
+                    pbar.create('[B]OMEGA WATCHDOG[/B]' if os.path.exists(ALFA_PATH+"/channels/omega.py") else '[COLOR red][B]OMEGA WATCHDOG[/B][/COLOR]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
+                    auto_checked = True
+                   
+                check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None), only_critical=os.path.exists(ALFA_PATH+"/channels/omega.py"))
+                
+            except Exception as ex:
+                omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
+                pass
+
+            if pbar:
+                pbar.update(100)
+                pbar.close()
+
+            t=0
+
+        else:
+            t+=1
 
     monitor.waitForAbort(1)
