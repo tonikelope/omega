@@ -336,7 +336,6 @@ class neiDebridVideoProxyChunkWriter():
                     self.bytes_written += len(current_chunk)
 
             except Exception as ex:
-                omegaNotification("CHUNKWRITER ERROR")
                 logger.info(ex)
 
             self.exit = True
@@ -362,24 +361,30 @@ class neiDebridVideoProxyChunkWriter():
                         request = urllib.request.Request(url, headers=request_headers)
                         
                         with urllib.request.urlopen(request, timeout=DEFAULT_HTTP_TIMEOUT) as response:
+
+                            read_error = False
                             
-                            while p_chunk_read < p_length and not self.exit:
-                                p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length - p_chunk_read))
+                            while not read_error and p_chunk_read < p_length and not self.exit:
+                                
+                                try:
+                                    p_chunk = response.read(min(RESPONSE_READ_CHUNK_SIZE, p_length - p_chunk_read))
 
-                                if not p_chunk:
-                                    # EOF inesperado
-                                    break
+                                    if not p_chunk:
+                                        # EOF inesperado
+                                        break
+                                except Exception as ex:
+                                    read_error = True
+                                    omegaNotification("CHUNKDOWNLOADER ERROR")
 
-                                self.output.write(p_chunk)
-
-                                p_chunk_read += len(p_chunk)
+                                if not read_error:
+                                    self.output.write(p_chunk)
+                                    p_chunk_read += len(p_chunk)
 
                         if p_chunk_read != p_length:
                             logger.debug(f"PARCIAL INCOMPLETO ({p_chunk_read}/{p_length}) en {url}")
                             frena_un_poco(0.3)
 
             except Exception as ex:
-                omegaNotification("CHUNKWRITER ERROR")
                 logger.debug(f"ERROR en CHUNK {self.start_offset}-{self.end_offset} en {url}")
                 logger.info(ex)
 
