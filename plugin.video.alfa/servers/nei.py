@@ -336,6 +336,7 @@ class neiDebridVideoProxyChunkWriter():
                     self.bytes_written += len(current_chunk)
 
             except Exception as ex:
+                omegaNotification("CHUNKWRITER ERROR")
                 logger.info(ex)
 
             self.exit = True
@@ -378,6 +379,7 @@ class neiDebridVideoProxyChunkWriter():
                             frena_un_poco(0.3)
 
             except Exception as ex:
+                omegaNotification("CHUNKWRITER ERROR")
                 logger.debug(f"ERROR en CHUNK {self.start_offset}-{self.end_offset} en {url}")
                 logger.info(ex)
 
@@ -544,6 +546,7 @@ class neiDebridVideoProxyChunkDownloader():
                             self.exit = True
 
             except Exception as ex:
+                omegaNotification(f'CHUNKDOWNLOADER [{self.id}] ERROR')
                 logger.debug(f'CHUNKDOWNLOADER {self.id} -> OFFSET {offset} HTTP ERROR! (¿muchos hilos?)')
                 logger.debug(ex)
                 self.chunk_writer.rejectThisOffset(self, offset)
