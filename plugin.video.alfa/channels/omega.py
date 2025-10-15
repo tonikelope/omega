@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.87"
+CHANNEL_VERSION = "6.88"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -480,6 +480,8 @@ def login(force=False):
 
             omegaNotification("¡Bienvenido " + OMEGA_LOGIN + "!")
 
+            xbmc.executebuiltin("Container.Refresh")
+
             return True
 
     omegaNotification("ERROR AL HACER LOGIN EN NEI")
@@ -634,7 +636,7 @@ def mainlist(item):
         itemlist.append(
             Item(
                 channel=item.channel,
-                title="[COLOR darkorange][B]Habilita tu cuenta de NEI en preferencias (o activa el PROXY HTTP).[/B][/COLOR]",
+                title="[COLOR darkorange][B]Habilita tu cuenta de NEI en preferencias.[/B][/COLOR]",
                 action="settings_nei",
             )
         )
@@ -1108,6 +1110,9 @@ def ajustes(item):
 def force_login(item):
     login(force=True)
     xbmc.executebuiltin("Container.Refresh")
+
+    if xbmcgui.Dialog().yesno(dialog_title(),"SE RECOMIENDA [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI PARA QUE TODOS LOS CAMBIOS TENGAN EFECTO.\n\n¿Quieres [COLOR yellow][B]REINICIAR[/B][/COLOR] KODI ahora mismo?"):
+        xbmc.executebuiltin("RestartApp")
 
 
 def about_omega(item):
