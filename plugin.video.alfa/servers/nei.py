@@ -91,6 +91,8 @@ DEFAULT_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 }
 
+MAX_DEBRID_RETRY = 3
+
 proxy_server = None
 
 def frena_un_poco(tiempo):
@@ -959,26 +961,32 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
 
                 page_url = response[0]
 
-                if OMEGA_REALDEBRID:
-                    urls = realdebrid.get_video_url(page_url)
-                elif OMEGA_ALLDEBRID:
-                    urls = alldebrid.get_video_url(page_url)
-                else:
-                    return []
+                debrid_urls_ok = False
 
-                if urls and len(urls)>0:
+                debrid_retry_count = 0
+
+                while not debrid_urls_ok and debrid_retry_count < MAX_DEBRID_RETRY:
+                    if OMEGA_REALDEBRID:
+                        urls = realdebrid.get_video_url(page_url)
+                    elif OMEGA_ALLDEBRID:
+                        urls = alldebrid.get_video_url(page_url)
+                    else:
+                        return []
+
+                    if urls and len(urls) > 0:
+                        # Comprobamos si TODAS las URLs tienen segundo elemento válido
+                        if all(u[1] for u in urls):
+                            debrid_urls_ok = True
+                        else:
+                            debrid_retry_count += 1
+                    else:
+                        debrid_retry_count += 1
+
+
+                if debrid_urls_ok:
                     for u in urls:
                         u[0]='VIDEO NEIDEBRID'
-
-                        if u[1]:
-                            u[1]=debrid2proxyURL(u[1])
-                        else:
-                            if progress_bar:
-                                close_background_pbar(pbar)
-                            
-                            omegaNotification("DEBRID ERROR")
-                            xbmcgui.Dialog().ok('DEBRID ERROR', "HAY ALGÚN PROBLEMA ENTRE TU SERVICIO DE DEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
-                            return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
+                        u[1]=debrid2proxyURL(u[1])
 
                     pickle.dump(urls, file)
                 else:
@@ -988,6 +996,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                     omegaNotification("DEBRID ERROR")
                     xbmcgui.Dialog().ok('DEBRID ERROR', "HAY ALGÚN PROBLEMA ENTRE TU SERVICIO DE DEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
                     return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
+
     else:
 
         fid = re.sub(r'^.*?#F?!(.*?)!.*$', r'\1', page_url)
@@ -1012,27 +1021,32 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
 
         if not cache or not os.path.isfile(filename_hash):
             with open(filename_hash, "wb") as file:
-                
-                if OMEGA_REALDEBRID:
-                    urls = realdebrid.get_video_url(page_url)
-                elif OMEGA_ALLDEBRID:
-                    urls = alldebrid.get_video_url(page_url)
-                else:
-                    urls = None
 
-                if urls and len(urls)>0:
+                debrid_urls_ok = False
+
+                debrid_retry_count = 0
+
+                while not debrid_urls_ok and debrid_retry_count < MAX_DEBRID_RETRY:
+                    if OMEGA_REALDEBRID:
+                        urls = realdebrid.get_video_url(page_url)
+                    elif OMEGA_ALLDEBRID:
+                        urls = alldebrid.get_video_url(page_url)
+                    else:
+                        return []
+
+                    if urls and len(urls) > 0:
+                        # Comprobamos si TODAS las URLs tienen segundo elemento válido
+                        if all(u[1] for u in urls):
+                            debrid_urls_ok = True
+                        else:
+                            debrid_retry_count += 1
+                    else:
+                        debrid_retry_count += 1
+
+                if debrid_urls_ok:
                     for u in urls:
                         u[0]='VIDEO NEIDEBRID'
-                        
-                        if u[1]:
-                            u[1]=debrid2proxyURL(u[1])
-                        else:
-                            if progress_bar:
-                                close_background_pbar(pbar)
-                            
-                            omegaNotification("DEBRID ERROR")
-                            xbmcgui.Dialog().ok('DEBRID ERROR', "HAY ALGÚN PROBLEMA ENTRE TU SERVICIO DE DEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
-                            return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
+                        u[1]=debrid2proxyURL(u[1])
 
                     pickle.dump(urls, file)
                 else:
