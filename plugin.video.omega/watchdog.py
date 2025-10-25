@@ -254,7 +254,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True, only_critical=T
 
     if not only_critical:
         for non_critical_dir in NON_CRITICAL_ALFA_DIRS:
-            if restore_files(progress_bar, ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
+            if restore_files(progress_bar, ALFA_URL+non_critical_dir, ALFA_PATH+non_critical_dir, sha1_checksums=None):
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
                     progress_bar.update(pbar_counter)
@@ -262,7 +262,7 @@ def check_integrity(progress_bar=None, repair=True, notify=True, only_critical=T
                 non_critical_updated = True
 
         for non_critical_dir in NON_CRITICAL_OMEGA_DIRS:
-            if restore_files(progress_bar, OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None, replace=False):
+            if restore_files(progress_bar, OMEGA_URL+non_critical_dir, OMEGA_PATH+non_critical_dir, sha1_checksums=None):
                 if progress_bar:
                     pbar_counter+=min(pbar_increment, 100-pbar_counter)
                     progress_bar.update(pbar_counter)
