@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.90"
+CHANNEL_VERSION = "6.91"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -1076,7 +1076,7 @@ def ajustes(item):
     itemlist.append(
         Item(
             channel=item.channel,
-            title="[B]VERIFICAR (FULL) INTEGRIDAD DE ALFA/OMEGA[/B]",
+            title="[COLOR yellow][B]VERIFICAR INTEGRIDAD COMPLETA DE ALFA/OMEGA[/B][/COLOR]",
             action="verificar_integridad_omega",
             fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
             thumbnail="special://home/addons/plugin.video.alfa/resources/media/themes/default/thumb_update.png",
