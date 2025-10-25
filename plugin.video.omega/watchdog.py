@@ -311,7 +311,7 @@ while not monitor.abortRequested():
                     pbar.create('[B]OMEGA WATCHDOG[/B]' if os.path.exists(ALFA_PATH+"/channels/omega.py") else '[COLOR red][B]OMEGA WATCHDOG[/B][/COLOR]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
                     auto_checked = True
                    
-                check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None), only_critical=os.path.exists(ALFA_PATH+"/channels/omega.py"))
+                check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None), only_critical=(os.path.exists(ALFA_PATH+"/channels/omega.py" and t!=0)))
                 
             except Exception as ex:
                 omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
