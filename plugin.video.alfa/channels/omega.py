@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.88"
+CHANNEL_VERSION = "6.89"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -874,7 +874,7 @@ def mainlist(item):
                     title="[B]OMEGA " + str(omega_version()) + "_" + CHANNEL_VERSION + "[/B]",
                     action="about_omega",
                     fanart="special://home/addons/plugin.video.omega/resources/fanart.png",
-                    thumbnail="special://home/addons/plugin.video.omega/resources/icon.gif",
+                    thumbnail="special://home/addons/plugin.video.omega/resources/tonikelopeqr.png",
                 )
             )
 
@@ -4605,7 +4605,7 @@ def cleanContentTitle(s):
     s = s.replace("-", " ")
     s = re.sub(r"\( *?\d{4} *?\).*", "", s)
     s = re.sub(r"\[[^\]]+\]", "", s)
-    s = re.sub(r"\.[^.]+(?:\.part.*?)?$", "", s)
+    s = re.sub(r"\.[^ .]+(?:\.part.*?)?$", "", s)
     s = cleanEpisodeNumber(s)
     s = re.sub("^(Saga|Trilog.a|Duolog*a) ", "", s)
     # s = replaceRomansToIntegers(s) ESTO HAY QUE REVISARLO ¿Qué hacemos con las i latinas mayúsculas?
