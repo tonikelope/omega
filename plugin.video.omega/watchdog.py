@@ -287,7 +287,7 @@ if not os.path.exists(xbmcvfs.translatePath('special://home/addons/plugin.video.
 # MONITORS ALFA/OMEGA
 monitor = xbmc.Monitor()
 
-auto_checked = False
+boot_check = False
 alfa_error = False
 t=0
 
@@ -300,19 +300,18 @@ while not monitor.abortRequested():
     else:
         alfa_error = False
 
-        verify_now = (not os.path.exists(ALFA_PATH+"/channels/omega.py") or t==INTEGRITY_AUTO_CHECK_TIME or not auto_checked)
+        verify_now = (not os.path.exists(ALFA_PATH+"/channels/omega.py") or t==INTEGRITY_AUTO_CHECK_TIME or not boot_check)
 
         if verify_now:
             pbar=None
 
             try:
-                if not auto_checked or t!=INTEGRITY_AUTO_CHECK_TIME:
+                if not boot_check:
                     pbar = xbmcgui.DialogProgressBG()    
                     pbar.create('[B]OMEGA WATCHDOG[/B]' if os.path.exists(ALFA_PATH+"/channels/omega.py") else '[COLOR red][B]OMEGA WATCHDOG[/B][/COLOR]', '[B]VERIFICANDO INTEGRIDAD...[/B]')
-                    auto_checked = True
-                   
-                check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None), only_critical=(os.path.exists(ALFA_PATH+"/channels/omega.py" and t!=0)))
-                
+                    
+                check_integrity(progress_bar=pbar, repair=REPAIR_OMEGA_ALFA_STUFF_INTEGRITY, notify=(pbar!=None), only_critical=(os.path.exists(ALFA_PATH+"/channels/omega.py") and boot_check))
+                boot_check = True
             except Exception as ex:
                 omegaNotification("¡ERROR AL VERIFICAR INTEGRIDAD!")
                 pass
