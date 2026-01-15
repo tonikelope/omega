@@ -54,7 +54,7 @@ import http.cookiejar
 import urllib.error
 
 
-CHANNEL_VERSION = "6.91"
+CHANNEL_VERSION = "6.92"
 
 REPAIR_OMEGA_ALFA_STUFF_INTEGRITY = True
 
@@ -6129,9 +6129,9 @@ def extract_title(title):
 
 def extract_quality(title):
     patterns = [
-        {"p": r"\[[^\[\]()]*(UHD|2160)", "q": "UHD"},
-        {"p": r"\[[^\[\]()]*(microHD|720|1080)", "q": "HD"},
         {"p": r"\[[^\[\]()]*(HDrip|DVD)", "q": "SD"},
+        {"p": r"\[[^\[\]()]*(UHD|2160|4K)", "q": "UHD"},
+        {"p": r"\[[^\[\]()]*(microHD|720|1080|HD)", "q": "HD"}
     ]
 
     for p in patterns:
