@@ -994,7 +994,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                         close_background_pbar(pbar)
 
                     omegaNotification("DEBRID ERROR")
-                    xbmcgui.Dialog().ok('DEBRID ERROR', "HAY ALGÚN PROBLEMA ENTRE TU SERVICIO DE DEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
+                    xbmcgui.Dialog().ok('DEBRID ERROR', "HAY ALGÚN PROBLEMA ENTRE TU SERVICIO DE DEBRID Y MEGA\n(REVISA EL ESTADO DE PAGO DE TU SUSCRIPCIÓN O ESPERA UNOS MINUTOS)\n\n[B]Sugerencia: puedes probar a desactivar Real/AllDebrid en ajustes y conectar a MEGA directamente.[/B]")
                     return [["ERROR: REAL/ALLDEBRID <----> MEGA", ""]]
 
     else:
