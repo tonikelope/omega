@@ -3672,9 +3672,6 @@ def foro(item, episode_count_call=False):
 
         for scrapedmsg, scrapedurl, rawscrapedtitle, uploader in matches:
 
-            if OMEGA_LOGIN == 'Pepillo':
-                scrapedurl='https://noestasinvitado.com/hd-espanol/quien-tiene-un-amigo-tiene-un-tesoro-(1981)(brrip-1080p-dual)(comedia-aventuras'
-
             url = urllib.parse.urljoin(item.url, scrapedurl)
 
             custom_title = findCustomTitle(rawscrapedtitle)
