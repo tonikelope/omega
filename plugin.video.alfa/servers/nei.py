@@ -72,8 +72,10 @@ OMEGA_REALDEBRID = config.get_setting("omega_realdebrid", "omega")
 OMEGA_ALLDEBRID = config.get_setting("omega_alldebrid", "omega")
 
 MAX_PBAR_CLOSE_WAIT = 60
-MEGACRYPTER2DEBRID_ENDPOINT = 'https://noestasinvitado.com/megacrypter2debrid.php'
-MEGACRYPTER2DEBRID_TIMEOUT = 300 #Cuando aumente la demanda habrá que implementar en el server de NEI un sistema de polling asíncrono
+MEGACRYPTER2DEBRID_ENDPOINT = 'https://noestasinvitado.com/megacrypter2debridredis.php'
+MEGACRYPTER2DEBRIDCHECK_ENDPOINT = 'https://noestasinvitado.com/megacrypter2debridredischeck.php'
+MEGACRYPTER2DEBRID_RETRY = 90
+MEGACRYPTER2DEBRID_PAUSE = 2
 MEGACRYPTER2DEBRID_MULTI_RETRY = 5
 VIDEO_MULTI_DEBRID_URL = None
 VIDEO_MULTI_DEBRID_URL_LOCK = threading.Lock()
@@ -728,15 +730,13 @@ if OMEGA_REALDEBRID or OMEGA_ALLDEBRID:
 
 
 """
-Este método convierte un enlace de MegaCrypter en un enlace temporal auxiliar de MEGA. 
-Devuelve el enlace de MEGA temporal (compatible con Real/Alldebrid) y un hash del FID de MEGA del fichero original
+This method converts a MegaCrypter link to a temporary auxiliary MEGA link. 
+It uses a polling system to wait for the backend background worker to complete.
 """
 def megacrypter2auxmega(link, clean=True, account=1):
-
     global DEBRID_ACCOUNT_FREE_SPACE
 
     try:
-
         if DEBRID_AUX_MEGA_ACCOUNTS:
             cuenta = DEBRID_AUX_MEGA_ACCOUNTS[account-1]
             email = base64.urlsafe_b64encode(cuenta['email'].encode('utf-8'))
@@ -746,71 +746,85 @@ def megacrypter2auxmega(link, clean=True, account=1):
             password = base64.urlsafe_b64encode(config.get_setting("omega_debrid_mega_password"+str(account), "omega").encode('utf-8'))
 
         megacrypter_link = link.split('#')
-
         link_data = re.sub(r'^.*?(!.+)$', r'\1', megacrypter_link[0])
-
-        noexpire = urllib.parse.quote(megacrypter_link[4]) #Hay que hacerlo así porque el noexpire está en base64 normal (no url safe)
+        noexpire = urllib.parse.quote(megacrypter_link[4]) 
 
         client = HTTPClient()
 
-        mega_link_response = client.get(MEGACRYPTER2DEBRID_ENDPOINT+'?noexpire='+noexpire+'&c='+('1' if clean else '0')+'&l='+link_data+'&email='+email.decode('utf-8').replace('=','')+'&password='+password.decode('utf-8').replace('=',''), timeout=MEGACRYPTER2DEBRID_TIMEOUT)
-
-        logger.info(MEGACRYPTER2DEBRID_ENDPOINT+'?c='+('1' if clean else '0')+'&l='+link_data+'&email='+email.decode('utf-8').replace('=','')+'&password='+password.decode('utf-8').replace('=',''))
-
-        logger.info(mega_link_response)
-
+        # Step 1: Push the job to the backend producer
+        request_url = MEGACRYPTER2DEBRID_ENDPOINT + '?noexpire=' + noexpire + '&c=' + ('1' if clean else '0') + '&l=' + link_data + '&email=' + email.decode('utf-8').replace('=','') + '&password=' + password.decode('utf-8').replace('=','')
+        logger.info("Submitting Job: " + request_url)
+        
+        mega_link_response = client.get(request_url)
         json_response = json.loads(mega_link_response.encode('utf-8').decode('utf-8-sig'))
-
-        logger.info(json_response)
 
         if 'error' in json_response:
             logger.debug(json_response['error'])
             return None
 
-        if 'link' in json_response and 'fid_hash' in json_response:
-            mega_link = json_response['link']
-            
-            fid_hash = json_response['fid_hash']
-            
-            DEBRID_ACCOUNT_FREE_SPACE = int(json_response['free_space'])
+        job_id = json_response.get('job_id')
+        fid_hash = json_response.get('fid_hash')
 
-            return (mega_link, fid_hash)
-        else:
+        if not job_id:
             return None
-    except:
+
+        # Step 2: Poll the status endpoint until the worker finishes
+
+        for attempt in range(MEGACRYPTER2DEBRID_RETRY):
+            time.sleep(MEGACRYPTER2DEBRID_PAUSE)
+            
+            status_response = client.get(MEGACRYPTER2DEBRIDCHECK_ENDPOINT + '?job_id=' + job_id)
+            status_data = json.loads(status_response.encode('utf-8').decode('utf-8-sig'))
+
+            current_status = status_data.get('status')
+            
+            if current_status == 'completed':
+                logger.info(f"Job {job_id} Completed!")
+                mega_link = status_data.get('link')
+                DEBRID_ACCOUNT_FREE_SPACE = int(status_data.get('free_space', 0))
+                return (mega_link, fid_hash)
+            
+            elif current_status == 'failed':
+                logger.debug(f"Job Failed: {status_data.get('error')}")
+                return None
+                
+            # If status is 'pending' or 'processing', the loop continues
+            
+        logger.debug("Job timed out while waiting for completion.")
         return None
 
+    except Exception as e:
+        logger.debug(f"megacrypter2auxmega Exception: {str(e)}")
+        return None
 
 """
-Este método es como el anterior pero no genera el enlaces auxiliar de MEGA, sino 
-que nos devuelve el hash del FID original (para ver si ya lo tenemos cacheado).
+This method only returns the original FID hash without queuing a Docker job.
 """
 def megacrypter2auxmegaHASH(link):
-    megacrypter_link = link.split('#')
+    try:
+        megacrypter_link = link.split('#')
+        link_data = re.sub(r'^.*?(!.+)$', r'\1', megacrypter_link[0])
+        noexpire = urllib.parse.quote(megacrypter_link[4]) 
 
-    link_data = re.sub(r'^.*?(!.+)$', r'\1', megacrypter_link[0])
+        client = HTTPClient()
 
-    noexpire = urllib.parse.quote(megacrypter_link[4]) #Hay que hacerlo así porque el noexpire está en base64 normal (no url safe)
+        # Since no email/password is sent, the new PHP script will instantly return only the hash
+        request_url = MEGACRYPTER2DEBRID_ENDPOINT + '?noexpire=' + noexpire + '&l=' + link_data
+        logger.info("Requesting Hash: " + request_url)
 
-    client = HTTPClient()
+        mega_link_response = client.get(request_url)
+        json_response = json.loads(mega_link_response.encode('utf-8').decode('utf-8-sig'))
 
-    mega_link_response = client.get(MEGACRYPTER2DEBRID_ENDPOINT+'?noexpire='+noexpire+'&l='+link_data, timeout=MEGACRYPTER2DEBRID_TIMEOUT)
+        if 'error' in json_response:
+            logger.debug(json_response['error'])
+            return None
 
-    logger.info(MEGACRYPTER2DEBRID_ENDPOINT+'?l='+link_data)
-
-    logger.info(mega_link_response)
-
-    json_response = json.loads(mega_link_response.encode('utf-8').decode('utf-8-sig'))
-
-    logger.info(json_response)
-
-    if 'error' in json_response:
-        logger.debug(json_response['error'])
+        if 'fid_hash' in json_response:
+            return json_response['fid_hash']
+        
         return None
-
-    if 'fid_hash' in json_response:
-        return json_response['fid_hash']
-    else:
+    except Exception as e:
+        logger.debug(f"megacrypter2auxmegaHASH Exception: {str(e)}")
         return None
 
 
