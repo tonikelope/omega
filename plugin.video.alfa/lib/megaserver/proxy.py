@@ -133,7 +133,8 @@ class MegaProxyServer(Thread):
 
             proxy_pass = base64.b64decode(m.group(1)).split(':')
 
-            logger.info("channels.omega PROXY " + proxy_pass[1] + " " + self.password)
+            # No loguear contraseñas del proxy
+            logger.info("channels.omega PROXY auth recibido")
 
             if proxy_pass[1] == self.password:
 

@@ -753,7 +753,8 @@ def megacrypter2auxmega(link, clean=True, account=1):
 
         # Step 1: Push the job to the backend producer
         request_url = MEGACRYPTER2DEBRID_ENDPOINT + '?noexpire=' + noexpire + '&c=' + ('1' if clean else '0') + '&l=' + link_data + '&email=' + email.decode('utf-8').replace('=','') + '&password=' + password.decode('utf-8').replace('=','')
-        logger.info("Submitting Job: " + request_url)
+        # No loguear request_url en claro: contiene email y password de la cuenta MEGA auxiliar
+        logger.info("Submitting Job: " + re.sub(r'(email|password)=[^&]*', r'\1=***', request_url))
         
         mega_link_response = client.get(request_url)
         json_response = json.loads(mega_link_response.encode('utf-8').decode('utf-8-sig'))

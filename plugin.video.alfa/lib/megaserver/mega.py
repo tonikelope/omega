@@ -217,7 +217,7 @@ class Mega(object):
       
         user_data = self._api_request({'a': 'uq', 'xfer': 1, 'strg': 1, 'pro': 1})
 
-        logger.info(user_data)
+        # No loguear user_data: contiene información sensible de la cuenta MEGA
 
         return user_data
 

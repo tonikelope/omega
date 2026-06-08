@@ -121,7 +121,8 @@ class Client(object):
 
     def __add_url(self, url):
 
-        logger.info(url)
+        # No loguear la URL completa: el fragmento tras '!' es la clave de descifrado del fichero
+        logger.info("MEGA Server adding file: " + url.split('!')[0].split('#')[0])
 
         if '/!' in url:
             url_split = url.split('#')

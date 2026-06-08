@@ -613,13 +613,13 @@ def mega_login(verbose):
                 else "LOGIN EN MEGA (PRO) OK!"
             )
 
-            logger.info("channels.omega " + login_msg + " " + MEGA_EMAIL)
+            logger.info("channels.omega " + login_msg)
 
             if verbose:
                 omegaNotification(login_msg)
         else:
 
-            logger.info("channels.omega ERROR AL HACER LOGIN EN MEGA: " + MEGA_EMAIL)
+            logger.info("channels.omega ERROR AL HACER LOGIN EN MEGA")
 
             if verbose:
                 omegaNotification("ERROR AL HACER LOGIN EN MEGA")
