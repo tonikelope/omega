@@ -848,8 +848,26 @@ def test_video_exists(page_url):
     return True, ""
 
 
-#Para comprobar si las urls de Real/Alldebrid cacheadas aún funcionan
-def check_debrid_urls(itemlist):
+#Devuelve el tamaño esperado (bytes) embebido en un enlace multi-url MegaCrypter/MEGA, o None si no se puede derivar.
+#Formatos:  MegaCrypter -> <...>#<...>#<size>#...    MEGA -> <...>@<size>
+#OJO: solo tiene sentido con enlaces de vídeo TROCEADO (multi-url); en single-url no se usa (queda None).
+def get_expected_video_size(url):
+    try:
+        if 'megacrypter.noestasinvitado' in url:
+            return int(url.split('#')[2])
+        else:
+            return int(url.split('@')[1])
+    except:
+        return None
+
+
+#Para comprobar si las urls de Real/Alldebrid cacheadas aún funcionan.
+#IMPORTANTE: RealDebrid puede devolver cabeceras 200/206 "cacheadas" en su CDN aunque el
+#fichero MEGA auxiliar de origen ya no exista (enlace caducado). Por eso NO basta con mirar
+#el status: hay que LEER de verdad un byte para forzar a RD a servir datos reales del origen.
+#Si se pasa expected_size, además se comprueba que el Content-Length coincide (detecta trozos
+#truncados/sustituidos, típico en vídeos multi-url cuyas cuentas MEGA auxiliares se limpian entre sesiones).
+def check_debrid_urls(itemlist, expected_size=None):
 
     try:
         for i in itemlist:
@@ -860,13 +878,29 @@ def check_debrid_urls(itemlist):
 
             if response.status != 200 or 'Content-Length' not in response.headers:
                 return False
-            elif 'Accept-Ranges' in response.headers and response.headers['Accept-Ranges']!='none':
-                size = int(response.headers['Content-Length'])
+
+            size = int(response.headers['Content-Length'])
+
+            #Blindaje multi-url: si conocemos el tamaño esperado del trozo, debe coincidir exactamente.
+            if expected_size is not None and size != expected_size:
+                logger.info('DEBRID CHECK: tamaño no coincide (%s != %s) -> se considera caducado' % (size, expected_size))
+                return False
+
+            if 'Accept-Ranges' in response.headers and response.headers['Accept-Ranges']!='none':
+                #Soporta rangos: pedimos el ÚLTIMO byte y LO LEEMOS de verdad (fuerza a RD a entregar datos reales del origen MEGA).
                 request2 = urllib.request.Request(url, headers={'Range': 'bytes='+str(size-1)+'-'+str(size-1)})
                 response2 = urllib.request.urlopen(request2, timeout=DEFAULT_HTTP_TIMEOUT)
 
-                if response2.status != 206:
+                if response2.status != 206 or len(response2.read(1)) != 1:
                     return False
+            else:
+                #No soporta rangos: al menos confirmamos que entrega datos reales desde el inicio (leemos 1 byte y cerramos).
+                response2 = urllib.request.urlopen(urllib.request.Request(url), timeout=DEFAULT_HTTP_TIMEOUT)
+
+                if response2.status != 200 or len(response2.read(1)) != 1:
+                    return False
+
+                response2.close()
     except:
         return False
 
@@ -874,7 +908,7 @@ def check_debrid_urls(itemlist):
 
 
 #Comprueba la cache de URLS convertidas MEGA/MegaCrypter -> Real/Alldebrid (devuelve True si el enlace no está cacheado)
-def neiURL2DEBRIDCheckCache(page_url):
+def neiURL2DEBRIDCheckCache(page_url, expected_size=None):
 
     if 'megacrypter.noestasinvitado' in page_url:
 
@@ -893,7 +927,7 @@ def neiURL2DEBRIDCheckCache(page_url):
                 except:
                     urls = None
 
-            return not urls or not check_debrid_urls(urls)
+            return not urls or not check_debrid_urls(urls, expected_size)
         else:
             return True
     else:
@@ -912,7 +946,7 @@ def neiURL2DEBRIDCheckCache(page_url):
                 except:
                     urls = None
 
-            return not urls or not check_debrid_urls(urls)
+            return not urls or not check_debrid_urls(urls, expected_size)
         else:
             return True
 
@@ -927,7 +961,7 @@ def getDebridServiceString():
 
 
 #Este método convierte un enlace de noestasinvitado.com MEGA/MegaCrypter en uno de Real/Alldebrid ("proxyficado" para el reproductor de KODI)
-def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1):
+def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1, expected_size=None):
 
     global DEBRID_ACCOUNT_FREE_SPACE
 
@@ -955,7 +989,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                 except:
                     urls = None
 
-            urls_ok=(urls and check_debrid_urls(urls))
+            urls_ok=(urls and check_debrid_urls(urls, expected_size))
 
             if urls_ok:
                 logger.info('DEBRID USANDO CACHE -> '+fid_hash)
@@ -1027,7 +1061,7 @@ def neiURL2DEBRID(page_url, clean=True, cache=True, progress_bar=True, account=1
                 except:
                     urls = None
        
-            urls_ok=(urls and check_debrid_urls(urls))
+            urls_ok=(urls and check_debrid_urls(urls, expected_size))
 
             if urls_ok:
                 logger.info('DEBRID USANDO CACHE -> '+fid_hash)
@@ -1134,7 +1168,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
             while i<len(page_urls) and not cache_error:
                 url = base64.b64decode(page_urls[i].encode('utf-8')).decode('utf-8')
-                cache_error = neiURL2DEBRIDCheckCache(url)
+                cache_error = neiURL2DEBRIDCheckCache(url, expected_size=get_expected_video_size(url))
                 i+=1
 
             i = 1
@@ -1178,7 +1212,7 @@ def get_video_url(page_url, premium=False, user="", password="", video_password=
 
                 while megacrypter2debrid_error and retry<MEGACRYPTER2DEBRID_MULTI_RETRY:
 
-                    debrid_url = neiURL2DEBRID(url, clean=clean, cache=use_cache, progress_bar=False, account=account)
+                    debrid_url = neiURL2DEBRID(url, clean=clean, cache=use_cache, progress_bar=False, account=account, expected_size=current_video_size)
 
                     if debrid_url[0][1] and debrid_url[0][1].strip():
                         megacrypter2debrid_error = False
